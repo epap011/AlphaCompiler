@@ -24,7 +24,7 @@ enum operator{
     LT,
     GTE,
     LTE
-}
+};
 
 enum keyword{
     IF,
@@ -42,7 +42,22 @@ enum keyword{
     TRUE,
     FALSE,
     NIL
-}
+};
+
+enum punctuation{
+    LBRACE,
+    RBRACE,
+    LCBRACE,
+    RCBRACE,
+    LPAR,
+    RPAR,
+    SEMI,
+    COMMA,
+    COLON,
+    DCOLON,
+    DOT,
+    DDOT
+};
 
 struct alpha_token_t {
   unsigned int     numline;
