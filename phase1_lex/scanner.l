@@ -1,7 +1,7 @@
 /*Options*/
 %option yylineno 
-%option outfile = "scanner.c"
 %option noyywrap
+%option outfile = "scanner.c"
 
 %{
     #include <stdio.h>
@@ -27,14 +27,28 @@ undefined   .
 {intVal}     {fprintf(stderr, "%d:  #%d \"%s\" CONST_INT \n",yylineno, ++tkn_counter, yytext);}
 {RealVal}    {fprintf(stderr, "%d:  #%d \"%s\" CONST_REAL \n",yylineno, ++tkn_counter, yytext);}
 {comment1}   {fprintf(stderr, "%d:  #%d \"%s\" LINE_COMMENT \n",yylineno, ++tkn_counter, yytext);}
-\n           {yylineno++;}
+\n           {yylineno++;} 
+"="  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"+"  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"-"  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"*"  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"/"  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"%"  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"==" {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"!=" {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"++" {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"--" {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+">"  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"<"  {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+">=" {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
+"<=" {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR \n",yylineno, ++tkn_counter, yytext);}
 %%
 
 struct alpha_token_t {          //to struct pou dinei stin erwtisi 8
-  unsigned int     numline;
-  unsigned int     numToken;
-  char          *content;
-  char          *type;
+  unsigned int numline;
+  unsigned int numToken;
+  char         *content;
+  char         *type;
   struct alpha_token_t *alpha_yylex;
 
 };
