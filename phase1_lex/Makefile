@@ -1,6 +1,6 @@
 all:
-	make analyzer.c analyzer
-analyzer.c: scanner.l
+	make scanner.c scanner
+scanner.c: scanner.l
 	flex -o $@ -i scanner.l
-analyzer: analyzer.c
+scanner: scanner.c
 	gcc -o $@ $<
