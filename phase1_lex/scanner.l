@@ -53,6 +53,19 @@ undefined   .
 "false"    {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD \n",yylineno, ++tkn_counter, yytext);}
 "nil"      {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD \n",yylineno, ++tkn_counter, yytext);}
 
+"{"  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+"}"  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+"["  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+"]"  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+"("  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+")"  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+";"  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+","  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+":"  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+"::" {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+"."  {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+".." {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION \n",yylineno, ++tkn_counter, yytext);}
+
 {id}         {fprintf(stderr, "%d:  #%d \"%s\" ID \n",yylineno, ++tkn_counter, yytext);}
 {string}     {fprintf(stderr, "%d:  #%d \"%s\" STRING \n",yylineno, ++tkn_counter, yytext);}
 {intVal}     {fprintf(stderr, "%d:  #%d \"%s\" CONST_INT \n",yylineno, ++tkn_counter, yytext);}
