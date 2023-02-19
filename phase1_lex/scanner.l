@@ -5,6 +5,9 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>    
+
+    /*To be modified, to add token to list*/
+    #define TOKEN(str,lc,tkn,text) (fprintf(stderr, "%d:  #%d \"%s\str,lc,tkn,text))
     
     int  tkn_counter  = 0;
     int  line_counter = 1;
@@ -46,55 +49,55 @@ undefined [^ \n \t]
 
 /*Rules*/
 %%
-"="          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR ASSIGN <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"+"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR PLUS <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"-"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR MINUS <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"*"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR MUL <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"/"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR SLASH <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"%"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR MOD <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"=="         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR EQ <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"!="         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR NEQ <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"++"         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR INC <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"--"         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR DEC <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-">"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR GT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"<"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR LT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-">="         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR GTE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"<="         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" OPERATOR LTE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }   
+"="          {if(!comm_counter) {TOKEN(" OPERATOR ASSIGN <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"+"          {if(!comm_counter) {TOKEN(" OPERATOR PLUS <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"-"          {if(!comm_counter) {TOKEN(" OPERATOR MINUS <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"*"          {if(!comm_counter) {TOKEN(" OPERATOR MUL <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"/"          {if(!comm_counter) {TOKEN(" OPERATOR SLASH <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"%"          {if(!comm_counter) {TOKEN(" OPERATOR MOD <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"=="         {if(!comm_counter) {TOKEN(" OPERATOR EQ <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"!="         {if(!comm_counter) {TOKEN(" OPERATOR NEQ <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"++"         {if(!comm_counter) {TOKEN(" OPERATOR INC <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"--"         {if(!comm_counter) {TOKEN(" OPERATOR DEC <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+">"          {if(!comm_counter) {TOKEN(" OPERATOR GT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"<"          {if(!comm_counter) {TOKEN(" OPERATOR LT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+">="         {if(!comm_counter) {TOKEN(" OPERATOR GTE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"<="         {if(!comm_counter) {TOKEN(" OPERATOR LTE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }   
 
-"if"         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD IF <-enumerated \n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"else"       {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD ELSE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"while"      {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD WHILE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"for"        {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD FOR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"function"   {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD FUNCTION <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"return"     {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD RETURN <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"break"      {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD BREAK <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"continue"   {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD CONTINUE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"and"        {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD AND <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"not"        {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD NOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"or"         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD OR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"local"      {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD LOCAL <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"true"       {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD TRUE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"false"      {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD FALSE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"nil"        {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" KEYWORD NIL <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }  
+"if"         {if(!comm_counter) {TOKEN(" KEYWORD IF <-enumerated \n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"else"       {if(!comm_counter) {TOKEN(" KEYWORD ELSE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"while"      {if(!comm_counter) {TOKEN(" KEYWORD WHILE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"for"        {if(!comm_counter) {TOKEN(" KEYWORD FOR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"function"   {if(!comm_counter) {TOKEN(" KEYWORD FUNCTION <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"return"     {if(!comm_counter) {TOKEN(" KEYWORD RETURN <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"break"      {if(!comm_counter) {TOKEN(" KEYWORD BREAK <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"continue"   {if(!comm_counter) {TOKEN(" KEYWORD CONTINUE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"and"        {if(!comm_counter) {TOKEN(" KEYWORD AND <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"not"        {if(!comm_counter) {TOKEN(" KEYWORD NOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"or"         {if(!comm_counter) {TOKEN(" KEYWORD OR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"local"      {if(!comm_counter) {TOKEN(" KEYWORD LOCAL <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"true"       {if(!comm_counter) {TOKEN(" KEYWORD TRUE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"false"      {if(!comm_counter) {TOKEN(" KEYWORD FALSE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"nil"        {if(!comm_counter) {TOKEN(" KEYWORD NIL <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }  
 
-"{"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION LCBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"}"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION RCBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"["          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION LBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"]"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION RBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"("          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION LPAR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-")"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION RPAR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-";"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION SEMI <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-","          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION COMMA <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-":"          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION COLON <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"::"         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION DCOLON <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-"."          {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION DOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
-".."         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" PUNCTUATION DDOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"{"          {if(!comm_counter) {TOKEN(" PUNCTUATION LCBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"}"          {if(!comm_counter) {TOKEN(" PUNCTUATION RCBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"["          {if(!comm_counter) {TOKEN(" PUNCTUATION LBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"]"          {if(!comm_counter) {TOKEN(" PUNCTUATION RBRACE <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"("          {if(!comm_counter) {TOKEN(" PUNCTUATION LPAR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+")"          {if(!comm_counter) {TOKEN(" PUNCTUATION RPAR <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+";"          {if(!comm_counter) {TOKEN(" PUNCTUATION SEMI <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+","          {if(!comm_counter) {TOKEN(" PUNCTUATION COMMA <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+":"          {if(!comm_counter) {TOKEN(" PUNCTUATION COLON <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"::"         {if(!comm_counter) {TOKEN(" PUNCTUATION DCOLON <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+"."          {if(!comm_counter) {TOKEN(" PUNCTUATION DOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+".."         {if(!comm_counter) {TOKEN(" PUNCTUATION DDOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 
-{id}         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" ID \"%s\" <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{id}         {if(!comm_counter) {TOKEN(" ID \"%s\" <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
 {string}     {if(!comm_counter) {fprintf(stderr, "%d:  #%d %s STRING %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{intVal}     {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" CONST_INT %s <-int\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{RealVal}    {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" CONST_REAL %s <-real\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{comment1}   {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" LINE_COMMENT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+{intVal}     {if(!comm_counter) {TOKEN(" CONST_INT %s <-int\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{RealVal}    {if(!comm_counter) {TOKEN(" CONST_REAL %s <-real\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{comment1}   {if(!comm_counter) {TOKEN(" LINE_COMMENT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 
 {comment2o} {
                 comm_counter++;
@@ -112,7 +115,7 @@ undefined [^ \n \t]
                 }
                 else if(!comm_counter){
                     comment=commcat(comment,yytext);
-                    fprintf(stderr, "%d:  #%d \"%s\" BLOCK_COMMENT <-enumerated\n", comm_line, ++tkn_counter, comment);
+                    TOKEN(" BLOCK_COMMENT <-enumerated\n", comm_line, ++tkn_counter, comment);
                     free(comment);
                 }
                 else{
