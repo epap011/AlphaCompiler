@@ -5,9 +5,10 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>    
+    #include "tokens.h"
 
     /*To be modified, to add token to list*/
-    #define TOKEN(str,lc,tkn,text) (fprintf(stderr, "%d:  #%d \"%s\str,lc,tkn,text))
+    #define TOKEN(str,lc,tkn,text) (fprintf(stderr, "%d:  #%d \"%s\"%s",lc,tkn,text,str))
     
     int  tkn_counter  = 0;
     int  line_counter = 1;
@@ -33,14 +34,14 @@
     }
 
     /*List of tokens to be written by the analyzer*/
-    alpha_token_t head,tail;
+    alpha_token_t *head,*tail;
 
-    void insert_token(int numline,int numToken, char *content, enum type){
+    void insert_token(int numline,int numToken, char *content, enum type tType){
         if(tail){
             tail->next=malloc(sizeof(alpha_token_t));
             tail->next->numline=numline;
-            tail->next->numToken=numtoken;
-            tail->next->type=type;
+            tail->next->numToken=numToken;
+            tail->next->tType=tType;
             tail->next->content=malloc(sizeof(char)*strlen(content) + 1);
             memcpy(tail->next->content, content, strlen(content) + 1);
             tail=tail->next;
@@ -49,8 +50,8 @@
         else{
             head=malloc(sizeof(alpha_token_t));
             head->numline=numline;
-            head->numToken=numtoken;
-            head->type=type;
+            head->numToken=numToken;
+            head->tType=tType;
             head->content=malloc(sizeof(char)*strlen(content) + 1);
             memcpy(head->content, content, strlen(content) + 1);
             tail->next=NULL;
@@ -120,10 +121,10 @@ undefined [^ \n \t]
 "."          {if(!comm_counter) {TOKEN(" PUNCTUATION DOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 ".."         {if(!comm_counter) {TOKEN(" PUNCTUATION DDOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 
-{id}         {if(!comm_counter) {TOKEN(" ID \"%s\" <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{string}     {if(!comm_counter) {fprintf(stderr, "%d:  #%d %s STRING %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{intVal}     {if(!comm_counter) {TOKEN(" CONST_INT %s <-int\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{RealVal}    {if(!comm_counter) {TOKEN(" CONST_REAL %s <-real\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{id}         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" ID %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{string}     {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" STRING %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{intVal}     {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" CONST_INT %s <-int\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{RealVal}    {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" CONST_REAL %s <-real\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
 {comment1}   {if(!comm_counter) {TOKEN(" LINE_COMMENT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 
 {comment2o} {
