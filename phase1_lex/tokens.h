@@ -6,7 +6,8 @@ enum type{
     OPERATOR,
     KEYWORD,
     PUNCTUATION,
-    COMMENT
+    COMMENT,
+    UNDEFCHR
 };
 
 enum operator{
