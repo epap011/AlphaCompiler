@@ -5,6 +5,7 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>    
+    #include <string.h>
     #include "tokens.h"
 
     /*To be modified, to add token to list*/
@@ -44,7 +45,7 @@ intVal    [0-9]+
 RealVal   {intVal}+"."{intVal}+
 id        [a-zA-Z][a-zA-Z_0-9]* 
 string    \"[^\n"]*\"
-comment1  "//".*
+comment1  "//"[^*].*
 comment2o "/\*"
 comment2c "\*/"
 blanks    [\t \v]
@@ -100,7 +101,18 @@ undefined [^ \n\t\r]
 {string}     {if(!comm_counter) {fprintf(yyout, "%d:  #%d %s STRING %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
 {intVal}     {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" CONST_INT %s <-int\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
 {RealVal}    {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" CONST_REAL %s <-real\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{comment1}   {if(!comm_counter) {TOKEN(" LINE_COMMENT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
+{comment1}   {
+                if(comm_counter > 0) { //single line comment is inside a block comment
+                    REJECT;
+                }
+
+                if(!comm_counter) {
+                    TOKEN(" LINE_COMMENT <-enumerated\n",line_counter, ++tkn_counter, yytext);
+                } 
+                else {
+                    comment=commcat(comment,yytext);
+                } 
+}
 
 {comment2o} {
                 comm_counter++;
@@ -116,7 +128,7 @@ undefined [^ \n\t\r]
                     /*revert chars*/
                     REJECT;
                 }
-                else if(!comm_counter){
+                else if(!comm_counter){ 
                     comment=commcat(comment,yytext);
                     TOKEN(" BLOCK_COMMENT <-enumerated\n", comm_line, ++tkn_counter, comment);
                     free(comment);
@@ -130,6 +142,16 @@ undefined [^ \n\t\r]
 
 {undefined}  {if(!comm_counter) {fprintf(stderr, "%d:  Undefined character \"%s\"\n",line_counter, yytext);} else {comment=commcat(comment,yytext);} }
 \n           {line_counter++; if(comm_counter){comment=commcat(comment,"\\n");}} 
+
+<<EOF>>      {
+                if(comm_counter){
+                    comment=commcat(comment,yytext);
+                    TOKEN(" BLOCK_COMMENT <-enumerated\n", comm_line, ++tkn_counter, comment);
+                    free(comment);
+                    return 1;
+                }
+                return 0;
+             }
 %%
 
 
