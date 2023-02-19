@@ -61,11 +61,15 @@ enum punctuation{
 };
 
 struct alpha_token_t {
-  unsigned int     numline;
-  unsigned int     numToken;
-  char          *content;
-  enum type     tType;
-  struct alpha_token_t *next;
+    unsigned int numline;
+    unsigned int numToken;
+    char         *content;
+    enum type    tType;
+    struct alpha_token_t *next;
+    struct alpha_token_t *head;
+    struct alpha_token_t *tail;
 };
 
 typedef struct alpha_token_t alpha_token_t;
+
+void insert_token(alpha_token_t *tokenList, int numline,int numToken, char *content, enum type tType);
