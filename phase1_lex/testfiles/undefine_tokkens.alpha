@@ -1,8 +1,0 @@
-//Illegal chars $, _d, ~, ?, #, &&, ||, !
-$ agnwstos xarakthras _d %s
-
-bool_expr = !(a && b) || b
-~	
-a = (a ? b : 12);
-# undefine tokken
-
