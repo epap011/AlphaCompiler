@@ -64,7 +64,7 @@ struct alpha_token_t {
   unsigned int     numline;
   unsigned int     numToken;
   char          *content;
-  enum          type;
+  enum type     tType;
   struct alpha_token_t *next;
 };
 
