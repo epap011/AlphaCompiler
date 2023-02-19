@@ -8,7 +8,7 @@
     #include "tokens.h"
 
     /*To be modified, to add token to list*/
-    #define TOKEN(str,lc,tkn,text) (fprintf(stderr, "%d:  #%d \"%s\"%s",lc,tkn,text,str))
+    #define TOKEN(str,lc,tkn,text) (fprintf(yyout, "%d:  #%d \"%s\"%s",lc,tkn,text,str))
     
     int  tkn_counter  = 0;
     int  line_counter = 1;
@@ -47,8 +47,8 @@ string    \"[^\n"]*\"
 comment1  "//".*
 comment2o "/\*"
 comment2c "\*/"
-blanks    [ \t \v]
-undefined [^ \n \t]
+blanks    [\t \v]
+undefined [^ \n\t\r]
 
 /*Rules*/
 %%
@@ -96,10 +96,10 @@ undefined [^ \n \t]
 "."          {if(!comm_counter) {TOKEN(" PUNCTUATION DOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 ".."         {if(!comm_counter) {TOKEN(" PUNCTUATION DDOT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 
-{id}         {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" ID %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{string}     {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" STRING %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{intVal}     {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" CONST_INT %s <-int\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{RealVal}    {if(!comm_counter) {fprintf(stderr, "%d:  #%d \"%s\" CONST_REAL %s <-real\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{id}         {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" ID \"%s\" <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{string}     {if(!comm_counter) {fprintf(yyout, "%d:  #%d %s STRING %s <-char*\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{intVal}     {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" CONST_INT %s <-int\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+{RealVal}    {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" CONST_REAL %s <-real\n",line_counter, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
 {comment1}   {if(!comm_counter) {TOKEN(" LINE_COMMENT <-enumerated\n",line_counter, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 
 {comment2o} {
