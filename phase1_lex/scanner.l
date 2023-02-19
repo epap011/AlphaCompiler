@@ -32,6 +32,33 @@
         return result;
     }
 
+    /*List of tokens to be written by the analyzer*/
+    alpha_token_t head,tail;
+
+    void insert_token(int numline,int numToken, char *content, enum type){
+        if(tail){
+            tail->next=malloc(sizeof(alpha_token_t));
+            tail->next->numline=numline;
+            tail->next->numToken=numtoken;
+            tail->next->type=type;
+            tail->next->content=malloc(sizeof(char)*strlen(content) + 1);
+            memcpy(tail->next->content, content, strlen(content) + 1);
+            tail=tail->next;
+            tail->next=NULL;
+        }
+        else{
+            head=malloc(sizeof(alpha_token_t));
+            head->numline=numline;
+            head->numToken=numtoken;
+            head->type=type;
+            head->content=malloc(sizeof(char)*strlen(content) + 1);
+            memcpy(head->content, content, strlen(content) + 1);
+            tail->next=NULL;
+            head=tail;
+        }
+
+    }
+
    // #define YY_DECL int alpha_yylex(alpha_token_t* ylval) //to prototype pou zitaei i askisi (ewrwtiseis 7)
 %}
 
