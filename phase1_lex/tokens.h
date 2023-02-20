@@ -10,7 +10,8 @@ enum type{
     UNDEFCHR
 };
 
-enum operator{
+enum subtype{
+    /*Operators*/
     ASSIGN,
     PLUS,
     MINUS,
@@ -24,10 +25,8 @@ enum operator{
     GT,
     LT,
     GTE,
-    LTE
-};
-
-enum keyword{
+    LTE,
+    /*Keywords*/
     IF,
     ELSE,
     WHILE,
@@ -42,10 +41,8 @@ enum keyword{
     LOCAL,
     TRUE,
     FALSE,
-    NIL
-};
-
-enum punctuation{
+    NIL,
+    /*Punctuation*/
     LBRACE,
     RBRACE,
     LCBRACE,
@@ -60,11 +57,13 @@ enum punctuation{
     DDOT
 };
 
+
 struct alpha_token_t {
     unsigned int numline;
     unsigned int numToken;
     char         *content;
     enum type    tType;
+    enum subtype sType;
     struct alpha_token_t *next;
     struct alpha_token_t *head;
     struct alpha_token_t *tail;
