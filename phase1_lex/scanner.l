@@ -30,9 +30,8 @@
 /*Macros (Regex)*/
 intVal    [0-9]+
 RealVal   {intVal}+"."{intVal}+
-id        [a-zA-Z][a-zA-Z_0-9]* 
-/*TODO: na ftiaksoume to Regex etsi wste na anagnwrizei to \" (opws zitaei stin ekfwnisi)*/
-string    \"[^\n"]*\"
+id        [a-zA-Z][a-zA-Z_0-9]*
+string    \"(\\.|[^"\\])*\"
 comment1  "//"[^*].*
 comment2o "/\*"
 comment2c "\*/"
