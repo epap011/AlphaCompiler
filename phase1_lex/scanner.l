@@ -20,20 +20,8 @@
     int   comm_line;
     char* comment;
 
-    char* commcat(char* comm, char *cat) {
-        size_t comm_len = comm ? strlen(comm) : 0;
-        size_t cat_len = strlen(cat);
-        char* result = malloc(comm_len + cat_len + 1);
-        if (!result) {
-            fprintf(stderr, "Failed to allocate memory for concatenated string\n");
-            exit(1);
-        }
-        if (comm_len > 0) {
-            memcpy(result, comm, comm_len);
-        }
-        memcpy(result + comm_len, cat, cat_len + 1);
-        return result;
-    }
+    char* replace_escape_chars(char *str, int yyleng);
+    char* commcat(char* comm, char *cat);
 
     /*List of tokens to be written by the analyzer*/
     struct alpha_token_t *tokenList;
@@ -45,6 +33,7 @@
 intVal    [0-9]+
 RealVal   {intVal}+"."{intVal}+
 id        [a-zA-Z][a-zA-Z_0-9]* 
+/*TODO: na ftiaksoume to Regex etsi wste na anagnwrizei to \" (opws zitaei stin ekfwnisi)*/
 string    \"[^\n"]*\"
 comment1  "//"[^*].*
 comment2o "/\*"
@@ -99,9 +88,18 @@ undefined [^ \n\t\r]
 ".."         {if(!comm_counter) {TOKEN(" PUNCTUATION DDOT <-enumerated\n",yylineno, ++tkn_counter, yytext);} else {comment=commcat(comment,yytext);} }
 
 {id}         {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" ID \"%s\" <-char*\n",yylineno, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
-{string}     {if(!comm_counter) {fprintf(yyout, "%d:  #%d %s STRING %s <-char*\n",yylineno, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
 {intVal}     {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" CONST_INT %s <-int\n",yylineno, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
 {RealVal}    {if(!comm_counter) {fprintf(yyout, "%d:  #%d \"%s\" CONST_REAL %s <-real\n",yylineno, ++tkn_counter, yytext, yytext);} else {comment=commcat(comment,yytext);} }
+
+{string}     {
+                if(!comm_counter) {
+                    yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote
+                    fprintf(yyout, "%d:  #%d \"%s\" STRING \"%s\" <-char*\n",yylineno, ++tkn_counter, yytext, yytext);
+                } 
+                    else 
+                        comment=commcat(comment,yytext);
+            }
+
 {comment1}   {
                 if(comm_counter > 0) { //single line comment is inside a block comment
                     REJECT;
@@ -113,7 +111,7 @@ undefined [^ \n\t\r]
                 else {
                     comment=commcat(comment,yytext);
                 } 
-}
+            }
 
 {comment2o} {
                 comm_counter++;
@@ -155,6 +153,66 @@ undefined [^ \n\t\r]
              }
 %%
 
+/*This function is used to process the string and replace any escape character with their actual value*/
+char * replace_escape_chars(char* str, int length){
+
+    str[length - 1] = '\0'; //remove the last quote as well
+
+    char *new_str = malloc(length);
+
+    int  i = 0, j = 0;
+
+    while(str[i] != '\0'){
+
+        if(str[i] == '\\'){ 
+            switch(str[++i]){
+                case 'n': 
+                    new_str[j] = '\n';
+                    break;
+                case 't':
+                    new_str[j] = '\t';
+                    break;
+                case 'r':
+                    new_str[j] = '\r';
+
+                    break;
+                case '\\': 
+                    new_str[j] = '\\';
+                    break;
+                case '"':
+                    new_str[j] = '"';
+                    break;
+                case '\'':              //auto einai peritto? (afou stin glwsa mas den uparxei mono quote den exoume logo kaneis nato kanei escape??)
+                    new_str[j] = '\'';
+                    break;
+                default:            /*Invalid escape character, we leave it as it is*/
+                    new_str[j] = str[i-1];
+                    new_str[++j] = str[i];
+                    break;
+            }          
+        }
+        else
+            new_str[j] = str[i];
+        
+        i++; j++;
+    }
+    return new_str;
+}
+
+char* commcat(char* comm, char *cat) {
+        size_t comm_len = comm ? strlen(comm) : 0;
+        size_t cat_len = strlen(cat);
+        char* result = malloc(comm_len + cat_len + 1);
+        if (!result) {
+            fprintf(stderr, "Failed to allocate memory for concatenated string\n");
+            exit(1);
+        }
+        if (comm_len > 0) {
+            memcpy(result, comm, comm_len);
+        }
+        memcpy(result + comm_len, cat, cat_len + 1);
+        return result;
+    }
 
 int main(int argc, char** argv){
 
