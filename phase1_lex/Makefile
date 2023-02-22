@@ -14,4 +14,4 @@ scanner: scanner.o token.o
 	gcc -o $@ $^
 
 clean:
-	rm -f scanner scanner.c *.o
+	rm -f scanner scanner.c
