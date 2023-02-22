@@ -1,7 +1,6 @@
 enum type{
     STRING,
-    INTCONST,
-    REALCONST,
+    NUMBER,
     IDENT,
     OPERATOR,
     KEYWORD,
@@ -54,9 +53,16 @@ enum subtype{
     COLON,
     DCOLON,
     DOT,
-    DDOT
+    DDOT,
+    /*Numbers*/
+    INTCONST,
+    REALCONST,
+    /*Comments*/
+    LINECOMM,
+    BLOCKCOMM,
+    /*Invalid value*/
+    NOSTYPE
 };
-
 
 struct alpha_token_t {
     unsigned int numline;
@@ -65,10 +71,17 @@ struct alpha_token_t {
     enum type    tType;
     enum subtype sType;
     struct alpha_token_t *next;
-    struct alpha_token_t *head;
-    struct alpha_token_t *tail;
 };
 
 typedef struct alpha_token_t alpha_token_t;
 
-void insert_token(alpha_token_t *tokenList, int numline,int numToken, char *content, enum type tType);
+struct TokenList{
+    alpha_token_t *head;
+    alpha_token_t *tail;
+};
+
+typedef struct TokenList TokenList;
+
+void insert_token(TokenList *tokenList, int numline, int numToken, char *content, enum type tType, enum subtype sType);
+const char* get_type(enum type s);
+const char* get_subtype(enum subtype s);
