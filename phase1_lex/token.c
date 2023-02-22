@@ -119,3 +119,36 @@ void print_list(TokenList *tokenList, FILE *yyout){
         iterator=iterator->next;
     }
 }
+
+int main(int argc, char** argv){
+
+    if (argc == 2 || argc == 3) {
+        if(!(yyin = fopen(argv[1], "r"))) {
+          fprintf(stderr, "Could not open input file: %s\n", argv[1]);
+          return 1;
+        }
+    }
+    else if(argc < 2)
+        yyin = stdin;
+    else {
+        fprintf(stderr, "Invalid arguments.\n");
+        return 1;
+    }
+
+    if(argc == 3) {
+        if(!(yyout = fopen(argv[2], "w"))) {
+          fprintf(stderr, "Could not open output file: %s\n", argv[2]);
+          return 1;
+        }
+    }
+    else
+        yyout = stdout;
+
+    tokenList = malloc(sizeof(TokenList));
+    
+    alpha_yylex(tokenList->head);   //tokenList is a list of alpha_token_t tokens
+
+    print_list(tokenList, yyout);
+
+    return 0;
+}
