@@ -1,3 +1,5 @@
+extern FILE* yyout;
+
 enum type{
     STRING,
     NUMBER,
@@ -85,3 +87,4 @@ typedef struct TokenList TokenList;
 void insert_token(TokenList *tokenList, int numline, int numToken, char *content, enum type tType, enum subtype sType);
 const char* get_type(enum type s);
 const char* get_subtype(enum subtype s);
+void print_list(TokenList *tokenList, FILE *yyout);

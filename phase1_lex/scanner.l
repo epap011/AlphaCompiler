@@ -13,7 +13,6 @@
     #define TOKEN(type,subtype,lc,tkn,text) insert_token(tokenList,lc,tkn,text,type,subtype)
 
     int  tkn_counter  = 0;
-    /*int  line_counter = 1;*/
 
     /*Block comment handlers*/
     int   comm_counter = 0;
@@ -239,19 +238,8 @@ int main(int argc, char** argv){
 
     tokenList = malloc(sizeof(TokenList));
     alpha_yylex(tokenList->head);   //tokenList is a list of alpha_token_t tokens
-
-    /*Printing tokens (experimental, to be modded & moved to token.c)*/
-    alpha_token_t *iterator=tokenList->head;
-    while(iterator){
-
-        if(strcmp(get_type(iterator->tType),"UNDEFCHR") == 0)
-            fprintf(yyout, "%d:  Undefined character \"%s\"\n",iterator->numline,iterator->content);
-        
-        else
-            fprintf(yyout, "%d  #%d Type:%s Subtype:%s \"%s\"\n",iterator->numline,iterator->numToken,get_type(iterator->tType),get_subtype(iterator->sType),iterator->content);
-       
-        iterator=iterator->next;
-    }
+    
+    print_list(tokenList, yyout);
 
     return 0;
 }

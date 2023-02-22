@@ -95,3 +95,27 @@ const char* get_subtype(enum subtype s) {
         default: return "INVALID";
     }
 }   
+
+void print_list(TokenList *tokenList, FILE *yyout){
+
+    alpha_token_t *iterator=tokenList->head;
+    while(iterator){
+
+        if(strcmp(get_type(iterator->tType),"UNDEFCHR") == 0)
+            fprintf(stderr, "%d:  Undefined character \"%s\"\n",iterator->numline, iterator->content);
+        
+        else
+        if(strcmp(get_subtype(iterator->sType),"NOSTYPE") == 0){
+            fprintf(yyout, "%d  #%d \"%s\" %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), iterator->content, "char*");    
+        }
+        else{
+            if(strcmp(get_subtype(iterator->sType),"INTCONST") == 0)
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), get_subtype(iterator->sType), iterator->content, "int");
+            else if(strcmp(get_subtype(iterator->sType),"REALCONST") == 0)
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), get_subtype(iterator->sType), iterator->content, "float");
+            else
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), get_subtype(iterator->sType), iterator->content, "enumerated");   
+        }
+        iterator=iterator->next;
+    }
+}
