@@ -10,7 +10,7 @@
     #include "tokens.h"
 
     /*To be modified, to add token to list*/
-    #define TOKEN(type,subtype,lc,tkn,text) insert_token(tokenList,lc,tkn,text,type,subtype)
+    #define TOKEN(type,subtype,lc,tkn, text) insert_token(tokenList,lc,tkn,text,type,subtype)
 
     int  tkn_counter  = 0;
 
