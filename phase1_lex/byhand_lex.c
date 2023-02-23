@@ -14,7 +14,7 @@
 FILE* inputFile   = (FILE*)0;
 
 int state         = 0;
-int  useLookAhead = 0;
+int useLookAhead  = 0;
 
 unsigned curr     = 0;
 unsigned lineNo   = 0;
@@ -22,18 +22,20 @@ unsigned lineNo   = 0;
 char lexeme[MAX_LEXEME];
 char lookAhead = '\0';
 
-int sf0 (char c); int sf1 (char c); int sf2 (char c);
-void     resetLexeme (void); void checkLine   (char c);
-char     getNextChar (void); void retrack     (char c);
-unsigned gettoken2   (void); void extendLexeme(char c);
-char*    getLexeme   (void);
+int sf0 (char c); int sf1 (char c); int sf2 (char c); int sf3 (char c); int sf4 (char c); 
+int sf5 (char c); int sf6 (char c); int sf7 (char c); int sf8 (char c); int sf9 (char c);
+int sf10(char c); int sf11(char c); int sf12(char c);
 
-//int isalpha(char c); int isdigit(char c); int isspace(char c);
+void     resetLexeme(void); void checkLine(char c);
+char     getNextChar(void); void retrack(char c);
+unsigned gettoken2(void);   void extendLexeme(char c);
+char*    getLexeme(void);   int  isAlpha(char c);
+int      isSpace(char c);   int  isPancuation(char c);
+int      isDigit(char c); 
 
-int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2};
+int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12};
 
 int main(int argc, char** argv) {
-
     if(argc != 2) {
         fprintf(stderr, "Error: wrong number of arguments\n");
         exit(EXIT_FAILURE);
@@ -45,7 +47,7 @@ int main(int argc, char** argv) {
     }
 
     unsigned token;
-    while((token = gettoken()) != END_OF_FILE) {
+    while((token = gettoken2()) != END_OF_FILE) {
         
     }
 }
@@ -56,21 +58,124 @@ int sf0 (char c) {
     if(c == '!')   return STATE(2);
     if(c == '=')   return STATE(3);
     if(c == '>')   return STATE(4);
-    if(isalpha(c)) return STATE(5);
-    if(isspace(c)) {
+    if(c == '+')   return STATE(5);
+    if(c == '-')   return STATE(6);
+    if(c == '*')   return STATE(7);
+    if(c == '/')   return STATE(8);
+    if(c == '%')   return STATE(9);
+    if(isAlpha(c) || isDigit(c)) return STATE(10);
+    if(isPancuation(c))          return STATE(11);
+    if(isSpace(c)) {
         checkLine(c);
-        return STATE(6);
+        return STATE(12);
     }
-
     return STATE(-1);
 }
 
+/* read < */
 int sf1(char c) {
-
+    if(c == '=') { 
+        extendLexeme(c);
+        return TOKEN(LTE);
+    }
+    retrack(c);
+    return TOKEN(LT);
 }
 
+/* read ! */
 int sf2(char c) {
+    if(c == '=') { 
+        extendLexeme(c);
+        return TOKEN(NEQ);
+    }
+    retrack(c);
+    return TOKEN(NOT);
+}
 
+/* read = */
+int sf3(char c) {
+    if(c == '=') { 
+        extendLexeme(c);
+        return TOKEN(EQ);
+    }
+    retrack(c);
+    return TOKEN(ASSIGN);
+}
+
+/* read > */
+int sf4(char c) {
+    if(c == '=') { 
+        extendLexeme(c);
+        return TOKEN(GTE);
+    }
+    retrack(c);
+    return TOKEN(GT);
+}
+
+/* read + */
+int sf5(char c) {
+    if(c == '+') { 
+        extendLexeme(c);
+        return TOKEN(INC);
+    }
+    retrack(c);
+    return TOKEN(PLUS);
+}
+
+/* read - */
+int sf6(char c) {
+    if(c == '-') { 
+        extendLexeme(c);
+        return TOKEN(DEC);
+    }
+    retrack(c);
+    return TOKEN(MINUS);
+}
+
+/* read * */
+int sf7(char c) {
+    extendLexeme(c);
+    return TOKEN(MUL);
+}
+
+/* read / */
+int sf8(char c) {
+    /* signle line comment OR block comment or division */
+}
+
+/* read % */
+int sf9(char c) {
+    extendLexeme(c);
+    return TOKEN(MOD);
+}
+
+/* read identifier or number */
+int sf10(char c) {
+    if(isalpha(c) || isdigit(c)) {
+        extendLexeme(c);
+        return STATE(10);
+    }
+    retrack(c);
+    return TOKEN(IDENT);
+}
+
+int sf11(char c) {
+    if(isPancuation(c)) {
+        extendLexeme(c);
+        return STATE(11);
+    }
+    retrack(c);
+    return TOKEN(PUNCTUATION);
+}
+
+/* read whitespace */
+int sf12(char c) {
+    if(isspace(c)) {
+        checkLine(c);
+        return STATE(11);
+    }
+    retrack(c);
+    return STATE(0);
 }
 
 unsigned gettoken2() {
@@ -131,14 +236,18 @@ void extendLexeme(char c) {
     lexeme[curr++] = c;
 }
 
-// int isalpha(char c) {
-//     return 1;
-// }
+int isAlpha(char c) {
+    return 1;
+}
 
-// int isdigit(char c) {
-//     return 1;
-// }
+int isDigit(char c) {
+    return 1;
+}
 
-// int isspace(char c) {
-//     return 1;
-// }
+int isSpace(char c) {
+    return 1;
+}
+
+int isPunctuation(char c) {
+    return 1;
+}
