@@ -11,6 +11,13 @@
 #define STATE(s)    s
 #define ISTOKEN(s)  ((s) >= MAX_STATE)
 
+#define END_OF_FILE 46
+#define LETTER 47
+#define DIGIT  48
+#define PUNC   49
+#define SPACE  50
+#define IDENTIFIER 51
+
 FILE* inputFile   = (FILE*)0;
 
 int state         = 0;
@@ -29,9 +36,7 @@ int sf10(char c); int sf11(char c);
 void     resetLexeme(void); void checkLine(char c);
 char     getNextChar(void); void retrack(char c);
 unsigned gettoken2(void);   void extendLexeme(char c);
-char*    getLexeme(void);   int  isAlpha(char c);
-int      isSpace(char c);   int  isPancuation(char c);
-int      isDigit(char c); 
+char*    getLexeme(void);   int  isPunctuation(char c);
 
 int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11};
 
@@ -41,7 +46,7 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    if((inputFile = fopen("input.txt", "r")) == NULL) {
+    if((inputFile = fopen(argv[1], "r")) == NULL) {
         fprintf(stderr, "Error: can't open file \"%s\"\n", argv[1]);
         exit(EXIT_FAILURE);
     }
@@ -69,12 +74,12 @@ int sf0 (char c) {
         return TOKEN(MOD);
     }
     if(c == '/')   return STATE(7);
-    if(isAlpha(c)) return STATE(8);
-    if(isDigit(c)) return STATE(9);
-    if(isPancuation(c)) return STATE(10);
-    if(isSpace(c)) {
+    if(isalpha(c)) return STATE(8);
+    if(isdigit(c)) return STATE(9);
+    if(isPunctuation(c)) return STATE(10);
+    if(isspace(c)) {
         checkLine(c);
-        return STATE(12);
+        return STATE(11);
     }
     return STATE(-1);
 }
@@ -142,23 +147,24 @@ int sf6(char c) {
 /* read / */
 int sf7(char c) {
     /* signle line comment OR block comment OR division */
+    return -1;
 }
 
 /* read letter | digit */
 int sf8(char c) {
-    if(isAlpha(c) || isDigit(c)) {
+    if(isalpha(c) || isdigit(c)) {
         extendLexeme(c);
-        return STATE(10);
+        return STATE(8);
     }
     retrack(c);
-    return TOKEN(IDENT);
+    return TOKEN(IDENTIFIER);
 }
 
 /* read Digit */
 int sf9(char c) {
-    if(isDigit(c)) {
-        extendLexeme(c);
-        return STATE(11);
+    if(isdigit(c)) {
+        printf("lala\n");
+        return STATE(9);
     }
     retrack(c);
     return TOKEN(NUMBER);
@@ -166,9 +172,9 @@ int sf9(char c) {
 
 /* read punctuation */
 int sf10(char c) {
-    if(isPancuation(c)) {
+    if(isPunctuation(c)) {
         extendLexeme(c);
-        return STATE(11);
+        return STATE(10);
     }
     retrack(c);
     return TOKEN(PUNCTUATION);
@@ -184,7 +190,6 @@ int sf11(char c) {
     return STATE(0);
 }
 
-// sum = sum + 5;
 unsigned gettoken2() {
     state = 0;
     resetLexeme();
@@ -196,10 +201,13 @@ unsigned gettoken2() {
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
-            doAction();
+            printf("Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
             return state-TOKEN_SHIFT;
-        } 
-        else extendLexeme(c);
+        }
+        else {
+            printf("here 2: %c\n", c);
+            extendLexeme(c);
+        }
     }
 }
 
@@ -235,31 +243,13 @@ void extendLexeme(char c) {
     lexeme[curr++] = c;
 }
 
-int isAlpha(char c) {
-    if('c' >= 65 && 'c' <= 90 || 'c' >= 97 && 'c' <= 122) return STRING;
-}
-
-int isDigit(char c) {
-    if('c' >= 48 && 'c' <= 57) return NUMBER;
-}
-
-int isSpace(char c) {
-    if('c' == 32 || 'c' == 9 || 'c' == 10 || 'c' == 13) return 1;
-}
-
 int isPunctuation(char c) {
-    if('c' == 33 || 'c' == 34 || 'c' == 35 || 'c' == 36 || 
-       'c' == 37 || 'c' == 38 || 'c' == 39 || 'c' == 40 || 
-       'c' == 41 || 'c' == 42 || 'c' == 43 || 'c' == 44 || 
-       'c' == 45 || 'c' == 46 || 'c' == 47 || 'c' == 58 || 
-       'c' == 59 || 'c' == 60 || 'c' == 61 || 'c' == 62 || 
-       'c' == 63 || 'c' == 64 || 'c' == 91 || 'c' == 92 ||
-       'c' == 93 || 'c' == 94 || 'c' == 95 || 'c' == 96 || 
-       'c' == 123 || 'c' == 124 || 'c' == 125 || 'c' == 126) 
-       
-       return PUNCTUATION;
-}
-
-int doAction() {
-
+    if(c == 33 || c == 34 || c == 35 || c == 36 || c == 37 || c == 38 
+    || c == 39 || c == 40 || c == 41 || c == 42 || c == 43 || c == 44 
+    || c == 45 || c == 46 || c == 47 || c == 58 || c == 59 || c == 60 
+    || c == 61 || c == 62 || c == 63 || c == 64 || c == 91 || c == 92 
+    || c == 93 || c == 94 || c == 95 || c == 96 || c == 123 || c == 124 
+    || c == 125 || c == 126)     
+       return PUNC;
+    return 0;
 }

@@ -64,8 +64,7 @@ enum subtype{
     LINECOMM,
     BLOCKCOMM,
     /*Invalid value*/
-    NOSTYPE,
-    END_OF_FILE
+    NOSTYPE
 };
 
 struct alpha_token_t {
