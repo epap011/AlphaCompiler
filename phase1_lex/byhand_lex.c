@@ -56,9 +56,6 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    //temporary before using token.c
-    yyout=stdout;
-
     unsigned token;
     while((token = gettoken2()) != END_OF_FILE) {
         //printf();
@@ -220,7 +217,7 @@ unsigned gettoken2() {
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
-            if(state-TOKEN_SHIFT!=-1)fprintf(yyout,"Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
+            if(state-TOKEN_SHIFT!=-1)printf("Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
             return state-TOKEN_SHIFT;
         }
         else {
