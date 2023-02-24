@@ -15,7 +15,6 @@
 #define END_OF_FILE 46
 #define LETTER 47
 #define DIGIT  48
-#define PUNC   49
 #define SPACE  50
 
 FILE* inputFile   = (FILE*)0;
@@ -54,7 +53,8 @@ int main(int argc, char** argv) {
 
     unsigned token;
     while((token = gettoken2()) != END_OF_FILE) {
-        
+        // KEYWORD;
+        // getLexeme(); //if
     }
 }
 
@@ -68,11 +68,11 @@ int sf0 (char c) {
     if(c == '-')   return STATE(6);
     if(c == '*') {
         extendLexeme(c);
-        return TOKEN(MUL);
+        return TOKEN(OPERATOR);
     }
     if(c == '%')   {
         extendLexeme(c);
-        return TOKEN(MOD);
+        return TOKEN(OPERATOR);
     }
     if(c == '/')   return STATE(7);
     if(isalpha(c)) return STATE(8);
@@ -89,60 +89,60 @@ int sf0 (char c) {
 int sf1(char c) {
     if(c == '=') { 
         extendLexeme(c);
-        return TOKEN(LTE);
+        return TOKEN(OPERATOR);
     }
     retrack(c);
-    return TOKEN(LT);
+    return TOKEN(OPERATOR);
 }
 
 /* read ! */
 int sf2(char c) {
     if(c == '=') { 
         extendLexeme(c);
-        return TOKEN(NEQ);
+        return TOKEN(OPERATOR);
     }
     retrack(c);
-    return TOKEN(NOT);
+    return TOKEN(OPERATOR);
 }
 
 /* read = */
 int sf3(char c) {
     if(c == '=') { 
         extendLexeme(c);
-        return TOKEN(EQ);
+        return TOKEN(OPERATOR);
     }
     retrack(c);
-    return TOKEN(ASSIGN);
+    return TOKEN(OPERATOR);
 }
 
 /* read > */
 int sf4(char c) {
     if(c == '=') { 
         extendLexeme(c);
-        return TOKEN(GTE);
+        return TOKEN(OPERATOR);
     }
     retrack(c);
-    return TOKEN(GT);
+    return TOKEN(OPERATOR);
 }
 
 /* read + */
 int sf5(char c) {
     if(c == '+') { 
         extendLexeme(c);
-        return TOKEN(INC);
+        return TOKEN(OPERATOR);
     }
     retrack(c);
-    return TOKEN(PLUS);
+    return TOKEN(OPERATOR);
 }
 
 /* read - */
 int sf6(char c) {
     if(c == '-') { 
         extendLexeme(c);
-        return TOKEN(DEC);
+        return TOKEN(OPERATOR);
     }
     retrack(c);
-    return TOKEN(MINUS);
+    return TOKEN(OPERATOR);
 }
 
 /* read / */
@@ -252,58 +252,58 @@ int isPunctuation(char c) {
     || c == 61 || c == 62 || c == 63 || c == 64 || c == 91 || c == 92 
     || c == 93 || c == 94 || c == 95 || c == 96 || c == 123 || c == 124 
     || c == 125 || c == 126)     
-       return PUNC;
+       return PUNCTUATION;
     return 0;
 }
 
 int isKeyword(char* string) {
     if(strcmp(string, "if") == 0) {
-        return IF;
+        return KEYWORD;
     }
     if(strcmp(string, "else") == 0) {
-        return ELSE;
+        return KEYWORD;
     }
     if(strcmp(string, "while") == 0) {
-        return WHILE;
+        return KEYWORD;
     }
     if(strcmp(string, "for") == 0) {
-        return FOR;
+        return KEYWORD;
     }
     if(strcmp(string, "function") == 0) {
-        return FUNCTION;
+        return KEYWORD;
     }
     if(strcmp(string, "return") == 0) {
-        return RETURN;
+        return KEYWORD;
     }
     if(strcmp(string, "break") == 0) {
-        return BREAK;
+        return KEYWORD;
     }
     if(strcmp(string, "continue") == 0) {
-        return CONTINUE;
+        return KEYWORD;
     }
     if(strcmp(string, "and") == 0) {
-        return AND;
+        return KEYWORD;
     }
     if(strcmp(string, "not") == 0) {
-        return NOT;
+        return KEYWORD;
     }
     if(strcmp(string, "or") == 0) {
-        return OR;
+        return KEYWORD;
     }
     if(strcmp(string, "local") == 0) {
-        return LOCAL;
+        return KEYWORD;
     }
     if(strcmp(string, "true") == 0) {
-        return TRUE;
+        return KEYWORD;
     }
     if(strcmp(string, "false") == 0) {
-        return FALSE;
+        return KEYWORD;
     }
     if(strcmp(string, "return") == 0) {
-        return RETURN;
+        return KEYWORD;
     }
     if(strcmp(string, "nil") == 0) {
-        return NIL;
+        return KEYWORD;
     }
 
     return -1;
