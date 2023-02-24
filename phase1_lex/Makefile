@@ -5,33 +5,33 @@ CC = gcc
 CFLAGS = -Wall
 
 #File names (no extension)
-SCANNER = scanner
-BYHAND  = byhand_lex
+SCANNER_FILE = scanner
+BYHAND_FILE  = byhand_lex
 
 #Targets
 SCANNER_TARGET = scanner
 BYHAND_TARGET  = bonus
 
-all: $(SCANNER).c $(SCANNER).o $(SCANNER) token.o 
+all: $(SCANNER_FILE).c $(SCANNER_FILE).o $(SCANNER_TARGET) token.o 
 	rm -f *.o
 
-$(SCANNER_TARGET): $(SCANNER).o token.o
+$(SCANNER_TARGET): $(SCANNER_FILE).o token.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(BYHAND_TARGET): $(BYHAND).o
+$(BYHAND_TARGET): $(BYHAND_FILE).o
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(SCANNER).o: $(SCANNER).c
+$(SCANNER_FILE).o: $(SCANNER_FILE).c
 	$(CC) $(CFLAGS) -c $<
 
-$(BYHAND).o: $(BYHAND).c
+$(BYHAND_FILE).o: $(BYHAND_FILE).c
 	$(CC) $(CFLAGS) -c $<
 
 token.o: token.c
 	$(CC) $(CFLAGS) -c $<
 
-$(SCANNER).c: $(SCANNER).l
-	flex -o $@ -i $(SCANNER).l
+$(SCANNER_FILE).c: $(SCANNER_FILE).l
+	flex -o $@ -i $(SCANNER_FILE).l
 
 clean:
-	rm -f *.o $(SCANNER_TARGET) $(SCANNER).c $(BYHAND_TARGET)
+	rm -f *.o $(SCANNER_TARGET) $(SCANNER_FILE).c $(BYHAND_TARGET)
