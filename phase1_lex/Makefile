@@ -15,6 +15,9 @@ BYHAND_TARGET  = bonus
 all: $(SCANNER_FILE).c $(SCANNER_FILE).o $(SCANNER_TARGET) token.o 
 	rm -f *.o
 
+bonustoken: token.o $(BYHAND_FILE).o
+	$(CC) $(CFLAGS) -o $@ $^
+
 $(SCANNER_TARGET): $(SCANNER_FILE).o token.o
 	$(CC) $(CFLAGS) -o $@ $^
 
@@ -34,4 +37,4 @@ $(SCANNER_FILE).c: $(SCANNER_FILE).l
 	flex -o $@ -i $(SCANNER_FILE).l
 
 clean:
-	rm -f *.o $(SCANNER_TARGET) $(SCANNER_FILE).c $(BYHAND_TARGET)
+	rm -f *.o $(SCANNER_TARGET) $(SCANNER_FILE).c $(BYHAND_TARGET) bonustoken
