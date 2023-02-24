@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <ctype.h>
 #include "tokens.h"
@@ -16,7 +17,6 @@
 #define DIGIT  48
 #define PUNC   49
 #define SPACE  50
-#define IDENTIFIER 51
 
 FILE* inputFile   = (FILE*)0;
 
@@ -37,6 +37,7 @@ void     resetLexeme(void); void checkLine(char c);
 char     getNextChar(void); void retrack(char c);
 unsigned gettoken2(void);   void extendLexeme(char c);
 char*    getLexeme(void);   int  isPunctuation(char c);
+int      isKeyword(char* s);
 
 int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11};
 
@@ -153,17 +154,19 @@ int sf7(char c) {
 /* read letter | digit */
 int sf8(char c) {
     if(isalpha(c) || isdigit(c)) {
-        extendLexeme(c);
         return STATE(8);
     }
     retrack(c);
-    return TOKEN(IDENTIFIER);
+    //at this point we need to chech if it is a keyword
+    if(isKeyword(getLexeme()) != -1) {
+        return TOKEN(KEYWORD);
+    }
+    return TOKEN(IDENT);
 }
 
 /* read Digit */
 int sf9(char c) {
     if(isdigit(c)) {
-        printf("lala\n");
         return STATE(9);
     }
     retrack(c);
@@ -201,11 +204,10 @@ unsigned gettoken2() {
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
-            printf("Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
+            if(state-TOKEN_SHIFT!=-1)printf("Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
             return state-TOKEN_SHIFT;
         }
         else {
-            printf("here 2: %c\n", c);
             extendLexeme(c);
         }
     }
@@ -252,4 +254,57 @@ int isPunctuation(char c) {
     || c == 125 || c == 126)     
        return PUNC;
     return 0;
+}
+
+int isKeyword(char* string) {
+    if(strcmp(string, "if") == 0) {
+        return IF;
+    }
+    if(strcmp(string, "else") == 0) {
+        return ELSE;
+    }
+    if(strcmp(string, "while") == 0) {
+        return WHILE;
+    }
+    if(strcmp(string, "for") == 0) {
+        return FOR;
+    }
+    if(strcmp(string, "function") == 0) {
+        return FUNCTION;
+    }
+    if(strcmp(string, "return") == 0) {
+        return RETURN;
+    }
+    if(strcmp(string, "break") == 0) {
+        return BREAK;
+    }
+    if(strcmp(string, "continue") == 0) {
+        return CONTINUE;
+    }
+    if(strcmp(string, "and") == 0) {
+        return AND;
+    }
+    if(strcmp(string, "not") == 0) {
+        return NOT;
+    }
+    if(strcmp(string, "or") == 0) {
+        return OR;
+    }
+    if(strcmp(string, "local") == 0) {
+        return LOCAL;
+    }
+    if(strcmp(string, "true") == 0) {
+        return TRUE;
+    }
+    if(strcmp(string, "false") == 0) {
+        return FALSE;
+    }
+    if(strcmp(string, "return") == 0) {
+        return RETURN;
+    }
+    if(strcmp(string, "nil") == 0) {
+        return NIL;
+    }
+
+    return -1;
 }
