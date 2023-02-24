@@ -18,13 +18,15 @@
 #define PUNC   49
 #define SPACE  50
 
-FILE* inputFile   = (FILE*)0;
+FILE* yyin   = (FILE*)0;
+FILE* yyout   = (FILE*)0;
 
 int state         = 0;
 int useLookAhead  = 0;
 
 unsigned curr     = 0;
 unsigned lineNo   = 0;
+unsigned tokenNo   = 0;
 
 char lexeme[MAX_LEXEME];
 char lookAhead = '\0';
@@ -41,21 +43,35 @@ int      isKeyword(char* s);
 
 int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11};
 
+/*
 int main(int argc, char** argv) {
-    if(argc != 2) {
-        fprintf(stderr, "Error: wrong number of arguments\n");
-        exit(EXIT_FAILURE);
+    if(argc < 2) {
+        //fprintf(stderr, "Error: wrong number of arguments\n");
+        //exit(EXIT_FAILURE);
+        yyin = stdin;
     }
 
-    if((inputFile = fopen(argv[1], "r")) == NULL) {
+    else if((yyin = fopen(argv[1], "r")) == NULL) {
         fprintf(stderr, "Error: can't open file \"%s\"\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 
+    //temporary before using token.c
+    yyout=stdout;
+
     unsigned token;
     while((token = gettoken2()) != END_OF_FILE) {
-        
+        //printf();
     }
+}
+*/
+
+int alpha_yylex(TokenList *tokenList){
+    unsigned token;
+    while((token = gettoken2()) != END_OF_FILE) {
+        insert_token(tokenList,lineNo,++tokenNo,lexeme,token,get_subtype(token,lexeme));
+    }
+    return 0;
 }
 
 /* start state */
@@ -197,14 +213,14 @@ unsigned gettoken2() {
     state = 0;
     resetLexeme();
     while(1) {
-        if(feof(inputFile)) return END_OF_FILE;
+        if(feof(yyin)) return END_OF_FILE;
 
         char c = getNextChar();
         state  = (*state_funcs[state])(c);
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
-            if(state-TOKEN_SHIFT!=-1)printf("Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
+            if(state-TOKEN_SHIFT!=-1)fprintf(yyout,"Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
             return state-TOKEN_SHIFT;
         }
         else {
@@ -218,8 +234,8 @@ char getNextChar() {
         useLookAhead = 0;
         return lookAhead;
     } else {
-        assert(!feof(inputFile));
-        return fgetc(inputFile);
+        assert(!feof(yyin));
+        return fgetc(yyin);
     }
 }
 
