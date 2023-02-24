@@ -2,4 +2,5 @@ testfiles/
 scanner.c
 scanner
 bonus
+bonustoken
 *.o
