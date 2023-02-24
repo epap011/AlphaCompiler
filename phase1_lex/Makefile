@@ -8,13 +8,17 @@ CFLAGS = -Wall
 SCANNER = scanner
 BYHAND  = byhand_lex
 
+#Targets
+SCANNER_TARGET = scanner
+BYHAND_TARGET  = bonus
+
 all: $(SCANNER).c $(SCANNER).o $(SCANNER) token.o 
 	rm -f *.o
 
-scanner: $(SCANNER).o token.o
+$(SCANNER_TARGET): $(SCANNER).o token.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-bonus: $(BYHAND).o
+$(BYHAND_TARGET): $(BYHAND).o
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(SCANNER).o: $(SCANNER).c
@@ -30,4 +34,4 @@ $(SCANNER).c: $(SCANNER).l
 	flex -o $@ -i $(SCANNER).l
 
 clean:
-	rm -f *.o $(SCANNER) $(SCANNER).c $(BYHAND)
+	rm -f *.o $(SCANNER_TARGET) $(SCANNER).c $(BYHAND_TARGET)
