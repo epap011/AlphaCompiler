@@ -3,6 +3,9 @@
 #include <string.h>
 #include "tokens.h"
 
+/*List of tokens to be written*/
+TokenList *tokenList;
+
 /*List insertion function*/
 void insert_token(TokenList *tokenList, int numline, int numToken, char *content, enum type tType, enum subtype sType){
 
@@ -31,7 +34,7 @@ void insert_token(TokenList *tokenList, int numline, int numToken, char *content
 }
 
 /*Token type to string*/
-const char* get_type(enum type s) {
+const char* str_type(enum type s) {
     switch (s) {
         case STRING: return "STRING";
         case NUMBER: return "NUMBER";
@@ -44,7 +47,7 @@ const char* get_type(enum type s) {
         default: return "INVALID";
     }
 }
-const char* get_subtype(enum subtype s) {
+const char* str_subtype(enum subtype s) {
     switch (s) {
         case ASSIGN: return "ASSIGN";
         case PLUS: return "PLUS";
@@ -94,7 +97,65 @@ const char* get_subtype(enum subtype s) {
         case NOSTYPE: return "NOSTYPE";
         default: return "INVALID";
     }
-}   
+}
+//Get subtyoe from type & content.
+enum subtype get_subtype(enum type s, char* str) {
+        if(s == OPERATOR){
+            if (strcmp(str,"==") == 0) return ASSIGN;
+            if (strcmp(str,"+") == 0) return PLUS;
+            if (strcmp(str,"-") == 0) return MINUS;
+            if (strcmp(str,"*") == 0) return MUL;
+            if (strcmp(str,"/") == 0) return SLASH;
+            if (strcmp(str,"%") == 0) return MOD;
+            if (strcmp(str,"=") == 0) return EQ;
+            if (strcmp(str,"!=") == 0) return NEQ;
+            if (strcmp(str,"++") == 0) return INC;
+            if (strcmp(str,"--") == 0) return DEC;
+            if (strcmp(str,">") == 0) return GT;
+            if (strcmp(str,"<") == 0) return LT;
+            if (strcmp(str,">=") == 0) return GTE;
+            if (strcmp(str,"<=") == 0) return LTE;
+        }
+        else if(s == KEYWORD){
+            if (strcmp(str,"if") == 0) return IF;
+            if (strcmp(str,"else") == 0) return ELSE;
+            if (strcmp(str,"while") == 0) return WHILE;
+            if (strcmp(str,"for") == 0) return FOR;
+            if (strcmp(str,"function") == 0) return FUNCTION;
+            if (strcmp(str,"return") == 0) return RETURN;
+            if (strcmp(str,"break") == 0) return BREAK;
+            if (strcmp(str,"continue") == 0) return CONTINUE;
+            if (strcmp(str,"and") == 0) return AND;
+            if (strcmp(str,"not") == 0) return NOT;
+            if (strcmp(str,"or") == 0) return OR;
+            if (strcmp(str,"local") == 0) return LOCAL;
+            if (strcmp(str,"true") == 0) return TRUE;
+            if (strcmp(str,"false") == 0) return FALSE;
+            if (strcmp(str,"nil") == 0) return NIL;
+       }
+        else if (s == PUNCTUATION){
+            if (strcmp(str,"[") == 0) return LBRACE;
+            if (strcmp(str,"]") == 0) return RBRACE;
+            if (strcmp(str,"{") == 0) return LCBRACE;
+            if (strcmp(str,"}") == 0) return RCBRACE;
+            if (strcmp(str,"(") == 0) return LPAR;
+            if (strcmp(str,")") == 0) return RPAR;
+            if (strcmp(str,";") == 0) return SEMI;
+            if (strcmp(str,",") == 0) return COMMA;
+            if (strcmp(str,"") == 0) return COLON;
+            if (strcmp(str,"") == 0) return DCOLON;
+            if (strcmp(str,".") == 0) return DOT;
+            if (strcmp(str,"..") == 0) return DDOT;
+        }
+        //return INTCONST;
+        //return REALCONST;
+        //return LINECOMM;
+        //return BLOCKCOMM;
+
+        //No subtype found.
+        //Further chekcs required for int, real or comment.
+	    return NOSTYPE;
+}
 
 void print_list(TokenList *tokenList, FILE *yyout){
 
@@ -106,15 +167,15 @@ void print_list(TokenList *tokenList, FILE *yyout){
         
         else
         if(iterator->sType == NOSTYPE){
-            fprintf(yyout, "%d  #%d \"%s\" %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), iterator->content, "char*");    
+            fprintf(yyout, "%d  #%d \"%s\" %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), iterator->content, "char*");    
         }
         else{
             if(iterator->sType == INTCONST)
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), get_subtype(iterator->sType), iterator->content, "int");
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), str_subtype(iterator->sType), iterator->content, "int");
             else if(iterator->sType == REALCONST)
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), get_subtype(iterator->sType), iterator->content, "float");
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), str_subtype(iterator->sType), iterator->content, "float");
             else
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, get_type(iterator->tType), get_subtype(iterator->sType), iterator->content, "enumerated");   
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), str_subtype(iterator->sType), iterator->content, "enumerated");   
         }
         iterator=iterator->next;
     }
@@ -146,7 +207,7 @@ int main(int argc, char** argv){
 
     tokenList = malloc(sizeof(TokenList));
     
-    alpha_yylex(tokenList->head);   //tokenList is a list of alpha_token_t tokens
+    alpha_yylex(tokenList);   //tokenList is a list of alpha_token_t tokens
 
     print_list(tokenList, yyout);
 

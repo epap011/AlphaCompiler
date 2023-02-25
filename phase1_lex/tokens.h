@@ -84,10 +84,10 @@ struct TokenList{
 };
 
 typedef struct TokenList TokenList;
-extern TokenList *tokenList;
 
 void insert_token(TokenList *tokenList, int numline, int numToken, char *content, enum type tType, enum subtype sType);
-const char* get_type(enum type s);
-const char* get_subtype(enum subtype s);
+const char* str_type(enum type s);
+const char* str_subtype(enum subtype s);
+enum subtype get_subtype(enum type s, char *str);
 void print_list(TokenList *tokenList, FILE *yyout);
-int alpha_yylex(alpha_token_t* ylval);
+int alpha_yylex(TokenList* ylval);
