@@ -97,7 +97,7 @@ int sf0 (char c) {
     if(isPunctuation(c)) return STATE(10);
     if(isspace(c)) {
         checkLine(c);
-        if(c == ' ') return STATE(-1);
+        if(c == ' ' || c == '\n') return STATE(-1);
         return STATE(11);
     }
     return STATE(-1);
@@ -260,9 +260,9 @@ unsigned gettoken2() {
         if(feof(yyin)) return END_OF_FILE;
 
         char c = getNextChar();
-        printf("[Before]state: %d | char: '%c'\n", state, c);
+        //printf("[Before]state: %d | char: '%c'\n", state, c);
         state  = (*state_funcs[state])(c);
-        printf("[After]state: %d | char: '%c'\n", state, c);
+        //printf("[After]state: %d | char: '%c'\n", state, c);
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
