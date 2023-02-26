@@ -90,4 +90,4 @@ const char* str_type(enum type s);
 const char* str_subtype(enum subtype s);
 enum subtype get_subtype(enum type s, char *str);
 void print_list(TokenList *tokenList, FILE *yyout);
-int alpha_yylex(TokenList* ylval);
+int alpha_yylex(void* yylval);

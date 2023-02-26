@@ -10,7 +10,7 @@
     #include "tokens.h"
 
     /*To be modified, to add token to list*/
-    #define TOKEN(type,subtype,lc,tkn, text) insert_token(ylval,lc,tkn,text,type,subtype)
+    #define TOKEN(type,subtype,lc,tkn, text) insert_token(yylval,lc,tkn,text,type,subtype)
 
     int  tkn_counter  = 0;
 
@@ -22,7 +22,7 @@
     char* replace_escape_chars(char *str, int yyleng);
     char* commcat(char* comm, char *cat);
 
-    #define YY_DECL int alpha_yylex(TokenList* ylval)
+    #define YY_DECL int alpha_yylex(void* yylval)
 %}
 
 /*Macros (Regex)*/

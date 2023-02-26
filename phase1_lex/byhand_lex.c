@@ -65,10 +65,10 @@ int main(int argc, char** argv) {
 }
 */
 
-int alpha_yylex(TokenList *tokenList){
+int alpha_yylex(void *yylval){
     unsigned token;
     while((token = gettoken2()) != END_OF_FILE) {
-        insert_token(tokenList,lineNo,++tokenNo,lexeme,token,get_subtype(token,lexeme));
+        insert_token(yylval,lineNo,++tokenNo,lexeme,token,get_subtype(token,lexeme));
     }
     return 0;
 }
