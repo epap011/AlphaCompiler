@@ -6,7 +6,7 @@
 #include "tokens.h"
 
 #define MAX_LEXEME  1024
-#define MAX_STATE   11
+#define MAX_STATE   13
 #define TOKEN_SHIFT (MAX_STATE+1)
 #define TOKEN(t)    TOKEN_SHIFT+(t)
 #define STATE(s)    s
@@ -17,22 +17,25 @@
 #define DIGIT  48
 #define SPACE  50
 
-FILE* yyin   = (FILE*)0;
-FILE* yyout   = (FILE*)0;
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
-int state         = 0;
-int useLookAhead  = 0;
+FILE* yyin  = (FILE*)0;
+FILE* yyout = (FILE*)0;
 
-unsigned curr     = 0;
-unsigned lineNo   = 0;
-unsigned tokenNo   = 0;
+int state        = 0;
+int useLookAhead = 0;
+
+unsigned curr    = 0;
+unsigned lineNo  = 0;
+unsigned tokenNo = 0;
 
 char lexeme[MAX_LEXEME];
 char lookAhead = '\0';
 
 int sf0 (char c); int sf1 (char c); int sf2 (char c); int sf3 (char c); int sf4 (char c); 
 int sf5 (char c); int sf6 (char c); int sf7 (char c); int sf8 (char c); int sf9 (char c);
-int sf10(char c); int sf11(char c);
+int sf10(char c); int sf11(char c); int sf12(char c);
 
 void     resetLexeme(void); void checkLine(char c);
 char     getNextChar(void); void retrack(char c);
@@ -40,7 +43,7 @@ unsigned gettoken2(void);   void extendLexeme(char c);
 char*    getLexeme(void);   int  isPunctuation(char c);
 int      isKeyword(char* s);
 
-int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11};
+int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12};
 
 /*
 int main(int argc, char** argv) {
@@ -89,9 +92,11 @@ int sf0 (char c) {
     if(c == '/')   return STATE(7);
     if(isalpha(c)) return STATE(8);
     if(isdigit(c)) return STATE(9);
+    if(c == '"')   return STATE(12);
     if(isPunctuation(c)) return STATE(10);
     if(isspace(c)) {
         checkLine(c);
+        if(c == ' ') return STATE(-1);
         return STATE(11);
     }
     return STATE(-1);
@@ -169,7 +174,6 @@ int sf8(char c) {
         return STATE(8);
     }
     retrack(c);
-    //at this point we need to chech if it is a keyword
     if(isKeyword(getLexeme()) != -1) {
         return TOKEN(KEYWORD);
     }
@@ -188,8 +192,8 @@ int sf9(char c) {
 /* read punctuation */
 int sf10(char c) {
     if(isPunctuation(c)) {
-        extendLexeme(c);
-        return STATE(10);
+        retrack(c);
+        return TOKEN(PUNCTUATION);
     }
     retrack(c);
     return TOKEN(PUNCTUATION);
@@ -205,6 +209,14 @@ int sf11(char c) {
     return STATE(0);
 }
 
+/* read " */
+int sf12(char c) {
+    if(c == '"') {
+        return TOKEN(STRING);
+    }
+    return STATE(12);
+}
+
 unsigned gettoken2() {
     state = 0;
     resetLexeme();
@@ -212,15 +224,23 @@ unsigned gettoken2() {
         if(feof(yyin)) return END_OF_FILE;
 
         char c = getNextChar();
+        printf("[Before]state: %d | char: '%c'\n", state, c);
         state  = (*state_funcs[state])(c);
+        //printf("[After]state: %d | char: '%c'\n", state, c);
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
-            if(state-TOKEN_SHIFT!=-1)printf("Recognized token: '%s' | token: %d\n", getLexeme(), state-TOKEN_SHIFT);
+            if(state-TOKEN_SHIFT!=-1)printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
             return state-TOKEN_SHIFT;
         }
         else {
-            extendLexeme(c);
+            if(state == 12 && curr > 0 && c == '"' && lexeme[curr-1] == '\\')
+                extendLexeme(c);
+            else if((state == 12 || state == 0) && c == '"') {
+                continue;
+            }
+            else if(state != 11) 
+                extendLexeme(c);
         }
     }
 }
