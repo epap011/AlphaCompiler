@@ -6,7 +6,7 @@
 #include "tokens.h"
 
 #define MAX_LEXEME  1024
-#define MAX_STATE   14
+#define MAX_STATE   16
 #define TOKEN_SHIFT (MAX_STATE+1)
 #define TOKEN(t)    TOKEN_SHIFT+(t)
 #define STATE(s)    s
@@ -35,7 +35,8 @@ char lookAhead = '\0';
 
 int sf0 (char c); int sf1 (char c); int sf2 (char c); int sf3 (char c); int sf4 (char c); 
 int sf5 (char c); int sf6 (char c); int sf7 (char c); int sf8 (char c); int sf9 (char c);
-int sf10(char c); int sf11(char c); int sf12(char c); int sf13(char c);
+int sf10(char c); int sf11(char c); int sf12(char c); int sf13(char c); int sf14(char c);
+int sf15(char c);
 
 void     resetLexeme(void); void checkLine(char c);
 char     getNextChar(void); void retrack(char c);
@@ -43,7 +44,7 @@ unsigned gettoken2(void);   void extendLexeme(char c);
 char*    getLexeme(void);   int  isPunctuation(char c);
 int      isKeyword(char* s);
 
-int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12, &sf13};
+int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12, &sf13, &sf14, &sf15};
 
 /*
 int main(int argc, char** argv) {
@@ -168,9 +169,14 @@ int sf7(char c) {
     if(c == '/') {
         return STATE(13);
     }
+    /* devision*/
     else if(c != '*') {
         retrack(c);
         return TOKEN(OPERATOR);
+    }
+    /* block comment */
+    else {
+        return STATE(14);
     }
     return -1;
 }
@@ -231,6 +237,22 @@ int sf13(char c) {
     return STATE(13);
 }
 
+int sf14(char c) {
+    if(c == '*') {
+        return STATE(15);
+    }
+    return STATE(14);
+}
+
+int sf15(char c) {
+    if(c == '/') {
+        return TOKEN(COMMENT);
+    }
+    else {
+        return STATE(14);
+    }
+}
+
 unsigned gettoken2() {
     state = 0;
     resetLexeme();
@@ -240,7 +262,7 @@ unsigned gettoken2() {
         char c = getNextChar();
         printf("[Before]state: %d | char: '%c'\n", state, c);
         state  = (*state_funcs[state])(c);
-        //printf("[After]state: %d | char: '%c'\n", state, c);
+        printf("[After]state: %d | char: '%c'\n", state, c);
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
@@ -256,7 +278,12 @@ unsigned gettoken2() {
             else if(state == 13 && c == '/') {
                 resetLexeme();
             }
-
+            else if(state == 14 && c == '*') {
+                resetLexeme();
+            }
+            else if(state == 15 && c == '*') {
+                continue;
+            }
             else if(state != 11) 
                 extendLexeme(c);
         }
