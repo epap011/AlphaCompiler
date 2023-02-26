@@ -211,7 +211,7 @@ int sf11(char c) {
 
 /* read " */
 int sf12(char c) {
-    if(c == '"') {
+    if(c == '"' && lexeme[curr-1] != '\\') {
         return TOKEN(STRING);
     }
     return STATE(12);
