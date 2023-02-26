@@ -97,8 +97,7 @@ int sf0 (char c) {
     if(isPunctuation(c)) return STATE(10);
     if(isspace(c)) {
         checkLine(c);
-        if(c == ' ' || c == '\n') return STATE(-1);
-        return STATE(11);
+        return STATE(0);
     }
     return STATE(-1);
 }
@@ -274,9 +273,8 @@ unsigned gettoken2() {
         state  = (*state_funcs[state])(c);
         //printf("[After]state: %d | char: '%c'\n", state, c);
 
-        if(state == -1) {
-            if(!isspace(c)) return NOSTYPE;
-            state = 0;
+        if(state == -1 && !feof(yyin)) {
+            return UNDEFCHR;
         }          
         else if(ISTOKEN(state)) {
             if(state-TOKEN_SHIFT!=-1) {
@@ -299,10 +297,12 @@ unsigned gettoken2() {
             else if(state == 15 && c == '*') {
                 continue;
             }
+            else if(state == 0 && isspace(c)) {
+                continue;
+            }
             else if(state != 11) {
                 extendLexeme(c);
-            }
-                
+            }        
         }
     }
 }
@@ -340,12 +340,9 @@ void extendLexeme(char c) {
 }
 
 int isPunctuation(char c) {
-    if(c == 33 || c == 34 || c == 35 || c == 36 || c == 37 || c == 38 
-    || c == 39 || c == 40 || c == 41 || c == 42 || c == 43 || c == 44 
-    || c == 45 || c == 46 || c == 47 || c == 58 || c == 59 || c == 60 
-    || c == 61 || c == 62 || c == 63 || c == 64 || c == 91 || c == 92 
-    || c == 93 || c == 94 || c == 95 || c == 96 || c == 123 || c == 124 
-    || c == 125 || c == 126)     
+    if(c == '{' || c == '}' || c == '(' || c == ')'  
+    || c == '[' || c == ']' || c == ';' || c == ',' 
+    || c == ':' || c == '.')
        return PUNCTUATION;
     return 0;
 }
