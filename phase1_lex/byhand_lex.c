@@ -97,7 +97,7 @@ int sf0 (char c) {
     if(isPunctuation(c)) return STATE(10);
     if(isspace(c)) {
         checkLine(c);
-        if(c == ' ' || c == '\n') return STATE(-1);
+        if(c == ' ' || c == '\n') return STATE(0);
         return STATE(11);
     }
     return STATE(-1);
@@ -276,8 +276,10 @@ unsigned gettoken2() {
 
         if(state == -1)         return NOSTYPE;          
         else if(ISTOKEN(state)) {
-            if(state-TOKEN_SHIFT!=-1)printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
-            return state-TOKEN_SHIFT;
+            if(state-TOKEN_SHIFT!=-1) {
+                printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
+                return state-TOKEN_SHIFT;
+            }
         }
         else {
             if(state == 12 && curr > 0 && c == '"' && lexeme[curr-1] == '\\')
@@ -294,8 +296,12 @@ unsigned gettoken2() {
             else if(state == 15 && c == '*') {
                 continue;
             }
-            else if(state != 11) 
-                extendLexeme(c);
+            else if(state != 11) {
+                if(!isspace(c)) {
+                    extendLexeme(c);
+                }
+            }
+                
         }
     }
 }
