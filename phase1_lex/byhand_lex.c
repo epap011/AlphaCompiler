@@ -168,6 +168,10 @@ int sf7(char c) {
     if(c == '/') {
         return STATE(13);
     }
+    else if(c != '*') {
+        retrack(c);
+        return TOKEN(OPERATOR);
+    }
     return -1;
 }
 
@@ -252,6 +256,7 @@ unsigned gettoken2() {
             else if(state == 13 && c == '/') {
                 resetLexeme();
             }
+
             else if(state != 11) 
                 extendLexeme(c);
         }
