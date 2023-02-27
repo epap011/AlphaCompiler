@@ -242,6 +242,8 @@ int sf14(char c) {
 int sf15(char c) {
     if(c == '/') {   
         open_comments--;    
+        if(lexeme[curr-2] == '/')
+            open_comments--;
         if(open_comments == 0) {
             lexeme[curr-1] = '\0';
             curr--;
