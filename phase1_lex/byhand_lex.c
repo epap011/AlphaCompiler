@@ -214,7 +214,10 @@ int sf11(char c) {
 
 /* read " */
 int sf12(char c) {
-    if(c == '"' && lexeme[curr-1] != '\\') {
+    if(curr > 0 && c == '"' && lexeme[curr-1] != '\\') {
+        return TOKEN(STRING);
+    }
+    if(curr == 0 && c == '"') { // empty string
         return TOKEN(STRING);
     }
     return STATE(12);
