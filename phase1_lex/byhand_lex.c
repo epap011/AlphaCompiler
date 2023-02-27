@@ -6,7 +6,7 @@
 #include "tokens.h"
 
 #define MAX_LEXEME  1024
-#define MAX_STATE   17
+#define MAX_STATE   19
 #define TOKEN_SHIFT (MAX_STATE+1)
 #define TOKEN(t)    TOKEN_SHIFT+(t)
 #define STATE(s)    s
@@ -36,7 +36,7 @@ char lookAhead = '\0';
 int sf0 (char c); int sf1 (char c); int sf2 (char c); int sf3 (char c); int sf4 (char c); 
 int sf5 (char c); int sf6 (char c); int sf7 (char c); int sf8 (char c); int sf9 (char c);
 int sf10(char c); int sf11(char c); int sf12(char c); int sf13(char c); int sf14(char c);
-int sf15(char c); int sf16(char c);
+int sf15(char c); int sf16(char c); int sf17(char c); int sf18(char c);
 
 void     resetLexeme(void); void checkLine(char c);
 char     getNextChar(void); void retrack(char c);
@@ -44,7 +44,7 @@ unsigned gettoken2(void);   void extendLexeme(char c);
 char*    getLexeme(void);   int  isPunctuation(char c);
 int      isKeyword(char* s);
 
-int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12, &sf13, &sf14, &sf15, &sf16};
+int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12, &sf13, &sf14, &sf15, &sf16, &sf17, &sf18};
 
 /*
 int main(int argc, char** argv) {
@@ -94,7 +94,11 @@ int sf0 (char c) {
     if(isalpha(c)) return STATE(8);
     if(isdigit(c)) return STATE(9);
     if(c == '"')   return STATE(12);
-    if(isPunctuation(c)) return STATE(10);
+    if(isPunctuation(c)) {
+        if(c == ':') return STATE(17);
+        if(c == '.') return STATE(18);
+        return STATE(10);
+    }
     if(isspace(c)) {
         checkLine(c);
         return STATE(0);
@@ -260,6 +264,26 @@ int sf16(char c) {
         return STATE(16);
     }
     return TOKEN(NUMBER);
+}
+
+/* read : */
+int sf17(char c) {
+    if(c == ':') { 
+        extendLexeme(c);
+        return TOKEN(PUNCTUATION);
+    }
+    retrack(c);
+    return TOKEN(PUNCTUATION);
+}
+
+/* read . */
+int sf18(char c) {
+    if(c == '.') {
+        extendLexeme(c);
+        return TOKEN(PUNCTUATION);
+    }
+    retrack(c);
+    return TOKEN(PUNCTUATION);
 }
 
 unsigned gettoken2() {
