@@ -232,7 +232,7 @@ int sf13(char c) {
 
 int sf14(char c) {
     if(c == '*') {
-        if(lexeme[curr-1] == '/') open_comments++;
+        if(curr > 0 && lexeme[curr-1] == '/') open_comments++;
         extendLexeme(c);
         return STATE(15);
     }
