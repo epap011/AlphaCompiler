@@ -6,7 +6,7 @@
 #include "tokens.h"
 
 #define MAX_LEXEME  1024
-#define MAX_STATE   19
+#define MAX_STATE   20
 #define TOKEN_SHIFT (MAX_STATE+1)
 #define TOKEN(t)    TOKEN_SHIFT+(t)
 #define STATE(s)    s
@@ -33,10 +33,13 @@ unsigned tokenNo = 0;
 char lexeme[MAX_LEXEME];
 char lookAhead = '\0';
 
+int open_comments  = 0;
+int close_comments = 0;
+
 int sf0 (char c); int sf1 (char c); int sf2 (char c); int sf3 (char c); int sf4 (char c); 
 int sf5 (char c); int sf6 (char c); int sf7 (char c); int sf8 (char c); int sf9 (char c);
 int sf10(char c); int sf11(char c); int sf12(char c); int sf13(char c); int sf14(char c);
-int sf15(char c); int sf16(char c); int sf17(char c); int sf18(char c);
+int sf15(char c); int sf16(char c); int sf17(char c); int sf18(char c); int sf19(char c);
 
 void     resetLexeme(void); void checkLine(char c);
 char     getNextChar(void); void retrack(char c);
@@ -44,27 +47,7 @@ unsigned gettoken2(void);   void extendLexeme(char c);
 char*    getLexeme(void);   int  isPunctuation(char c);
 int      isKeyword(char* s);
 
-int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12, &sf13, &sf14, &sf15, &sf16, &sf17, &sf18};
-
-/*
-int main(int argc, char** argv) {
-    if(argc < 2) {
-        //fprintf(stderr, "Error: wrong number of arguments\n");
-        //exit(EXIT_FAILURE);
-        yyin = stdin;
-    }
-
-    else if((yyin = fopen(argv[1], "r")) == NULL) {
-        fprintf(stderr, "Error: can't open file \"%s\"\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
-
-    unsigned token;
-    while((token = gettoken2()) != END_OF_FILE) {
-        //printf();
-    }
-}
-*/
+int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf6, &sf7, &sf8, &sf9, &sf10, &sf11, &sf12, &sf13, &sf14, &sf15, &sf16, &sf17, &sf18, &sf19};
 
 int alpha_yylex(void *yylval){
     unsigned token;
@@ -179,6 +162,7 @@ int sf7(char c) {
     }
     /* block comment */
     else {
+        open_comments++;
         return STATE(14);
     }
     return -1;
@@ -245,14 +229,23 @@ int sf13(char c) {
 
 int sf14(char c) {
     if(c == '*') {
+        if(lexeme[curr-1] == '/') open_comments++;
+        extendLexeme(c);
         return STATE(15);
     }
     return STATE(14);
 }
 
 int sf15(char c) {
-    if(c == '/') {
-        return TOKEN(COMMENT);
+    if(c == '/') {   
+        open_comments--;    
+        if(open_comments == 0) {
+            lexeme[curr-1] = '\0';
+            curr--;
+            return TOKEN(COMMENT);
+        }
+        
+        return STATE(14);
     }
     else {
         return STATE(14);
@@ -284,6 +277,18 @@ int sf18(char c) {
     }
     retrack(c);
     return TOKEN(PUNCTUATION);
+}
+
+int sf19(char c) {
+    if(c == '/') {
+        open_comments--;
+        //if(open_comments == 0) return TOKEN(COMMENT);
+        return TOKEN(COMMENT);
+        //return STATE(14);
+    }
+    else {
+        return STATE(14);
+    }
 }
 
 unsigned gettoken2() {
