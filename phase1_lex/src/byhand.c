@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "tokens.h"
 
-#define MAX_LEXEME  1024
+#define MAX_LEXEME  65536
 #define MAX_STATE   20
 #define TOKEN_SHIFT (MAX_STATE+1)
 #define TOKEN(t)    TOKEN_SHIFT+(t)
@@ -277,7 +277,7 @@ int sf15(char c) {
     if(c == '/') {   
         open_comments--;
 
-        if(lexeme[curr-2] == '/')
+        if(curr > 2 && lexeme[curr-2] == '/')
             open_comments--;
         
         if(open_comments > 0) {
@@ -353,8 +353,8 @@ unsigned gettoken2() {
         }          
         else if(ISTOKEN(state)) {
             if(state-TOKEN_SHIFT!=-1) {
-                //printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
-                getLexeme();
+                printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
+                //getLexeme();
                 return state-TOKEN_SHIFT;
             }
         }
