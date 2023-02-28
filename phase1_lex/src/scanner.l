@@ -16,6 +16,7 @@
     /*Block comment handlers*/
     int   comm_counter = 0;
     int   comm_line;
+    int   nest_line;
     char* comment;
 
     char* replace_escape_chars(char *str, int yyleng);
@@ -109,6 +110,7 @@ undefined [^\r\n]
 
 {comment2o} {
                 comm_counter++;
+                nest_line=yylineno;
                 comment=commcat(comment,yytext);
                 if(comm_counter==1){
                     comm_line=yylineno;
@@ -128,6 +130,7 @@ undefined [^\r\n]
                     free(comment);
                 }
                 else{
+                    TOKEN(COMMENT, NESTCOMM, nest_line, ++tkn_counter, comment);
                     comment=commcat(comment,yytext);
                 }
             }

@@ -68,6 +68,7 @@ enum subtype{
     /*Comments*/
     LINECOMM,
     BLOCKCOMM,
+    NESTCOMM,
     /*Invalid value*/
     NOSTYPE
 };

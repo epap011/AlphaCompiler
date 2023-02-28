@@ -100,6 +100,7 @@ const char* str_subtype(enum subtype s) {
         case REALCONST: return "REALCONST";
         case LINECOMM: return "LINECOMM";
         case BLOCKCOMM: return "BLOCKCOMM";
+        case NESTCOMM: return "NESTCOMM";
         case NOSTYPE: return "NOSTYPE";
         default: return "INVALID";
     }
