@@ -1,6 +1,5 @@
 /*Options*/
 %option noyywrap
-%option outfile = "scanner.c"
 %option yylineno
 
 %{

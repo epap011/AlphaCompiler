@@ -39,11 +39,11 @@ $(TOKEN_FILE_NAME).o: $(SRC_DIR)/$(TOKEN_FILE_NAME).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 #######################################################################
 
-$(SCANNER_FILE_NAME).c: $(SRC_DIR)/$(SCANNER_FILE_NAME).l
-	flex -o $(SRC_DIR)/$@ -i $^
+$(SRC_DIR)/$(SCANNER_FILE_NAME).c: $(SRC_DIR)/$(SCANNER_FILE_NAME).l
+	flex -o $@ -i $^
 
 $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@
 
 clean:
-	rm -rf $(BIN_DIR) $(OBJ_DIR)
+	rm -rf $(BIN_DIR) $(OBJ_DIR) $(SRC_DIR)/$(SCANNER_FILE_NAME).c
