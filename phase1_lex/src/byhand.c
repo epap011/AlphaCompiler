@@ -27,7 +27,7 @@ int state        = 0;
 int useLookAhead = 0;
 
 unsigned curr    = 0;
-unsigned lineNo  = 0;
+unsigned lineNo  = 1;
 unsigned tokenNo = 0;
 
 char lexeme[MAX_LEXEME];
