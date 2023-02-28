@@ -9,7 +9,7 @@
     #include "tokens.h"
 
     #define RED     "\033[31m"  //for colorful output
-    #define DEFAULT   "\x1b[0m"
+    #define DEFAULT "\x1b[0m"
 
     #define TOKEN(type,subtype,lc,tkn, text) insert_token(yylval,lc,tkn,text,type,subtype)
 
