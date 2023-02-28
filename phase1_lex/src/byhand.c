@@ -353,8 +353,8 @@ unsigned gettoken2() {
         }          
         else if(ISTOKEN(state)) {
             if(state-TOKEN_SHIFT!=-1) {
-                printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
-                //getLexeme();
+                //printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
+                getLexeme();
                 return state-TOKEN_SHIFT;
             }
         }
