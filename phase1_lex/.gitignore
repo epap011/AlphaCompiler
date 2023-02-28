@@ -1,4 +1,6 @@
 testfiles/
+bin/
+obj/
 scanner.c
 scanner
 bonus
