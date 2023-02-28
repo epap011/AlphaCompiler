@@ -199,7 +199,7 @@ void print_list(TokenList *tokenList, FILE *yyout){
     while(iterator){
 
         if(iterator->tType == UNDEFCHR)
-            fprintf(stderr, "%d:\tUndefined character\t\"%s\"\n",iterator->numline, FORMAT_NEWLINES(iterator->content));
+            fprintf(yyout, "%d:\tUndefined character\t\"%s\"\n",iterator->numline, FORMAT_NEWLINES(iterator->content));
         else if(iterator->tType == COMMENT)
             fprintf(yyout, "%d:\t#%d\t\"%s\"\t%s\t%s\t\"%s\"\t<-%s\n",iterator->numline, iterator->numToken, "", str_type(iterator->tType), str_subtype(iterator->sType), "", "enumerated");   
         else if(iterator->sType == NOSTYPE){

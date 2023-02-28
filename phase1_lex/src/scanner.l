@@ -8,7 +8,9 @@
     #include <string.h>
     #include "tokens.h"
 
-    /*To be modified, to add token to list*/
+    #define RED     "\033[31m"  //for colorful output
+    #define DEFAULT   "\x1b[0m"
+
     #define TOKEN(type,subtype,lc,tkn, text) insert_token(yylval,lc,tkn,text,type,subtype)
 
     int  tkn_counter  = 0;
@@ -137,7 +139,14 @@ undefined [^\r\n]
 
 {blanks}     {if (comm_counter){comment=commcat(comment,yytext);}}
 
-{undefined}  {if(!comm_counter) {TOKEN(UNDEFCHR, NOSTYPE, yylineno, -1, yytext);} else {comment=commcat(comment,yytext);} }
+{undefined}  {
+                if(!comm_counter) {
+                    TOKEN(UNDEFCHR, NOSTYPE, yylineno, -1, yytext); 
+                    fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno);
+                }   
+                else 
+                    comment=commcat(comment,yytext); 
+            }
 \n           {if(comm_counter){comment=commcat(comment,yytext);}}
 
 <<EOF>>      {
