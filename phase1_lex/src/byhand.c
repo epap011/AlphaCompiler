@@ -224,14 +224,21 @@ int sf12(char c) {
 }
 
 int sf13(char c) {
-    if(c == '\n') {
+    //Return token(comment) if \n ir EOF is encountered.
+    if(c == '\n' || feof(yyin)) {
         return TOKEN(COMMENT);
     }
     return STATE(13);
 }
 
 int sf14(char c) {
-    if(c == '*') {
+    //Return token(comment) also if EOF is encountered.
+    if(feof(yyin)){
+        lexeme[curr-1] = '\0';
+        curr--;
+        return TOKEN(COMMENT);
+    }
+    else if(c == '*') {
         if(curr > 0 && lexeme[curr-1] == '/') open_comments++;
         extendLexeme(c);
         return STATE(15);
