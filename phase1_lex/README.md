@@ -1,14 +1,27 @@
-[Authors]
-Παναγιώτης-Μιχαήλ Αλεξίου csd3665
-Κουμάκης Εμμανουήλ csd4281 
-Ευθύμης Παπαγεωργίου csd4340
+## Authors 
+Παναγιώτης-Μιχαήλ Αλεξίου csd3665  
+Κουμάκης Εμμανουήλ csd4281   
+Ευθύμης Παπαγεωργίου csd4340  
 
---
+## How to Build
 
-Για τρέξει κανείς το project αρκεί η εντολή make all, με την οποία γίνεται compile το scanner.l και παράγεται ένα .c αρχείο
-το οποίο γίνεται και αυτό compile στην συνέχεια μαζί με τα υπόλοιπα .c αρχεία που χρησιμοποιήσαμε.
-Το τελικό παραγόμενο αρχείο είναι το scanner το οποίο και τρέχουμε εκτελώντας ./scanner
-Αν θέλουμε να δώσουμε σαν έισοδο κάποιο εξωτερικό αρχείο αρκει να εκτελέσουμε ./scanner input_file
-Αν θέλουμε η έξοδος του προγράμματος να γραφτεί σε κάποιο εξωτερικό αρχείο και όχι στο stdout εκτελόυμε ./scanner input_file output_file
+For **Flex**:
+> make scanner
 
-Τέλος υλοποιήσαμε όλα τα κομμάτια όπως ακριβώς ζητούσε η εκφώνηση.
+For team's lexical analyzer(**by-hand**)
+> make bonustoken
+
+## How to Run
+At path AlphaCompiler/phase1_lex
+
+For **Flex**
+> ./bin/scanner
+
+For team's lexical analyzer(**by-hand**)
+> ./bin/bonustoken
+
+## How to clean
+> make clean
+
+## Description
+Yλοποιήσαμε όλα τα κομμάτια(+bonus) όπως ακριβώς ζητούσε η εκφώνηση
