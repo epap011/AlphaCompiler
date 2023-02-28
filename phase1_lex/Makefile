@@ -10,22 +10,22 @@ CPPFLAGS = -Iinclude
 
 #File names (no extension)
 SCANNER_FILE_NAME = scanner
-BYHAND_FILE_NAME  = byhand_lex
+BYHAND_FILE_NAME  = byhand
 TOKEN_FILE_NAME	  = token
 
-#Targets names
-SCANNER_TARGET = scanner
-BYHAND_TARGET  = bonustoken
+#Targets names (only for make)
+SCANNER_TARGET = flex
+BYHAND_TARGET  = byhand
 
 #all: $(SCANNER_FILE_NAME).c $(SCANNER_FILE_NAME).o $(SCANNER_TARGET) token.o 
 #	rm -f *.o
 
 ###################### T A R G E T S###################################
 $(SCANNER_TARGET): $(BIN_DIR) $(SCANNER_FILE_NAME).o $(TOKEN_FILE_NAME).o
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/$(SCANNER_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(SCANNER_FILE_NAME) $(OBJ_DIR)/$(SCANNER_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o
 
 $(BYHAND_TARGET): $(BIN_DIR) $(BYHAND_FILE_NAME).o $(TOKEN_FILE_NAME).o 
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/$(BYHAND_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o 
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(BYHAND_FILE_NAME) $(OBJ_DIR)/$(BYHAND_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o 
 #######################################################################
 
 ##################### O B J E C T - F I L E S #########################
