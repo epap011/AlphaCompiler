@@ -6,10 +6,10 @@
 ## How to Build
 
 For **Flex**:
-> make scanner
+> make flex
 
 For team's lexical analyzer(**by-hand**)
-> make bonustoken
+> make byhand
 
 ## How to Run
 At path AlphaCompiler/phase1_lex
@@ -18,7 +18,7 @@ For **Flex**
 > ./bin/scanner
 
 For team's lexical analyzer(**by-hand**)
-> ./bin/bonustoken
+> ./bin/byhand
 
 ## How to clean
 > make clean
