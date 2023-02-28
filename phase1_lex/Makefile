@@ -25,7 +25,7 @@ $(SCANNER_TARGET): $(BIN_DIR) $(SCANNER_FILE_NAME).o $(TOKEN_FILE_NAME).o
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(SCANNER_FILE_NAME) $(OBJ_DIR)/$(SCANNER_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o
 
 $(BYHAND_TARGET): $(BIN_DIR) $(BYHAND_FILE_NAME).o $(TOKEN_FILE_NAME).o 
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(BYHAND_FILE_NAME) $(OBJ_DIR)/$(BYHAND_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o 
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(SCANNER_FILE_NAME) $(OBJ_DIR)/$(BYHAND_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o 
 #######################################################################
 
 ##################### O B J E C T - F I L E S #########################
