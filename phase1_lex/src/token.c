@@ -217,7 +217,37 @@ void print_list(TokenList *tokenList, FILE *yyout){
     }
 }
 
+void push(line_stack_top *stack, int line) {
+    line_stack *new_node = (line_stack*)malloc(sizeof(line_stack));
+    new_node->line = line;
+    new_node->next = stack->top;
+    stack->top = new_node;
+}
+
+int pop(line_stack_top *stack) {
+    if (stack->top == NULL) {
+        printf("Error: Stack underflow\n");
+        return -1;
+    }
+    line_stack *node = stack->top;
+    int line = node->line;
+    stack->top = node->next;
+    free(node);
+    return line;
+}
+
 int main(int argc, char** argv){
+
+    line_stack_top *top=malloc(sizeof(line_stack_top));
+    top->top=NULL;
+
+    push(top,4);
+    push(top,5);
+    push(top,6);
+    printf("%d\n",pop(top));
+    printf("%d\n",pop(top));
+    printf("%d\n",pop(top));
+    printf("%d\n",pop(top));
 
     if (argc == 2 || argc == 3) {
         if(!(yyin = fopen(argv[1], "r"))) {

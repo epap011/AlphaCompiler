@@ -89,6 +89,15 @@ struct TokenList{
     alpha_token_t *tail;
 };
 
+typedef struct line_stack{
+    int line;
+    struct line_stack *next;
+} line_stack;
+
+typedef struct {
+    line_stack *top;
+} line_stack_top;
+
 typedef struct TokenList TokenList;
 
 void insert_token(TokenList *tokenList, int numline, int numToken, char *content, enum type tType, enum subtype sType);
