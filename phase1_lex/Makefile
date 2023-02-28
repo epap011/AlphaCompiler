@@ -29,7 +29,7 @@ $(BYHAND_TARGET): $(BIN_DIR) $(BYHAND_FILE_NAME).o $(TOKEN_FILE_NAME).o
 #######################################################################
 
 ##################### O B J E C T - F I L E S #########################
-$(SCANNER_FILE_NAME).o: $(SCANNER_FILE_NAME).c | $(OBJ_DIR)
+$(SCANNER_FILE_NAME).o: $(SRC_DIR)/$(SCANNER_FILE_NAME).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
 $(BYHAND_FILE_NAME).o: $(SRC_DIR)/$(BYHAND_FILE_NAME).c | $(OBJ_DIR)
@@ -40,10 +40,10 @@ $(TOKEN_FILE_NAME).o: $(SRC_DIR)/$(TOKEN_FILE_NAME).c | $(OBJ_DIR)
 #######################################################################
 
 $(SCANNER_FILE_NAME).c: $(SRC_DIR)/$(SCANNER_FILE_NAME).l
-	flex -o $@ -i $^
+	flex -o $(SRC_DIR)/$@ -i $^
 
 $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@
 
 clean:
-	rm -rv $(BIN_DIR) $(OBJ_DIR) scanner.c
+	rm -rf $(BIN_DIR) $(OBJ_DIR)
