@@ -3,6 +3,12 @@
 #include <string.h>
 #include "tokens.h"
 
+#ifdef DISABLE_NEWLINE_PRINTING
+#define FORMAT_NEWLINES(x) format_newlines(x)
+#else
+#define FORMAT_NEWLINES(x) x
+#endif
+
 /*List of tokens to be written*/
 TokenList *tokenList;
 
@@ -157,25 +163,54 @@ enum subtype get_subtype(enum type s, char* str) {
 	    return NOSTYPE;
 }
 
+//Format newlines for printing "\n" instead of a newline.
+char* format_newlines(char* str) {
+    int len = strlen(str);
+    int newline_count = 0;
+    int i;
+    // count newlines in input string
+    for (int i = 0; i < len; i++) {
+        if (str[i] == '\n') {
+            newline_count++;
+        }
+    }
+    // allocate memory for output string
+    char* out_str = malloc((len + newline_count + 1) * sizeof(char));
+    if (out_str == NULL) {
+        return NULL; // error: unable to allocate memory
+    }
+    // copy input string to output string, replacing newlines with "\n"
+    for (i=0; i < len; i++) {
+        if (str[i] == '\n') {
+            out_str[i++] = '\\';
+            out_str[i] = 'n';
+        } else {
+            out_str[i] = str[i];
+        }
+    }
+    out_str[i] = '\0'; // terminate output string with null character
+    return out_str;
+}
+
 void print_list(TokenList *tokenList, FILE *yyout){
 
     alpha_token_t *iterator=tokenList->head;
     while(iterator){
 
         if(iterator->tType == UNDEFCHR)
-            fprintf(stderr, "%d:  Undefined character \"%s\"\n",iterator->numline, iterator->content);
+            fprintf(stderr, "%d:  Undefined character \"%s\"\n",iterator->numline, FORMAT_NEWLINES(iterator->content));
         
         else
         if(iterator->sType == NOSTYPE){
-            fprintf(yyout, "%d  #%d \"%s\" %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), iterator->content, "char*");    
+            fprintf(yyout, "%d  #%d \"%s\" %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), FORMAT_NEWLINES(iterator->content), "char*");    
         }
         else{
             if(iterator->sType == INTCONST)
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), str_subtype(iterator->sType), iterator->content, "int");
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "int");
             else if(iterator->sType == REALCONST)
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), str_subtype(iterator->sType), iterator->content, "float");
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "float");
             else
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, iterator->content, str_type(iterator->tType), str_subtype(iterator->sType), iterator->content, "enumerated");   
+                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "enumerated");   
         }
         iterator=iterator->next;
     }
