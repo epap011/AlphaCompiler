@@ -106,3 +106,7 @@ const char* str_subtype(enum subtype s);
 enum subtype get_subtype(enum type s, char *str);
 void print_list(TokenList *tokenList, FILE *yyout);
 int alpha_yylex(void* yylval);
+void push(line_stack_top *stack, int line);
+int pop(line_stack_top *stack);
+
+extern line_stack_top *top; //Stack for nested_comment line counting

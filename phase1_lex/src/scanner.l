@@ -110,7 +110,7 @@ undefined [^\r\n]
 
 {comment2o} {
                 comm_counter++;
-                nest_line=yylineno;
+                push(top,yylineno);
                 comment=commcat(comment,yytext);
                 if(comm_counter==1){
                     comm_line=yylineno;
@@ -130,7 +130,7 @@ undefined [^\r\n]
                     free(comment);
                 }
                 else{
-                    TOKEN(COMMENT, NESTCOMM, nest_line, ++tkn_counter, comment);
+                    TOKEN(COMMENT, NESTCOMM, pop(top), ++tkn_counter, comment);
                     comment=commcat(comment,yytext);
                 }
             }

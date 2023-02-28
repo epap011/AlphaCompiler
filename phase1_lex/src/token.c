@@ -236,18 +236,12 @@ int pop(line_stack_top *stack) {
     return line;
 }
 
+line_stack_top *top;
+
 int main(int argc, char** argv){
 
-    line_stack_top *top=malloc(sizeof(line_stack_top));
+    top=malloc(sizeof(line_stack_top));
     top->top=NULL;
-
-    push(top,4);
-    push(top,5);
-    push(top,6);
-    printf("%d\n",pop(top));
-    printf("%d\n",pop(top));
-    printf("%d\n",pop(top));
-    printf("%d\n",pop(top));
 
     if (argc == 2 || argc == 3) {
         if(!(yyin = fopen(argv[1], "r"))) {
