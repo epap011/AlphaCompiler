@@ -187,7 +187,7 @@ int sf7(char c) {
 
 /* read letter | digit */
 int sf8(char c) {
-    if(isalpha(c) || isdigit(c)) {
+    if(isalpha(c) || isdigit(c) || c == '_') {
         return STATE(8);
     }
     retrack(c);
@@ -301,6 +301,7 @@ int sf16(char c) {
     if(isdigit(c)) {
         return STATE(16);
     }
+    retrack(c);
     return TOKEN(NUMBER);
 }
 
