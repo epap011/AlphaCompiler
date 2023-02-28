@@ -135,7 +135,7 @@ undefined [^\r\n]
 {blanks}     {if (comm_counter){comment=commcat(comment,yytext);}}
 
 {undefined}  {if(!comm_counter) {TOKEN(UNDEFCHR, NOSTYPE, yylineno, -1, yytext);} else {comment=commcat(comment,yytext);} }
-\n           {if(comm_counter){comment=commcat(comment,"\\n");}}
+\n           {if(comm_counter){comment=commcat(comment,yytext);}}
 
 <<EOF>>      {
                 if(comm_counter){
