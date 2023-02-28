@@ -1,40 +1,49 @@
-#Compiler
-CC = gcc
+#Directory folder names
+SRC_DIR = src
+OBJ_DIR = obj
+BIN_DIR = bin
 
-#compiler flags
-CFLAGS = -Wall
+#Compiler, Compiler flags and Includes
+CC       = gcc
+CFLAGS   = -Wall
+CPPFLAGS = -Iinclude
 
 #File names (no extension)
-SCANNER_FILE = scanner
-BYHAND_FILE  = byhand_lex
+SCANNER_FILE_NAME = scanner
+BYHAND_FILE_NAME  = byhand
+TOKEN_FILE_NAME	  = token
 
-#Targets
-SCANNER_TARGET = scanner
-BYHAND_TARGET  = bonus
+#Targets names (only for make)
+SCANNER_TARGET = flex
+BYHAND_TARGET  = byhand
 
-all: $(SCANNER_FILE).c $(SCANNER_FILE).o $(SCANNER_TARGET) token.o 
-	rm -f *.o
+#all: $(SCANNER_FILE_NAME).c $(SCANNER_FILE_NAME).o $(SCANNER_TARGET) token.o 
+#	rm -f *.o
 
-bonustoken: token.o $(BYHAND_FILE).o
-	$(CC) $(CFLAGS) -o $@ $^
+###################### T A R G E T S###################################
+$(SCANNER_TARGET): $(BIN_DIR) $(SCANNER_FILE_NAME).o $(TOKEN_FILE_NAME).o
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(SCANNER_FILE_NAME) $(OBJ_DIR)/$(SCANNER_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o
 
-$(SCANNER_TARGET): $(SCANNER_FILE).o token.o
-	$(CC) $(CFLAGS) -o $@ $^
+$(BYHAND_TARGET): $(BIN_DIR) $(BYHAND_FILE_NAME).o $(TOKEN_FILE_NAME).o 
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(SCANNER_FILE_NAME) $(OBJ_DIR)/$(BYHAND_FILE_NAME).o $(OBJ_DIR)/$(TOKEN_FILE_NAME).o 
+#######################################################################
 
-$(BYHAND_TARGET): $(BYHAND_FILE).o
-	$(CC) $(CFLAGS) -o $@ $^
+##################### O B J E C T - F I L E S #########################
+$(SCANNER_FILE_NAME).o: $(SRC_DIR)/$(SCANNER_FILE_NAME).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
-$(SCANNER_FILE).o: $(SCANNER_FILE).c
-	$(CC) $(CFLAGS) -c $<
+$(BYHAND_FILE_NAME).o: $(SRC_DIR)/$(BYHAND_FILE_NAME).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
-$(BYHAND_FILE).o: $(BYHAND_FILE).c
-	$(CC) $(CFLAGS) -c $<
+$(TOKEN_FILE_NAME).o: $(SRC_DIR)/$(TOKEN_FILE_NAME).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+#######################################################################
 
-token.o: token.c
-	$(CC) $(CFLAGS) -c $<
+$(SRC_DIR)/$(SCANNER_FILE_NAME).c: $(SRC_DIR)/$(SCANNER_FILE_NAME).l
+	flex -o $@ -i $^
 
-$(SCANNER_FILE).c: $(SCANNER_FILE).l
-	flex -o $@ -i $(SCANNER_FILE).l
+$(BIN_DIR) $(OBJ_DIR):
+	mkdir -p $@
 
 clean:
-	rm -f *.o $(SCANNER_TARGET) $(SCANNER_FILE).c $(BYHAND_TARGET) bonustoken
+	rm -rf $(BIN_DIR) $(OBJ_DIR) $(SRC_DIR)/$(SCANNER_FILE_NAME).c

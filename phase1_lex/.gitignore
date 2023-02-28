@@ -1,6 +1,7 @@
+.gitignore
+testproject/
 testfiles/
-scanner.c
-scanner
-bonus
-bonustoken
+bin/
+obj/
+src/scanner.c
 *.o

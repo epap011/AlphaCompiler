@@ -27,7 +27,7 @@ int state        = 0;
 int useLookAhead = 0;
 
 unsigned curr    = 0;
-unsigned lineNo  = 0;
+unsigned lineNo  = 1;
 unsigned tokenNo = 0;
 
 char lexeme[MAX_LEXEME];
@@ -35,6 +35,11 @@ char lookAhead = '\0';
 
 int open_comments  = 0;
 int close_comments = 0;
+int line_comm      = 0;
+
+void* _yylval = (void*)0;
+
+enum subtype comment_sub_type = NOSTYPE;
 
 int sf0 (char c); int sf1 (char c); int sf2 (char c); int sf3 (char c); int sf4 (char c); 
 int sf5 (char c); int sf6 (char c); int sf7 (char c); int sf8 (char c); int sf9 (char c);
@@ -51,8 +56,19 @@ int (*state_funcs[MAX_STATE+1])(char) = {&sf0, &sf1, &sf2, &sf3, &sf4, &sf5, &sf
 
 int alpha_yylex(void *yylval){
     unsigned token;
+    _yylval = yylval;
     while((token = gettoken2()) != END_OF_FILE) {
-        insert_token(yylval,lineNo,++tokenNo,lexeme,token,get_subtype(token,lexeme));
+        if(comment_sub_type == BLOCKCOMM) {
+            insert_token(yylval,line_comm,++tokenNo,lexeme,token,BLOCKCOMM);
+            comment_sub_type = NOSTYPE;
+        }
+        else if(comment_sub_type == LINECOMM) {
+            insert_token(yylval,lineNo,++tokenNo,lexeme,token,LINECOMM);
+            comment_sub_type = NOSTYPE;
+        }
+        else {
+            insert_token(yylval,lineNo,++tokenNo,lexeme,token,get_subtype(token,lexeme));
+        }
     }
     return 0;
 }
@@ -163,6 +179,7 @@ int sf7(char c) {
     /* block comment */
     else {
         open_comments++;
+        line_comm = lineNo;
         return STATE(14);
     }
     return -1;
@@ -224,15 +241,29 @@ int sf12(char c) {
 }
 
 int sf13(char c) {
-    if(c == '\n') {
+    //Return token(comment) if \n ir EOF is encountered.
+    if(c == '\n' || feof(yyin)) {
+        comment_sub_type = LINECOMM;
         return TOKEN(COMMENT);
     }
     return STATE(13);
 }
 
 int sf14(char c) {
-    if(c == '*') {
-        if(curr > 0 && lexeme[curr-1] == '/') open_comments++;
+    //Return token(comment) also if EOF is encountered.
+    if(c == '\n') {
+        lineNo++;
+    }
+    if(feof(yyin)){
+        lexeme[curr-1] = '\0';
+        curr--;
+        return TOKEN(COMMENT);
+    }
+    else if(c == '*') {
+        if(curr > 0 && lexeme[curr-1] == '/') {
+            open_comments++;
+            push(top, lineNo);
+        }
         extendLexeme(c);
         return STATE(15);
     }
@@ -240,11 +271,20 @@ int sf14(char c) {
 }
 
 int sf15(char c) {
+    if(c == '\n') {
+        lineNo++;
+    }
     if(c == '/') {   
-        open_comments--;    
+        open_comments--;
+
         if(lexeme[curr-2] == '/')
             open_comments--;
+        
+        if(open_comments > 0) {
+            insert_token(_yylval,pop(top),++tokenNo,lexeme,COMMENT,NESTCOMM);
+        }
         if(open_comments == 0) {
+            comment_sub_type = BLOCKCOMM;
             lexeme[curr-1] = '\0';
             curr--;
             return TOKEN(COMMENT);
@@ -312,7 +352,8 @@ unsigned gettoken2() {
         }          
         else if(ISTOKEN(state)) {
             if(state-TOKEN_SHIFT!=-1) {
-                printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
+                //printf(ANSI_COLOR_YELLOW "Recognized token: '%s' | token: %d\n" ANSI_COLOR_RESET, getLexeme(), state-TOKEN_SHIFT);
+                getLexeme();
                 return state-TOKEN_SHIFT;
             }
         }

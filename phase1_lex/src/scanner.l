@@ -1,6 +1,5 @@
 /*Options*/
 %option noyywrap
-%option outfile = "scanner.c"
 %option yylineno
 
 %{
@@ -9,7 +8,9 @@
     #include <string.h>
     #include "tokens.h"
 
-    /*To be modified, to add token to list*/
+    #define RED     "\033[31m"  //for colorful output
+    #define DEFAULT "\x1b[0m"
+
     #define TOKEN(type,subtype,lc,tkn, text) insert_token(yylval,lc,tkn,text,type,subtype)
 
     int  tkn_counter  = 0;
@@ -17,6 +18,7 @@
     /*Block comment handlers*/
     int   comm_counter = 0;
     int   comm_line;
+    int   nest_line;
     char* comment;
 
     char* replace_escape_chars(char *str, int yyleng);
@@ -110,6 +112,7 @@ undefined [^\r\n]
 
 {comment2o} {
                 comm_counter++;
+                push(top,yylineno);
                 comment=commcat(comment,yytext);
                 if(comm_counter==1){
                     comm_line=yylineno;
@@ -129,14 +132,22 @@ undefined [^\r\n]
                     free(comment);
                 }
                 else{
+                    TOKEN(COMMENT, NESTCOMM, pop(top), ++tkn_counter, comment);
                     comment=commcat(comment,yytext);
                 }
             }
 
 {blanks}     {if (comm_counter){comment=commcat(comment,yytext);}}
 
-{undefined}  {if(!comm_counter) {TOKEN(UNDEFCHR, NOSTYPE, yylineno, -1, yytext);} else {comment=commcat(comment,yytext);} }
-\n           {if(comm_counter){comment=commcat(comment,"\\n");}}
+{undefined}  {
+                if(!comm_counter) {
+                    TOKEN(UNDEFCHR, NOSTYPE, yylineno, -1, yytext); 
+                    fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno);
+                }   
+                else 
+                    comment=commcat(comment,yytext); 
+            }
+\n           {if(comm_counter){comment=commcat(comment,yytext);}}
 
 <<EOF>>      {
                 if(comm_counter){
@@ -196,16 +207,16 @@ char * replace_escape_chars(char* str, int length){
 }
 
 char* commcat(char* comm, char *cat) {
-        size_t comm_len = comm ? strlen(comm) : 0;
-        size_t cat_len = strlen(cat);
-        char* result = malloc(comm_len + cat_len + 1);
-        if (!result) {
-            fprintf(stderr, "Failed to allocate memory for concatenated string\n");
-            exit(1);
-        }
-        if (comm_len > 0) {
-            memcpy(result, comm, comm_len);
-        }
-        memcpy(result + comm_len, cat, cat_len + 1);
-        return result;
+    size_t comm_len = comm ? strlen(comm) : 0;
+    size_t cat_len = strlen(cat);
+    char* result = malloc(comm_len + cat_len + 1);
+    if (!result) {
+        fprintf(stderr, "Failed to allocate memory for concatenated string\n");
+        exit(1);
     }
+    if (comm_len > 0) {
+        memcpy(result, comm, comm_len);
+    }
+    memcpy(result + comm_len, cat, cat_len + 1);
+    return result;
+}
