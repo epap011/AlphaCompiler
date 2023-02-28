@@ -198,19 +198,19 @@ void print_list(TokenList *tokenList, FILE *yyout){
     while(iterator){
 
         if(iterator->tType == UNDEFCHR)
-            fprintf(stderr, "%d:  Undefined character \"%s\"\n",iterator->numline, FORMAT_NEWLINES(iterator->content));
-        
-        else
-        if(iterator->sType == NOSTYPE){
-            fprintf(yyout, "%d  #%d \"%s\" %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), FORMAT_NEWLINES(iterator->content), "char*");    
+            fprintf(stderr, "%d:\tUndefined character\t\"%s\"\n",iterator->numline, FORMAT_NEWLINES(iterator->content));
+        else if(iterator->tType == COMMENT)
+            fprintf(yyout, "%d:\t#%d\t\"%s\"\t%s\t%s\t\"%s\"\t<-%s\n",iterator->numline, iterator->numToken, "", str_type(iterator->tType), str_subtype(iterator->sType), "", "enumerated");   
+        else if(iterator->sType == NOSTYPE){
+            fprintf(yyout, "%d:\t#%d\t\"%s\"\t%s\t\"%s\"\t<-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), FORMAT_NEWLINES(iterator->content), "char*");    
         }
         else{
             if(iterator->sType == INTCONST)
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "int");
+                fprintf(yyout, "%d:\t#%d\t\"%s\"\t%s\t%s\t\"%s\"\t<-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "int");
             else if(iterator->sType == REALCONST)
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "float");
+                fprintf(yyout, "%d:\t#%d\t\"%s\"\t%s\t%s\t\"%s\"\t<-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "float");
             else
-                fprintf(yyout, "%d  #%d \"%s\" %s %s \"%s\" <-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "enumerated");   
+                fprintf(yyout, "%d:\t#%d\t\"%s\"\t%s\t%s\t\"%s\"\t<-%s\n",iterator->numline, iterator->numToken, FORMAT_NEWLINES(iterator->content), str_type(iterator->tType), str_subtype(iterator->sType), FORMAT_NEWLINES(iterator->content), "enumerated");   
         }
         iterator=iterator->next;
     }
