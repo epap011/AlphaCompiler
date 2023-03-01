@@ -11,6 +11,8 @@ For **Flex**:
 For team's lexical analyzer(**by-hand**)
 > make byhand
 
+Both Flex and team's lexical analyzer(by-hand) will produce the scanner executable.
+
 ## How to Run
 At path AlphaCompiler/phase1_lex
 
@@ -18,7 +20,7 @@ For **Flex**
 > ./bin/scanner
 
 For team's lexical analyzer(**by-hand**)
-> ./bin/byhand
+> ./bin/scanner
 
 ## How to clean
 > make clean
