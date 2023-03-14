@@ -192,9 +192,22 @@ char * replace_escape_chars(char* str, int length){
                 case '\'':              //auto einai peritto? (afou stin glwsa mas den uparxei mono quote den exoume logo kaneis nato kanei escape??)
                     new_str[j] = '\'';
                     break;
-                default:            /*Invalid escape character, we leave it as it is*/
+                case '?':
+                    new_str[j] = '\?';
+                    break;
+                case 'a':
+                    new_str[j] = '\a';
+                    break;
+                case 'b':
+                    new_str[j] = '\b';
+                    break;
+                case 'e':
+                    new_str[j] = '\e';
+                    break;
+                default:            /*Invalid escape character, we leave it as it is, but we print a warning*/
                     new_str[j] = str[i-1];
                     new_str[++j] = str[i];
+                    fprintf(stderr, RED"Warning: "DEFAULT"Invalid escape character \'%c\' in string : %s\" at line %d\n",str[i],yytext,yylineno);
                     break;
             }          
         }
