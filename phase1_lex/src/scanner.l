@@ -151,8 +151,7 @@ undefined [^\r\n]
 
 <<EOF>>      {
                 if(comm_counter){
-                    comment=commcat(comment,yytext);
-                    TOKEN(COMMENT, BLOCKCOMM, comm_line, ++tkn_counter, comment);
+                    fprintf(stderr, RED"ERROR: "DEFAULT"Unclosed comment at line %d\n",comm_line);
                     free(comment);
                     return 1;
                 }
