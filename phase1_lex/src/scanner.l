@@ -20,6 +20,7 @@
     int   comm_line;
     int   nest_line;
     char* comment;
+    int str_nl_counter = 0;
 
     char* replace_escape_chars(char *str, int yyleng);
     char* commcat(char* comm, char *cat);
@@ -91,7 +92,7 @@ undefined [^\r\n]
 {string}     {
                 if(!comm_counter) {
                     yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote
-                    TOKEN(STRING, NOSTYPE, yylineno, ++tkn_counter, yytext);
+                    TOKEN(STRING, NOSTYPE, yylineno - str_nl_counter, ++tkn_counter, yytext);
                 } 
                 else {
                     comment=commcat(comment,yytext);
@@ -174,6 +175,7 @@ char * replace_escape_chars(char* str, int length){
             switch(str[++i]){
                 case 'n': 
                     new_str[j] = '\n';
+                    str_nl_counter++;
                     break;
                 case 't':
                     new_str[j] = '\t';
