@@ -93,6 +93,7 @@ undefined [^\r\n]
                 if(!comm_counter) {
                     yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote
                     TOKEN(STRING, NOSTYPE, yylineno - str_nl_counter, ++tkn_counter, yytext);
+                    str_nl_counter=0;
                 } 
                 else {
                     comment=commcat(comment,yytext);
