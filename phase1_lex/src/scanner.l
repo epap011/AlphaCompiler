@@ -33,6 +33,7 @@ intVal    [0-9]+
 RealVal   {intVal}+"."{intVal}+
 id        [a-zA-Z][a-zA-Z_0-9]*
 string    \"(\\.|[^"\\])*\"
+unclosed_string \"(\\.|[^"\\])*
 comment1  "//"[^*].*
 comment2o "/\*"
 comment2c "\*/"
@@ -99,6 +100,8 @@ undefined [^\r\n]
                     comment=commcat(comment,yytext);
                 }
             }
+
+{unclosed_string} {if(!comm_counter) {fprintf(stderr, RED"Error: "DEFAULT"Unclosed string: \"%s\" at line %d\n",yytext,yylineno); return 0;}}
 
 {comment1}   {
                 if(comm_counter > 0) { //single line comment is inside a block comment
@@ -205,6 +208,9 @@ char * replace_escape_chars(char* str, int length){
                     break;
                 case 'e':
                     new_str[j] = '\e';
+                    break;
+                case 'v':
+                    new_str[j] = '\v';
                     break;
                 default:            /*Invalid escape character, we leave it as it is, but we print a warning*/
                     new_str[j] = str[i-1];
