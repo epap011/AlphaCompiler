@@ -20,6 +20,7 @@
     int   comm_line;
     int   nest_line;
     char* comment;
+    int str_nl_counter = 0;
 
     char* replace_escape_chars(char *str, int yyleng);
     char* commcat(char* comm, char *cat);
@@ -32,6 +33,7 @@ intVal    [0-9]+
 RealVal   {intVal}+"."{intVal}+
 id        [a-zA-Z][a-zA-Z_0-9]*
 string    \"(\\.|[^"\\])*\"
+unclosed_string \"(\\.|[^"\\])*
 comment1  "//"[^*].*
 comment2o "/\*"
 comment2c "\*/"
@@ -91,12 +93,15 @@ undefined [^\r\n]
 {string}     {
                 if(!comm_counter) {
                     yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote
-                    TOKEN(STRING, NOSTYPE, yylineno, ++tkn_counter, yytext);
+                    TOKEN(STRING, NOSTYPE, yylineno - str_nl_counter, ++tkn_counter, yytext);
+                    str_nl_counter=0;
                 } 
                 else {
                     comment=commcat(comment,yytext);
                 }
             }
+
+{unclosed_string} {if(!comm_counter) {fprintf(stderr, RED"Error: "DEFAULT"Unclosed string: \"%s\" at line %d\n",yytext,yylineno); return 0;}}
 
 {comment1}   {
                 if(comm_counter > 0) { //single line comment is inside a block comment
@@ -151,8 +156,7 @@ undefined [^\r\n]
 
 <<EOF>>      {
                 if(comm_counter){
-                    comment=commcat(comment,yytext);
-                    TOKEN(COMMENT, BLOCKCOMM, comm_line, ++tkn_counter, comment);
+                    fprintf(stderr, RED"ERROR: "DEFAULT"Unclosed comment at line %d\n",comm_line);
                     free(comment);
                     return 1;
                 }
@@ -175,6 +179,7 @@ char * replace_escape_chars(char* str, int length){
             switch(str[++i]){
                 case 'n': 
                     new_str[j] = '\n';
+                    str_nl_counter++;
                     break;
                 case 't':
                     new_str[j] = '\t';
@@ -192,9 +197,25 @@ char * replace_escape_chars(char* str, int length){
                 case '\'':              //auto einai peritto? (afou stin glwsa mas den uparxei mono quote den exoume logo kaneis nato kanei escape??)
                     new_str[j] = '\'';
                     break;
-                default:            /*Invalid escape character, we leave it as it is*/
+                case '?':
+                    new_str[j] = '\?';
+                    break;
+                case 'a':
+                    new_str[j] = '\a';
+                    break;
+                case 'b':
+                    new_str[j] = '\b';
+                    break;
+                case 'e':
+                    new_str[j] = '\e';
+                    break;
+                case 'v':
+                    new_str[j] = '\v';
+                    break;
+                default:            /*Invalid escape character, we leave it as it is, but we print a warning*/
                     new_str[j] = str[i-1];
                     new_str[++j] = str[i];
+                    fprintf(stderr, RED"Warning: "DEFAULT"Invalid escape character \'%c\' in string : %s\" at line %d\n",str[i],yytext,yylineno);
                     break;
             }          
         }

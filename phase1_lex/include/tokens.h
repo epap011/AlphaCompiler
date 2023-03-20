@@ -1,7 +1,7 @@
 /*Compilation parameters*/
 
 //Enable to print \n instead of actual newlines.
-#define DISABLE_NEWLINE_PRINTING
+//#define DISABLE_NEWLINE_PRINTING
 
 extern FILE* yyout;
 extern FILE* yyin;
