@@ -21,8 +21,12 @@ void insert_token(TokenList *tokenList, int numline, int numToken, char *content
         tokenList->tail->next->numToken=numToken;
         tokenList->tail->next->tType=tType;
         tokenList->tail->next->sType=sType;
-        tokenList->tail->next->content=malloc(sizeof(char)*strlen(content) + 1);
-        memcpy(tokenList->tail->next->content, content, strlen(content) + 1);
+        if(content){
+            tokenList->tail->next->content=malloc(sizeof(char)*strlen(content) + 1);
+            memcpy(tokenList->tail->next->content, content, strlen(content) + 1);
+        }
+        else
+            tokenList->tail->next->content=NULL;
         tokenList->tail=tokenList->tail->next;
         tokenList->tail->next=NULL;
     }
@@ -32,8 +36,13 @@ void insert_token(TokenList *tokenList, int numline, int numToken, char *content
         tokenList->head->numToken=numToken;
         tokenList->head->tType=tType;
         tokenList->head->sType=sType;
-        tokenList->head->content=malloc(sizeof(char)*strlen(content) + 1);
-        memcpy(tokenList->head->content, content, strlen(content) + 1);
+        if(content)
+        {
+            tokenList->head->content=malloc(sizeof(char)*strlen(content) + 1);
+            memcpy(tokenList->head->content, content, strlen(content) + 1);
+        }
+        else
+            tokenList->head->content=NULL;
         tokenList->head->next=NULL;
         tokenList->tail=tokenList->head;
     }
