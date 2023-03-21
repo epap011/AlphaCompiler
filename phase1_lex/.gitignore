@@ -1,7 +1,0 @@
-.gitignore
-testproject/
-testfiles/
-bin/
-obj/
-src/scanner.c
-*.o

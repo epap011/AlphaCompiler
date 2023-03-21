@@ -39,10 +39,10 @@
 //Grammatikoi kanones   
 %%  
 
-program     : stmt               {}  //pollapla
+program     : stmtList                  {}  //pollapla
             ;   
 
-stmt  :  expr SEMI                {}
+stmt        : expr SEMI                 {}
             | ifstmt                    {}
             | whilestmt                 {}
             | forstmt                   {}
@@ -123,26 +123,21 @@ methodcall  : DDOT IDENT LPAR elist RPAR
             ;
 
 elist       : %empty                  //pollapla
-            | expr COMMA expr
+            | expr com_expr_opt
             ;
 
 objectdef   : LCBRACE elist RCBRACE
             | LCBRACE indexed RCBRACE
             ;
 
-indexed     : indexedelem com_indexedelem //pollapla
+indexed     : indexedelem com_indexedelem_opt //pollapla
             ;
 
 
 indexedelem     : LCBRACE expr COLON expr RCBRACE
                 ;
 
-com_indexedelem : %empty
-                | COMMA indexedelem
-                ;
-
-block           : LCBRACE RCBRACE    //pollapla
-                | LCBRACE stmt RCBRACE
+block           : LCBRACE stmtList RCBRACE
                 ;
 
 funcdef         : FUNCTION IDENT LPAR idlist RPAR block //ksana des to
@@ -161,7 +156,32 @@ idlist          : %empty
                 | IDENT
                 ;
 
-ifstmt          : IF LPAR expr RPAR stmt 
+ifstmt          : IF LPAR expr RPAR stmt
+
+whilestmt       : WHILE LPAR expr RPAR stmt
+
+forstmt         : FOR LPAR expr SEMI expr SEMI expr RPAR stmt
+
+stmtList        : %empty
+                | stmt stmtList
+                ;
+
+returnstmt      : RETURN expr semi_opt
+                ;
+
+com_indexedelem_opt : %empty
+                    | COMMA indexedelem
+                    ;
+
+com_expr_opt : %empty
+             | COMMA expr com_expr_opt
+             ;
+
+semi_opt        : SEMI
+                | %empty
+                ;
+
+
 
 
 //Epilogos
