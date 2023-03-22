@@ -3,7 +3,7 @@
 #include <string.h>
 #include "stack.h"
 
-int alpha_yylex(void* yylval);
+int yylex(void* yylval);
 
 extern FILE* yyout;
 extern FILE* yyin;
@@ -36,7 +36,7 @@ int main(int argc, char** argv){
 
     stack = new_stack();
     //TokenList* token_list = new_token_list();
-    alpha_yylex(NULL);
+    yylex(NULL);
     //print_alpha_token_list(token_list, yyout);
 
     return 0;

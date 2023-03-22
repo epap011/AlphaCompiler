@@ -28,7 +28,7 @@
 
     Stack* stack;
 
-    #define YY_DECL int alpha_yylex(void* yylval)
+    
 %}
 
 /*Macros (Regex)*/

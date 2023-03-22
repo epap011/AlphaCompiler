@@ -1,5 +1,6 @@
 %{
     #include "yacc_util.h"
+    int yylex(void);
 %}
 
 %start program
