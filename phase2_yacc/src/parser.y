@@ -10,8 +10,8 @@
     extern FILE * yyin;    
 %}
 
+%defines
 
-//Diloseis
 %start program
 
 %token ASSIGN PLUS MINUS MUL DIV MOD EQ NEQ INC DEC GT LT GTE LTE UMINUS
@@ -34,12 +34,10 @@
 %left DOT DDOT  
 %left LBRACE RBRACE 
 %left LPAR RPAR 
-
-
-//Grammatikoi kanones   
+ 
 %%  
 
-program     : stmtList                  {}  //pollapla
+program     : stmtList                  {}
             ;   
 
 stmt        : expr SEMI                 {}
@@ -54,7 +52,7 @@ stmt        : expr SEMI                 {}
             | SEMI                      {}
             ;           
 
-expr        :  assignexpr               {}
+expr        : assignexpr                {}
             | expr op expr              {}
             | term                      {}
             ;           
@@ -85,7 +83,7 @@ term        : LPAR expr RPAR            {}
             | primary                   {}
             ;   
 
-assignmexpr : lvalue ASSIGN expr        {}
+assignexpr  : lvalue ASSIGN expr        {}
             ;   
 
 primary     : lvalue                    {}
@@ -122,7 +120,7 @@ normcall    : LPAR elist RPAR
 methodcall  : DDOT IDENT LPAR elist RPAR
             ;
 
-elist       : %empty                  //pollapla
+elist       : %empty
             | expr com_expr_opt
             ;
 
@@ -130,7 +128,7 @@ objectdef   : LCBRACE elist RCBRACE
             | LCBRACE indexed RCBRACE
             ;
 
-indexed     : indexedelem com_indexedelem_opt //pollapla
+indexed     : indexedelem com_indexedelem_opt
             ;
 
 
@@ -140,7 +138,7 @@ indexedelem     : LCBRACE expr COLON expr RCBRACE
 block           : LCBRACE stmtList RCBRACE
                 ;
 
-funcdef         : FUNCTION IDENT LPAR idlist RPAR block //ksana des to
+funcdef         : FUNCTION IDENT LPAR idlist RPAR block
                 ;
 
 const           : INTCONST
@@ -181,8 +179,4 @@ semi_opt        : SEMI
                 | %empty
                 ;
 
-
-
-
-//Epilogos
 %%

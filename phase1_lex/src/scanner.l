@@ -6,12 +6,14 @@
     #include <stdio.h>
     #include <stdlib.h>    
     #include <string.h>
-    #include "tokens.h"
+    #include "alpha_token_list.h"
+    #include "stack.h"
+    #include "alpha_types.h"
 
-    #define RED     "\033[31m"  //for colorful output
+    #define RED     "\033[31m"
     #define DEFAULT "\x1b[0m"
 
-    #define TOKEN(type,subtype,lc,tkn,text) insert_token(yylval,lc,tkn,text,type,subtype)
+    #define TOKEN(type,subtype,lc,tkn,text) insert_alpha_token(yylval,lc,tkn,text,type,subtype)
 
     int  tkn_counter  = 0;
 
@@ -24,6 +26,8 @@
 
     char* replace_escape_chars(char *str, int yyleng);
     /*char* commcat(char* comm, char *cat);*/
+
+    Stack* stack;
 
     #define YY_DECL int alpha_yylex(void* yylval)
 %}
@@ -109,7 +113,9 @@ undefined [^\r\n]
 
 {comment2o} {
                 comm_counter++;
-                push(top,yylineno);
+                int* line_no = (int*)malloc(sizeof(int));
+                *line_no = yylineno;
+                push(stack, line_no);
                 if(comm_counter==1){
                     comm_line=yylineno;
                 }
@@ -127,7 +133,7 @@ undefined [^\r\n]
                     free(comment);
                 }
                 else{
-                    TOKEN(COMMENT, NESTCOMM, pop(top), ++tkn_counter, NULL);
+                    TOKEN(COMMENT, NESTCOMM, *(int*)pop(stack), ++tkn_counter, NULL);
                 }
             }
 
