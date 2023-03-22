@@ -69,17 +69,9 @@
 /* First part of user prologue.  */
 #line 1 "phase2_yacc/src/parser.y"
 
-    #include <stdio.h>
-    #include <stdlib.h>
+    #include "yacc_util.h"
 
-    int yyerror(char * error_msg);
-    int yylex(void);
-
-    extern int yylineno;
-    extern char * yytext;
-    extern FILE * yyin;    
-
-#line 83 "phase2_yacc/src/parser.c"
+#line 75 "phase2_yacc/src/parser.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -576,15 +568,15 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    40,    40,    43,    44,    45,    46,    47,    48,    49,
-      50,    51,    52,    55,    56,    57,    60,    61,    62,    63,
-      64,    65,    66,    67,    68,    69,    70,    71,    72,    73,
-      76,    77,    78,    79,    80,    81,    82,    83,    86,    89,
-      90,    91,    92,    93,    96,    97,    98,    99,   102,   103,
-     104,   105,   108,   109,   110,   113,   114,   117,   120,   123,
-     124,   127,   128,   131,   135,   138,   141,   144,   145,   146,
-     147,   148,   149,   152,   153,   154,   157,   159,   161,   163,
-     164,   167,   170,   171,   174,   175,   178,   179
+       0,    30,    30,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    45,    46,    47,    50,    51,    52,    53,
+      54,    55,    56,    57,    58,    59,    60,    61,    62,    63,
+      66,    67,    68,    69,    70,    71,    72,    73,    76,    79,
+      80,    81,    82,    83,    86,    87,    88,    89,    92,    93,
+      94,    95,    98,    99,   100,   103,   104,   107,   110,   113,
+     114,   117,   118,   121,   125,   128,   131,   134,   135,   136,
+     137,   138,   139,   142,   143,   144,   147,   149,   151,   153,
+     154,   157,   160,   161,   164,   165,   168,   169
 };
 #endif
 
@@ -1329,307 +1321,307 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: stmtList  */
-#line 40 "phase2_yacc/src/parser.y"
+#line 30 "phase2_yacc/src/parser.y"
                                         {}
-#line 1335 "phase2_yacc/src/parser.c"
+#line 1327 "phase2_yacc/src/parser.c"
     break;
 
   case 3: /* stmt: expr SEMI  */
-#line 43 "phase2_yacc/src/parser.y"
+#line 33 "phase2_yacc/src/parser.y"
                                         {}
-#line 1341 "phase2_yacc/src/parser.c"
+#line 1333 "phase2_yacc/src/parser.c"
     break;
 
   case 4: /* stmt: ifstmt  */
-#line 44 "phase2_yacc/src/parser.y"
+#line 34 "phase2_yacc/src/parser.y"
                                         {}
-#line 1347 "phase2_yacc/src/parser.c"
+#line 1339 "phase2_yacc/src/parser.c"
     break;
 
   case 5: /* stmt: whilestmt  */
-#line 45 "phase2_yacc/src/parser.y"
+#line 35 "phase2_yacc/src/parser.y"
                                         {}
-#line 1353 "phase2_yacc/src/parser.c"
+#line 1345 "phase2_yacc/src/parser.c"
     break;
 
   case 6: /* stmt: forstmt  */
-#line 46 "phase2_yacc/src/parser.y"
+#line 36 "phase2_yacc/src/parser.y"
                                         {}
-#line 1359 "phase2_yacc/src/parser.c"
+#line 1351 "phase2_yacc/src/parser.c"
     break;
 
   case 7: /* stmt: returnstmt  */
-#line 47 "phase2_yacc/src/parser.y"
+#line 37 "phase2_yacc/src/parser.y"
                                         {}
-#line 1365 "phase2_yacc/src/parser.c"
+#line 1357 "phase2_yacc/src/parser.c"
     break;
 
   case 8: /* stmt: BREAK SEMI  */
-#line 48 "phase2_yacc/src/parser.y"
+#line 38 "phase2_yacc/src/parser.y"
                                         {}
-#line 1371 "phase2_yacc/src/parser.c"
+#line 1363 "phase2_yacc/src/parser.c"
     break;
 
   case 9: /* stmt: CONTINUE SEMI  */
-#line 49 "phase2_yacc/src/parser.y"
+#line 39 "phase2_yacc/src/parser.y"
                                         {}
-#line 1377 "phase2_yacc/src/parser.c"
+#line 1369 "phase2_yacc/src/parser.c"
     break;
 
   case 10: /* stmt: block  */
-#line 50 "phase2_yacc/src/parser.y"
+#line 40 "phase2_yacc/src/parser.y"
                                         {}
-#line 1383 "phase2_yacc/src/parser.c"
+#line 1375 "phase2_yacc/src/parser.c"
     break;
 
   case 11: /* stmt: funcdef  */
-#line 51 "phase2_yacc/src/parser.y"
+#line 41 "phase2_yacc/src/parser.y"
                                         {}
-#line 1389 "phase2_yacc/src/parser.c"
+#line 1381 "phase2_yacc/src/parser.c"
     break;
 
   case 12: /* stmt: SEMI  */
-#line 52 "phase2_yacc/src/parser.y"
+#line 42 "phase2_yacc/src/parser.y"
                                         {}
-#line 1395 "phase2_yacc/src/parser.c"
+#line 1387 "phase2_yacc/src/parser.c"
     break;
 
   case 13: /* expr: assignexpr  */
-#line 55 "phase2_yacc/src/parser.y"
+#line 45 "phase2_yacc/src/parser.y"
                                         {}
-#line 1401 "phase2_yacc/src/parser.c"
+#line 1393 "phase2_yacc/src/parser.c"
     break;
 
   case 14: /* expr: expr op expr  */
-#line 56 "phase2_yacc/src/parser.y"
+#line 46 "phase2_yacc/src/parser.y"
                                         {}
-#line 1407 "phase2_yacc/src/parser.c"
+#line 1399 "phase2_yacc/src/parser.c"
     break;
 
   case 15: /* expr: term  */
-#line 57 "phase2_yacc/src/parser.y"
+#line 47 "phase2_yacc/src/parser.y"
                                         {}
-#line 1413 "phase2_yacc/src/parser.c"
+#line 1405 "phase2_yacc/src/parser.c"
     break;
 
   case 16: /* op: PLUS  */
-#line 60 "phase2_yacc/src/parser.y"
+#line 50 "phase2_yacc/src/parser.y"
                                         {}
-#line 1419 "phase2_yacc/src/parser.c"
+#line 1411 "phase2_yacc/src/parser.c"
     break;
 
   case 17: /* op: MINUS  */
-#line 61 "phase2_yacc/src/parser.y"
+#line 51 "phase2_yacc/src/parser.y"
                                         {}
-#line 1425 "phase2_yacc/src/parser.c"
+#line 1417 "phase2_yacc/src/parser.c"
     break;
 
   case 18: /* op: MUL  */
-#line 62 "phase2_yacc/src/parser.y"
+#line 52 "phase2_yacc/src/parser.y"
                                         {}
-#line 1431 "phase2_yacc/src/parser.c"
+#line 1423 "phase2_yacc/src/parser.c"
     break;
 
   case 19: /* op: DIV  */
-#line 63 "phase2_yacc/src/parser.y"
+#line 53 "phase2_yacc/src/parser.y"
                                         {}
-#line 1437 "phase2_yacc/src/parser.c"
+#line 1429 "phase2_yacc/src/parser.c"
     break;
 
   case 20: /* op: MOD  */
-#line 64 "phase2_yacc/src/parser.y"
+#line 54 "phase2_yacc/src/parser.y"
                                         {}
-#line 1443 "phase2_yacc/src/parser.c"
+#line 1435 "phase2_yacc/src/parser.c"
     break;
 
   case 21: /* op: EQ  */
-#line 65 "phase2_yacc/src/parser.y"
+#line 55 "phase2_yacc/src/parser.y"
                                         {}
-#line 1449 "phase2_yacc/src/parser.c"
+#line 1441 "phase2_yacc/src/parser.c"
     break;
 
   case 22: /* op: NEQ  */
-#line 66 "phase2_yacc/src/parser.y"
+#line 56 "phase2_yacc/src/parser.y"
                                         {}
-#line 1455 "phase2_yacc/src/parser.c"
+#line 1447 "phase2_yacc/src/parser.c"
     break;
 
   case 23: /* op: GT  */
-#line 67 "phase2_yacc/src/parser.y"
+#line 57 "phase2_yacc/src/parser.y"
                                         {}
-#line 1461 "phase2_yacc/src/parser.c"
+#line 1453 "phase2_yacc/src/parser.c"
     break;
 
   case 24: /* op: LT  */
-#line 68 "phase2_yacc/src/parser.y"
+#line 58 "phase2_yacc/src/parser.y"
                                         {}
-#line 1467 "phase2_yacc/src/parser.c"
+#line 1459 "phase2_yacc/src/parser.c"
     break;
 
   case 25: /* op: GTE  */
-#line 69 "phase2_yacc/src/parser.y"
+#line 59 "phase2_yacc/src/parser.y"
                                         {}
-#line 1473 "phase2_yacc/src/parser.c"
+#line 1465 "phase2_yacc/src/parser.c"
     break;
 
   case 26: /* op: LTE  */
-#line 70 "phase2_yacc/src/parser.y"
+#line 60 "phase2_yacc/src/parser.y"
                                         {}
-#line 1479 "phase2_yacc/src/parser.c"
+#line 1471 "phase2_yacc/src/parser.c"
     break;
 
   case 27: /* op: AND  */
-#line 71 "phase2_yacc/src/parser.y"
+#line 61 "phase2_yacc/src/parser.y"
                                         {}
-#line 1485 "phase2_yacc/src/parser.c"
+#line 1477 "phase2_yacc/src/parser.c"
     break;
 
   case 28: /* op: OR  */
-#line 72 "phase2_yacc/src/parser.y"
+#line 62 "phase2_yacc/src/parser.y"
                                         {}
-#line 1491 "phase2_yacc/src/parser.c"
+#line 1483 "phase2_yacc/src/parser.c"
     break;
 
   case 29: /* op: NOT  */
-#line 73 "phase2_yacc/src/parser.y"
+#line 63 "phase2_yacc/src/parser.y"
                                         {}
-#line 1497 "phase2_yacc/src/parser.c"
+#line 1489 "phase2_yacc/src/parser.c"
     break;
 
   case 30: /* term: LPAR expr RPAR  */
-#line 76 "phase2_yacc/src/parser.y"
+#line 66 "phase2_yacc/src/parser.y"
                                         {}
-#line 1503 "phase2_yacc/src/parser.c"
+#line 1495 "phase2_yacc/src/parser.c"
     break;
 
   case 31: /* term: UMINUS expr  */
-#line 77 "phase2_yacc/src/parser.y"
+#line 67 "phase2_yacc/src/parser.y"
                                         {}
-#line 1509 "phase2_yacc/src/parser.c"
+#line 1501 "phase2_yacc/src/parser.c"
     break;
 
   case 32: /* term: NOT expr  */
-#line 78 "phase2_yacc/src/parser.y"
+#line 68 "phase2_yacc/src/parser.y"
                                         {}
-#line 1515 "phase2_yacc/src/parser.c"
+#line 1507 "phase2_yacc/src/parser.c"
     break;
 
   case 33: /* term: INC lvalue  */
-#line 79 "phase2_yacc/src/parser.y"
+#line 69 "phase2_yacc/src/parser.y"
                                         {}
-#line 1521 "phase2_yacc/src/parser.c"
+#line 1513 "phase2_yacc/src/parser.c"
     break;
 
   case 34: /* term: lvalue INC  */
-#line 80 "phase2_yacc/src/parser.y"
+#line 70 "phase2_yacc/src/parser.y"
                                         {}
-#line 1527 "phase2_yacc/src/parser.c"
+#line 1519 "phase2_yacc/src/parser.c"
     break;
 
   case 35: /* term: DEC lvalue  */
-#line 81 "phase2_yacc/src/parser.y"
+#line 71 "phase2_yacc/src/parser.y"
                                         {}
-#line 1533 "phase2_yacc/src/parser.c"
+#line 1525 "phase2_yacc/src/parser.c"
     break;
 
   case 36: /* term: lvalue DEC  */
-#line 82 "phase2_yacc/src/parser.y"
+#line 72 "phase2_yacc/src/parser.y"
                                         {}
-#line 1539 "phase2_yacc/src/parser.c"
+#line 1531 "phase2_yacc/src/parser.c"
     break;
 
   case 37: /* term: primary  */
-#line 83 "phase2_yacc/src/parser.y"
+#line 73 "phase2_yacc/src/parser.y"
                                         {}
-#line 1545 "phase2_yacc/src/parser.c"
+#line 1537 "phase2_yacc/src/parser.c"
     break;
 
   case 38: /* assignexpr: lvalue ASSIGN expr  */
-#line 86 "phase2_yacc/src/parser.y"
+#line 76 "phase2_yacc/src/parser.y"
                                         {}
-#line 1551 "phase2_yacc/src/parser.c"
+#line 1543 "phase2_yacc/src/parser.c"
     break;
 
   case 39: /* primary: lvalue  */
-#line 89 "phase2_yacc/src/parser.y"
+#line 79 "phase2_yacc/src/parser.y"
                                         {}
-#line 1557 "phase2_yacc/src/parser.c"
+#line 1549 "phase2_yacc/src/parser.c"
     break;
 
   case 40: /* primary: call  */
-#line 90 "phase2_yacc/src/parser.y"
+#line 80 "phase2_yacc/src/parser.y"
                                         {}
-#line 1563 "phase2_yacc/src/parser.c"
+#line 1555 "phase2_yacc/src/parser.c"
     break;
 
   case 41: /* primary: objectdef  */
-#line 91 "phase2_yacc/src/parser.y"
+#line 81 "phase2_yacc/src/parser.y"
                                         {}
-#line 1569 "phase2_yacc/src/parser.c"
+#line 1561 "phase2_yacc/src/parser.c"
     break;
 
   case 42: /* primary: LPAR funcdef RPAR  */
-#line 92 "phase2_yacc/src/parser.y"
+#line 82 "phase2_yacc/src/parser.y"
                                         {}
-#line 1575 "phase2_yacc/src/parser.c"
+#line 1567 "phase2_yacc/src/parser.c"
     break;
 
   case 43: /* primary: const  */
-#line 93 "phase2_yacc/src/parser.y"
+#line 83 "phase2_yacc/src/parser.y"
                                         {}
-#line 1581 "phase2_yacc/src/parser.c"
+#line 1573 "phase2_yacc/src/parser.c"
     break;
 
   case 44: /* lvalue: IDENT  */
-#line 96 "phase2_yacc/src/parser.y"
+#line 86 "phase2_yacc/src/parser.y"
                                         {}
-#line 1587 "phase2_yacc/src/parser.c"
+#line 1579 "phase2_yacc/src/parser.c"
     break;
 
   case 45: /* lvalue: LOCAL IDENT  */
-#line 97 "phase2_yacc/src/parser.y"
+#line 87 "phase2_yacc/src/parser.y"
                                         {}
-#line 1593 "phase2_yacc/src/parser.c"
+#line 1585 "phase2_yacc/src/parser.c"
     break;
 
   case 46: /* lvalue: DCOLON IDENT  */
-#line 98 "phase2_yacc/src/parser.y"
+#line 88 "phase2_yacc/src/parser.y"
                                         {}
-#line 1599 "phase2_yacc/src/parser.c"
+#line 1591 "phase2_yacc/src/parser.c"
     break;
 
   case 47: /* lvalue: member  */
-#line 99 "phase2_yacc/src/parser.y"
+#line 89 "phase2_yacc/src/parser.y"
                                         {}
-#line 1605 "phase2_yacc/src/parser.c"
+#line 1597 "phase2_yacc/src/parser.c"
     break;
 
   case 48: /* member: lvalue DOT IDENT  */
-#line 102 "phase2_yacc/src/parser.y"
+#line 92 "phase2_yacc/src/parser.y"
                                         {}
-#line 1611 "phase2_yacc/src/parser.c"
+#line 1603 "phase2_yacc/src/parser.c"
     break;
 
   case 49: /* member: lvalue LBRACE expr RBRACE  */
-#line 103 "phase2_yacc/src/parser.y"
+#line 93 "phase2_yacc/src/parser.y"
                                         {}
-#line 1617 "phase2_yacc/src/parser.c"
+#line 1609 "phase2_yacc/src/parser.c"
     break;
 
   case 50: /* member: call DOT IDENT  */
-#line 104 "phase2_yacc/src/parser.y"
+#line 94 "phase2_yacc/src/parser.y"
                                         {}
-#line 1623 "phase2_yacc/src/parser.c"
+#line 1615 "phase2_yacc/src/parser.c"
     break;
 
   case 51: /* member: call LBRACE expr RBRACE  */
-#line 105 "phase2_yacc/src/parser.y"
+#line 95 "phase2_yacc/src/parser.y"
                                         {}
-#line 1629 "phase2_yacc/src/parser.c"
+#line 1621 "phase2_yacc/src/parser.c"
     break;
 
 
-#line 1633 "phase2_yacc/src/parser.c"
+#line 1625 "phase2_yacc/src/parser.c"
 
       default: break;
     }
@@ -1822,4 +1814,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 182 "phase2_yacc/src/parser.y"
+#line 172 "phase2_yacc/src/parser.y"
+

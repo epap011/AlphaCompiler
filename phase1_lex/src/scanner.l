@@ -6,14 +6,13 @@
     #include <stdio.h>
     #include <stdlib.h>    
     #include <string.h>
-    #include "alpha_token_list.h"
     #include "stack.h"
-    #include "alpha_types.h"
+    #include "parser.h"
 
     #define RED     "\033[31m"
     #define DEFAULT "\x1b[0m"
 
-    #define TOKEN(type,subtype,lc,tkn,text) insert_alpha_token(yylval,lc,tkn,text,type,subtype)
+    #define TOKEN(type,subtype,lc,tkn,text) //insert_alpha_token(yylval,lc,tkn,text,type,subtype)
 
     int  tkn_counter  = 0;
 

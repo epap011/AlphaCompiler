@@ -1,16 +1,6 @@
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-
-    int yyerror(char * error_msg);
-    int yylex(void);
-
-    extern int yylineno;
-    extern char * yytext;
-    extern FILE * yyin;    
+    #include "yacc_util.h"
 %}
-
-%defines
 
 %start program
 

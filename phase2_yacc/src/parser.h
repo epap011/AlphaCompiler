@@ -108,7 +108,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "phase2_yacc/src/parser.y"
+#line 12 "phase2_yacc/src/parser.y"
 
 
 

@@ -1,16 +1,10 @@
 #include <stdio.h>
-#include <stdlib.h>    
-#include <string.h>
-#include "alpha_token_list.h"
-#include "stack.h"
-
-int alpha_yylex(void* yylval);
+#include <stdlib.h>
 
 extern FILE* yyout;
 extern FILE* yyin;
-extern Stack* stack;
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
     if (argc == 2 || argc == 3) {
         if(!(yyin = fopen(argv[1], "r"))) {
           fprintf(stderr, "Could not open input file: %s\n", argv[1]);
@@ -35,10 +29,5 @@ int main(int argc, char** argv){
         yyout = stdout;
     }
 
-    stack = new_stack();
-    TokenList *token_list = create_alpha_token_list();
-    alpha_yylex(token_list);
-    print_alpha_token_list(token_list, yyout);
-
-    return 0;
+    yyparse();
 }
