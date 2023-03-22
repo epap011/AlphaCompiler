@@ -10,10 +10,3 @@
    ebala kai string kai twra kai anoixto
    " string
 
-/*test*/
-int main()
-{
-    int x;
-
-    return 0;
-}
