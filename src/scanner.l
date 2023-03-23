@@ -90,9 +90,9 @@ undefined [^\r\n]
 ".."       {return DDOT;}
 
 
-{id}       {TOKEN(IDENT, NOSTYPE,       yylineno, ++tkn_counter, yytext); yylval.stringVal = strdup(yytext); return IDENT}
-{intVal}   {TOKEN(NUMBER, INTCONST,     yylineno, ++tkn_counter, yytext); yylval.intVal = atoi(yytext); return INTCONST;}
-{RealVal}  {TOKEN(NUMBER, REALCONST,    yylineno, ++tkn_counter, yytext); yylval.realVal = atof(yytext); return REALCONST;}
+{id}       {yylval.stringVal = strdup(yytext); return IDENT;}
+{intVal}   {yylval.intVal    = atoi(yytext);   return INTCONST;}
+{RealVal}  {yylval.realVal   = atof(yytext);   return REALCONST;}
 
 {string}     {
                     yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote

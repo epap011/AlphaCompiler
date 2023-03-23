@@ -6,12 +6,12 @@
 
 %union{
     int intVal;
-    double doubleVal;
+    double realVal;
     char *stringVal;
 }
 
 %token <intVal>    INTCONST
-%token <doubleVal> REALCONST
+%token <realVal>   REALCONST
 %token <stringVal> STRING
 %token <stringVal> IDENT
 
