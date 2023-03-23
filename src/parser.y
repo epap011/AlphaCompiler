@@ -1,18 +1,23 @@
 %{
     #include "yacc_util.h"
-    int yylex(void);
 %}
 
 %start program
 
+%union{
+    int intVal;
+    double doubleVal;
+    char *stringVal;
+}
+
+%token <intVal>    INTCONST
+%token <doubleVal> REALCONST
+%token <stringVal> STRING
+%token <stringVal> IDENT
+
 %token ASSIGN PLUS MINUS MUL DIV MOD EQ NEQ INC DEC GT LT GTE LTE UMINUS
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 %token LBRACE RBRACE LCBRACE RCBRACE LPAR RPAR SEMI COMMA COLON DCOLON DOT DDOT
-%token IDENT STRING INTCONST REALCONST 
-
-%union{
-
-}
 
 %right ASSIGN
 %left OR

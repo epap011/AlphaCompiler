@@ -6,7 +6,7 @@
 extern int   yylineno;
 extern char* yytext;
 
-int yylex();
+int yylex(void);
 int yyerror(char* yaccProvideMessage);
 
 extern int yylineno;
