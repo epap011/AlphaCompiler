@@ -95,10 +95,8 @@ undefined [^\r\n]
 {RealVal}  {yylval.realVal   = atof(yytext);   return REALCONST;}
 
 {string}     {
-                    yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote
-                    TOKEN(STRING, NOSTYPE,yylineno - str_nl_counter, ++tkn_counter, yytext);
+                    yytext = replace_escape_chars(yytext + 1, yyleng - 1);
                     str_nl_counter=0;
-
                     yylval.stringVal = strdup(yytext); 
                     return STRING;
             }
@@ -110,15 +108,12 @@ undefined [^\r\n]
                     REJECT;
                 }
                 else if(!comm_counter) {
-                    TOKEN(COMMENT, LINECOMM,yylineno, ++tkn_counter, NULL);
+                    printf("Single line comment found!\n");
                 }
             }
 
 {comment2o} {
                 comm_counter++;
-                int* line_no = (int*)malloc(sizeof(int));
-                *line_no = yylineno;
-                push(stack, line_no);
                 if(comm_counter==1){
                     comm_line=yylineno;
                 }
@@ -132,20 +127,17 @@ undefined [^\r\n]
                     REJECT;
                 }
                 else if(!comm_counter){ 
-                    TOKEN(COMMENT, BLOCKCOMM, comm_line, ++tkn_counter, NULL);
-                    free(comment);
+                     printf("Block comment found!\n");
                 }
-                else{
-                    TOKEN(COMMENT, NESTCOMM, *(int*)pop(stack), ++tkn_counter, NULL);
+                else {
+                    printf("Nested comment found!\n");
                 }
             }
 
 {blanks}     {}
 
-{undefined}  {
-                    TOKEN(UNDEFCHR, NOSTYPE,yylineno, -1, yytext); 
-                    fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno);
-            }
+{undefined} { fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno); }
+
 \n           {}
 
 <<EOF>>      {
