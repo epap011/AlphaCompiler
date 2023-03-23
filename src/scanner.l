@@ -89,14 +89,17 @@ undefined [^\r\n]
 "."        {TOKEN(PUNCTUATION, DOT,     yylineno, ++tkn_counter, yytext);}
 ".."       {TOKEN(PUNCTUATION, DDOT,    yylineno, ++tkn_counter, yytext);}
 
-{id}       {TOKEN(IDENT, NOSTYPE,       yylineno, ++tkn_counter, yytext);}
-{intVal}   {TOKEN(NUMBER, INTCONST,     yylineno, ++tkn_counter, yytext);}
-{RealVal}  {TOKEN(NUMBER, REALCONST,    yylineno, ++tkn_counter, yytext);}
+{id}       {TOKEN(IDENT, NOSTYPE,       yylineno, ++tkn_counter, yytext); yylval.stringVal = strdup(yytext); return IDENT}
+{intVal}   {TOKEN(NUMBER, INTCONST,     yylineno, ++tkn_counter, yytext); yylval.intVal = atoi(yytext); return INTCONST;}
+{RealVal}  {TOKEN(NUMBER, REALCONST,    yylineno, ++tkn_counter, yytext); yylval.realVal = atof(yytext); return REALCONST;}
 
 {string}     {
                     yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote
                     TOKEN(STRING, NOSTYPE, yylineno - str_nl_counter, ++tkn_counter, yytext);
                     str_nl_counter=0;
+
+                    yylval.stringVal = strdup(yytext); 
+                    return STRING;
             }
 
 {unclosed_string} {fprintf(stderr, RED"Error: "DEFAULT"Unclosed string: \"%s\" at line %d\n",yytext,yylineno); return 0;}
