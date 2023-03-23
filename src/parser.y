@@ -15,9 +15,36 @@
 %token <stringVal> STRING
 %token <stringVal> IDENT
 
-%token ASSIGN PLUS MINUS MUL DIV MOD EQ NEQ INC DEC GT LT GTE LTE UMINUS
+%token ASSIGN  "="
+%token PLUS    "+"
+%token MINUS   "-"
+%token MUL     "*" 
+%token DIV     "/"
+%token MOD     "%"
+%token EQ      "=="
+%token NEQ     "!="
+%token INC     "++"
+%token DEC     "--"
+%token GT      ">"
+%token LT      "<"
+%token GTE     ">="
+%token LTE     "<=" 
+%token LBRACE  "["  
+%token RBRACE  "]"
+%token LCBRACE "{"
+%token RCBRACE "}"
+%token LPAR    "("
+%token RPAR    ")"
+%token SEMI    ";"
+%token COMMA   ","
+%token COLON   ":"
+%token DCOLON  "::"
+%token DOT     "."
+%token DDOT    ".."
+
+%token UMINUS /* recheck */
+
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
-%token LBRACE RBRACE LCBRACE RCBRACE LPAR RPAR SEMI COMMA COLON DCOLON DOT DDOT
 
 %right ASSIGN
 %left OR
@@ -36,16 +63,16 @@
 program     : stmtList                  {}
             ;   
 
-stmt        : expr SEMI                 {}
+stmt        : expr ";"                  {}
             | ifstmt                    {}
             | whilestmt                 {}
             | forstmt                   {}
             | returnstmt                {}
-            | BREAK SEMI                {}
-            | CONTINUE SEMI             {}
+            | BREAK ";"                 {}
+            | CONTINUE ";"              {}
             | block                     {}
             | funcdef                   {}
-            | SEMI                      {}
+            | ";"                       {}
             ;           
 
 expr        : assignexpr                {}
@@ -53,126 +80,138 @@ expr        : assignexpr                {}
             | term                      {}
             ;           
 
-op          : PLUS                      {}
-            | MINUS                     {}
-            | MUL                       {}
-            | DIV                       {}
-            | MOD                       {}
-            | EQ                        {}
-            | NEQ                       {}
-            | GT                        {}
-            | LT                        {}
-            | GTE                       {}
-            | LTE                       {}
+op          : "+"                       {}
+            | "-"                       {}
+            | "*"                       {}
+            | "/"                       {}
+            | "%"                       {}
+            | "=="                      {}
+            | "!="                      {}
+            | ">"                       {}
+            | "<"                       {}
+            | ">="                      {}
+            | "<="                      {}
             | AND                       {}
             | OR                        {}
             | NOT                       {}
             ;           
 
-term        : LPAR expr RPAR            {}
+term        : "(" expr ")"              {}
             | UMINUS expr               {}
             | NOT expr                  {}
-            | INC lvalue                {}
-            | lvalue INC                {}
-            | DEC lvalue                {}
-            | lvalue DEC                {}
+            | "++" lvalue               {}
+            | lvalue "++"               {}
+            | "--" lvalue               {}
+            | lvalue "--"               {}
             | primary                   {}
             ;   
 
-assignexpr  : lvalue ASSIGN expr        {}
+assignexpr  : lvalue "=" expr           {}
             ;   
 
 primary     : lvalue                    {}
             | call                      {}
             | objectdef                 {}
-            | LPAR funcdef RPAR         {}
+            | "(" funcdef ")"           {}
             | const                     {}
             ;   
 
 lvalue      : IDENT                     {}
             | LOCAL IDENT               {}
-            | DCOLON IDENT              {}
+            | "::" IDENT                {}
             | member                    {}
             ;   
 
-member      : lvalue DOT IDENT          {}
-            | lvalue LBRACE expr RBRACE {}
-            | call DOT IDENT            {}
-            | call LBRACE expr RBRACE   {}
+member      : lvalue "." IDENT          {}
+            | lvalue "(" expr ")"       {}
+            | call "." IDENT            {}
+            | call "(" expr ")"         {}
             ;
 
-call        : call LPAR elist RPAR
-            | lvalue callsuffix
-            | LPAR funcdef RPAR LPAR elist RPAR     
+call        : call "(" elist ")"            {}
+            | lvalue callsuffix             {}
+            | "(" funcdef ")" "(" elist ")" {}     
             ;
 
-callsuffix  : normcall
-            | methodcall
+callsuffix  : normcall   {}
+            | methodcall {}
             ;
 
-normcall    : LPAR elist RPAR
+normcall    : "(" elist ")" {}
             ;
 
-methodcall  : DDOT IDENT LPAR elist RPAR
+methodcall  : ".." IDENT "(" elist ")" {}
             ;
-
-elist       : /* empty */
-            | expr com_expr_opt
-            ;
-
-objectdef   : LCBRACE elist RCBRACE
-            | LCBRACE indexed RCBRACE
-            ;
-
-indexed     : indexedelem com_indexedelem_opt
-            ;
-
-
-indexedelem     : LCBRACE expr COLON expr RCBRACE
-                ;
-
-block           : LCBRACE stmtList RCBRACE
-                ;
-
-funcdef         : FUNCTION IDENT LPAR idlist RPAR block
-                ;
-
-const           : INTCONST
-                | REALCONST
-                | STRING
-                | TRUE
-                | FALSE
-                | NIL
-                ;
-
-idlist          : /* empty */
-                | IDENT COMMA idlist
-                | IDENT
-                ;
-
-ifstmt          : IF LPAR expr RPAR stmt
-
-whilestmt       : WHILE LPAR expr RPAR stmt
-
-forstmt         : FOR LPAR expr SEMI expr SEMI expr RPAR stmt
-
-stmtList        : /* empty */
-                | stmt stmtList
-                ;
-
-returnstmt      : RETURN expr semi_opt
-                ;
-
-com_indexedelem_opt : /* empty */
-                    | COMMA indexedelem
-                    ;
 
 com_expr_opt : /* empty */
              | COMMA expr com_expr_opt
              ;
 
-semi_opt        : SEMI
-                | /* empty */
+objectdef   : "[" indexed "]" {}
+            | "[" elist   "]" {}
+            ;
+
+elist       : /* empty */
+            | expr com_expr_opt
+            ;
+            
+indexed     : /* empty */
+            | indexedelem com_indexedelem_opt {}
+            ;
+
+indexedelem     : "{" expr ":" expr "}" {}
+                ;
+
+com_indexedelem_opt : /* empty */
+                    | "," indexedelem com_indexedelem_opt {}
+                    ;
+
+block           : "{" stmtList "}" {}
+                ;
+
+stmtList        : /* empty */
+                | stmt stmtList {}
+                ;
+
+funcdef         : FUNCTION id_opt "(" idlist ")" block {}
+                ;
+
+id_opt  : /* empty */
+        | IDENT {}
+        ;
+
+const           : INTCONST  {}
+                | REALCONST {}
+                | STRING    {}
+                | TRUE      {}
+                | FALSE     {}
+                | NIL       {}
+                ;
+
+idlist          : /* empty */
+                | IDENT com_id_opt {}
+                ;
+
+com_id_opt      : /* empty */
+                | "," IDENT com_id_opt {}
+                ;
+
+ifstmt          : IF "(" expr ")" stmt else_stml_opt {}
+                ;
+
+else_stml_opt   : /* empty */
+                | ELSE stmt {}
+                ;
+
+whilestmt       : WHILE "(" expr ")" stmt {}
+
+forstmt         : FOR "(" expr ";" expr ";" expr ")" stmt {}
+
+returnstmt      : RETURN expr_opt ";" {}
+                ;
+
+expr_opt        : /* empty */
+                | expr {}
                 ;
 
 %%

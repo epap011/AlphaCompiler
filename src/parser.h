@@ -58,102 +58,51 @@ extern int yydebug;
     REALCONST = 259,               /* REALCONST  */
     STRING = 260,                  /* STRING  */
     IDENT = 261,                   /* IDENT  */
-    ASSIGN = 262,                  /* ASSIGN  */
-    PLUS = 263,                    /* PLUS  */
-    MINUS = 264,                   /* MINUS  */
-    MUL = 265,                     /* MUL  */
-    DIV = 266,                     /* DIV  */
-    MOD = 267,                     /* MOD  */
-    EQ = 268,                      /* EQ  */
-    NEQ = 269,                     /* NEQ  */
-    INC = 270,                     /* INC  */
-    DEC = 271,                     /* DEC  */
-    GT = 272,                      /* GT  */
-    LT = 273,                      /* LT  */
-    GTE = 274,                     /* GTE  */
-    LTE = 275,                     /* LTE  */
-    UMINUS = 276,                  /* UMINUS  */
-    AND = 277,                     /* AND  */
-    OR = 278,                      /* OR  */
-    NOT = 279,                     /* NOT  */
-    IF = 280,                      /* IF  */
-    ELSE = 281,                    /* ELSE  */
-    WHILE = 282,                   /* WHILE  */
-    FOR = 283,                     /* FOR  */
-    FUNCTION = 284,                /* FUNCTION  */
-    RETURN = 285,                  /* RETURN  */
-    BREAK = 286,                   /* BREAK  */
-    CONTINUE = 287,                /* CONTINUE  */
-    LOCAL = 288,                   /* LOCAL  */
-    TRUE = 289,                    /* TRUE  */
-    FALSE = 290,                   /* FALSE  */
-    NIL = 291,                     /* NIL  */
-    LBRACE = 292,                  /* LBRACE  */
-    RBRACE = 293,                  /* RBRACE  */
-    LCBRACE = 294,                 /* LCBRACE  */
-    RCBRACE = 295,                 /* RCBRACE  */
-    LPAR = 296,                    /* LPAR  */
-    RPAR = 297,                    /* RPAR  */
-    SEMI = 298,                    /* SEMI  */
-    COMMA = 299,                   /* COMMA  */
-    COLON = 300,                   /* COLON  */
-    DCOLON = 301,                  /* DCOLON  */
-    DOT = 302,                     /* DOT  */
-    DDOT = 303                     /* DDOT  */
+    ASSIGN = 262,                  /* "="  */
+    PLUS = 263,                    /* "+"  */
+    MINUS = 264,                   /* "-"  */
+    MUL = 265,                     /* "*"  */
+    DIV = 266,                     /* "/"  */
+    MOD = 267,                     /* "%"  */
+    EQ = 268,                      /* "=="  */
+    NEQ = 269,                     /* "!="  */
+    INC = 270,                     /* "++"  */
+    DEC = 271,                     /* "--"  */
+    GT = 272,                      /* ">"  */
+    LT = 273,                      /* "<"  */
+    GTE = 274,                     /* ">="  */
+    LTE = 275,                     /* "<="  */
+    LBRACE = 276,                  /* "["  */
+    RBRACE = 277,                  /* "]"  */
+    LCBRACE = 278,                 /* "{"  */
+    RCBRACE = 279,                 /* "}"  */
+    LPAR = 280,                    /* "("  */
+    RPAR = 281,                    /* ")"  */
+    SEMI = 282,                    /* ";"  */
+    COMMA = 283,                   /* ","  */
+    COLON = 284,                   /* ":"  */
+    DCOLON = 285,                  /* "::"  */
+    DOT = 286,                     /* "."  */
+    DDOT = 287,                    /* ".."  */
+    UMINUS = 288,                  /* UMINUS  */
+    AND = 289,                     /* AND  */
+    OR = 290,                      /* OR  */
+    NOT = 291,                     /* NOT  */
+    IF = 292,                      /* IF  */
+    ELSE = 293,                    /* ELSE  */
+    WHILE = 294,                   /* WHILE  */
+    FOR = 295,                     /* FOR  */
+    FUNCTION = 296,                /* FUNCTION  */
+    RETURN = 297,                  /* RETURN  */
+    BREAK = 298,                   /* BREAK  */
+    CONTINUE = 299,                /* CONTINUE  */
+    LOCAL = 300,                   /* LOCAL  */
+    TRUE = 301,                    /* TRUE  */
+    FALSE = 302,                   /* FALSE  */
+    NIL = 303                      /* NIL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define INTCONST 258
-#define REALCONST 259
-#define STRING 260
-#define IDENT 261
-#define ASSIGN 262
-#define PLUS 263
-#define MINUS 264
-#define MUL 265
-#define DIV 266
-#define MOD 267
-#define EQ 268
-#define NEQ 269
-#define INC 270
-#define DEC 271
-#define GT 272
-#define LT 273
-#define GTE 274
-#define LTE 275
-#define UMINUS 276
-#define AND 277
-#define OR 278
-#define NOT 279
-#define IF 280
-#define ELSE 281
-#define WHILE 282
-#define FOR 283
-#define FUNCTION 284
-#define RETURN 285
-#define BREAK 286
-#define CONTINUE 287
-#define LOCAL 288
-#define TRUE 289
-#define FALSE 290
-#define NIL 291
-#define LBRACE 292
-#define RBRACE 293
-#define LCBRACE 294
-#define RCBRACE 295
-#define LPAR 296
-#define RPAR 297
-#define SEMI 298
-#define COMMA 299
-#define COLON 300
-#define DCOLON 301
-#define DOT 302
-#define DDOT 303
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -165,7 +114,7 @@ union YYSTYPE
     double realVal;
     char *stringVal;
 
-#line 169 "src/parser.h"
+#line 118 "src/parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
