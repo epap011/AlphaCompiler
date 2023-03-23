@@ -116,7 +116,7 @@ normcall    : LPAR elist RPAR
 methodcall  : DDOT IDENT LPAR elist RPAR
             ;
 
-elist       : %empty
+elist       : /* empty */
             | expr com_expr_opt
             ;
 
@@ -145,7 +145,7 @@ const           : INTCONST
                 | NIL
                 ;
 
-idlist          : %empty
+idlist          : /* empty */
                 | IDENT COMMA idlist
                 | IDENT
                 ;
@@ -156,23 +156,23 @@ whilestmt       : WHILE LPAR expr RPAR stmt
 
 forstmt         : FOR LPAR expr SEMI expr SEMI expr RPAR stmt
 
-stmtList        : %empty
+stmtList        : /* empty */
                 | stmt stmtList
                 ;
 
 returnstmt      : RETURN expr semi_opt
                 ;
 
-com_indexedelem_opt : %empty
+com_indexedelem_opt : /* empty */
                     | COMMA indexedelem
                     ;
 
-com_expr_opt : %empty
+com_expr_opt : /* empty */
              | COMMA expr com_expr_opt
              ;
 
 semi_opt        : SEMI
-                | %empty
+                | /* empty */
                 ;
 
 %%

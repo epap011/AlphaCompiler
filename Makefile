@@ -53,7 +53,7 @@ $(SRC_DIR)/$(SCANNER).c: $(SRC_DIR)/$(SCANNER).l
 
 #---< produce parcer.c & parser.h(optional) from parser.y
 $(SRC_DIR)/$(PARSER).c: $(SRC_DIR)/$(PARSER).y
-	bison --defines  --output=$@ $^
+	bison --yacc --defines  --output=$@ $^
 
 $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@
