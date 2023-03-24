@@ -212,19 +212,3 @@ char * replace_escape_chars(char* str, int length){
     }
     return new_str;
 }
-/*
-char* commcat(char* comm, char *cat) {
-    size_t comm_len = comm ? strlen(comm) : 0;
-    size_t cat_len = strlen(cat);
-    char* result = malloc(comm_len + cat_len + 1);
-    if (!result) {
-        fprintf(stderr, "Failed to allocate memory for concatenated string\n");
-        exit(1);
-    }
-    if (comm_len > 0) {
-        memcpy(result, comm, comm_len);
-    }
-    memcpy(result + comm_len, cat, cat_len + 1);
-    return result;
-}
-*/
