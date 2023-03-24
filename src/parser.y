@@ -117,9 +117,9 @@ primary     : lvalue                    {fprintf(yyout, MAG "Detected :" RESET"l
             | const                     {fprintf(yyout, MAG "Detected :" RESET"const \n");}
             ;   
 
-lvalue      : IDENT                     {fprintf(yyout, MAG "Detected :" RESET"IDENT \n");}
-            | LOCAL IDENT               {fprintf(yyout, MAG "Detected :" RESET"LOCAL IDENT \n");}
-            | "::" IDENT                {fprintf(yyout, MAG "Detected :" RESET":: IDENT \n");}
+lvalue      : IDENT                     {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" -> "RESET" IDENT \n",yylval.stringVal);}
+            | LOCAL IDENT               {fprintf(yyout, MAG "Detected :" RESET"local %s"CYN" -> "RESET" LOCAL IDENT \n",yylval.stringVal);}
+            | "::" IDENT                {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" -> "RESET" ::IDENT \n",yylval.stringVal);}
             | member                    {fprintf(yyout, MAG "Detected :" RESET"member \n");}
             ;   
 
@@ -144,7 +144,7 @@ normcall    : "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( elist ) \n"
 methodcall  : ".." IDENT "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET".. IDENT ( elist ) \n");}
             ;
 
-com_expr_opt : /* empty */                  {fprintf(yyout, MAG "Detected :" RESET"com_expr_opt (empty)\n");}
+com_expr_opt : /* empty */                  {fprintf(yyout, MAG "Detected :" RESET"com_expr_opt "YEL" (empty) "RESET"\n");}
              | COMMA expr com_expr_opt      {fprintf(yyout, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");}
              ;
 
@@ -152,33 +152,33 @@ objectdef   : "[" indexed "]" {fprintf(yyout, MAG "Detected :" RESET"[ indexed ]
             | "[" elist   "]" {fprintf(yyout, MAG "Detected :" RESET"[ elist ] \n");}
             ;
 
-elist       : /* empty */       {fprintf(yyout, MAG "Detected :" RESET"elist (empty)\n");}
+elist       : /* empty */       {fprintf(yyout, MAG "Detected :" RESET"elist "YEL"(empty)"RESET"\n");}
             | expr com_expr_opt {fprintf(yyout, MAG "Detected :" RESET"expr com_expr_opt \n");}
             ;
             
-indexed     : /* empty */                       {fprintf(yyout, MAG "Detected :" RESET"indexed (empty)\n");}
+indexed     : /* empty */                       {fprintf(yyout, MAG "Detected :" RESET"indexed "YEL" (empty) "RESET"\n");}
             | indexedelem com_indexedelem_opt   {fprintf(yyout, MAG "Detected :" RESET"indexedelem com_indexedelem_opt \n");}
             ;
 
 indexedelem     : "{" expr ":" expr "}" {fprintf(yyout, MAG "Detected :" RESET"{ expr : expr } \n");}
                 ;
 
-com_indexedelem_opt : /* empty */                           {fprintf(yyout, MAG "Detected :" RESET"com_indexedelem_opt (empty)\n");}
+com_indexedelem_opt : /* empty */                           {fprintf(yyout, MAG "Detected :" RESET"com_indexedelem_opt "YEL"(empty)"RESET"\n");}
                     | "," indexedelem com_indexedelem_opt   {fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");}
                     ;
 
 block           : "{" stmtList "}" {fprintf(yyout, MAG "Detected :" RESET"{ stmtList } \n");}
                 ;
 
-stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList (empty)\n");}
+stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList "YEL" (empty)"RESET":\n");}
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList \n");}
                 ;
 
 funcdef         : FUNCTION id_opt "(" idlist ")" block {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block \n");}
                 ;
 
-id_opt  : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"id_opt (empty)\n");}
-        | IDENT         {fprintf(yyout, MAG "Detected :" RESET"IDENT \n");}
+id_opt  : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n");}
+        | IDENT         {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" -> "RESET"IDENT \n",yylval.stringVal);}
         ;
 
 const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d "CYN"-> "RESET"INTCONST \n",yylval.intVal);}
@@ -189,18 +189,18 @@ const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d "CYN"-> "R
                 | NIL       {fprintf(yyout, MAG "Detected :" RESET"NIL \n");}
                 ;
 
-idlist          : /* empty */           {fprintf(yyout, MAG "Detected :" RESET"idlist (empty)\n");}
+idlist          : /* empty */           {fprintf(yyout, MAG "Detected :" RESET"idlist "YEL" (empty)"RESET"\n");}
                 | IDENT com_id_opt      {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n");}
                 ;
 
-com_id_opt      : /* empty */           {fprintf(yyout, MAG "Detected :" RESET"com_id_opt (empty)\n");}
+com_id_opt      : /* empty */           {fprintf(yyout, MAG "Detected :" RESET"com_id_opt "YEL" (empty)"RESET"\n");}
                 | "," IDENT com_id_opt  {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n");}
                 ;
 
 ifstmt          : IF "(" expr ")" stmt else_stml_opt {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt else_stml_opt \n");}
                 ;
 
-else_stml_opt   : /* empty */               {fprintf(yyout, MAG "Detected :" RESET"else_stml_opt (empty)\n");}
+else_stml_opt   : /* empty */               {fprintf(yyout, MAG "Detected :" RESET"else_stml_opt "YEL"(empty)"RESET"\n");}
                 | ELSE stmt                 {fprintf(yyout, MAG "Detected :" RESET"ELSE stmt \n");}
                 ;
 
@@ -213,7 +213,7 @@ forstmt         : FOR "(" expr ";" expr ";" expr ")" stmt {fprintf(yyout, MAG "D
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ; \n");}
                 ;
 
-expr_opt        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"expr_opt (empty)\n");}
+expr_opt        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (empty)"RESET"\n");}
                 | expr          {fprintf(yyout, MAG "Detected :" RESET"expr \n");}
                 ;
 
