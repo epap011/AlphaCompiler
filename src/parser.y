@@ -43,7 +43,7 @@
 %token DOT     "."
 %token DDOT    ".."
 
-%token UMINUS /* recheck */
+/* %token UMINUS */
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
@@ -76,29 +76,25 @@ stmt        : expr ";"                  {fprintf(yyout, MAG "Detected :" RESET"e
             | ";"                       {fprintf(yyout, MAG "Detected :" RESET"; "CYN""RESET"-> stmt\n");}
             ;           
 
-expr        : assignexpr                {fprintf(yyout, MAG "Detected :" RESET"assignexpr \n");}
-            | expr op expr              {fprintf(yyout, MAG "Detected :" RESET"expr op expr\n");}
-            | term                      {fprintf(yyout, MAG "Detected :" RESET"term \n");}
-            ;           
-
-op          : "+"                       {fprintf(yyout, MAG "Detected :" RESET"+"CYN" ->"RESET" op \n");}
-            | "-"                       {fprintf(yyout, MAG "Detected :" RESET"-"CYN" ->"RESET" op \n");}
-            | "*"                       {fprintf(yyout, MAG "Detected :" RESET"*"CYN" ->"RESET" op \n");}
-            | "/"                       {fprintf(yyout, MAG "Detected :" RESET"/"CYN" ->"RESET" op \n");}
-            | "%"                       {fprintf(yyout, MAG "Detected :" RESET"%"CYN" ->"RESET" op \n");}
-            | "=="                      {fprintf(yyout, MAG "Detected :" RESET"=="CYN" ->"RESET" op \n");}
-            | "!="                      {fprintf(yyout, MAG "Detected :" RESET"!="CYN" ->"RESET" op \n");}
-            | ">"                       {fprintf(yyout, MAG "Detected :" RESET">"CYN" ->"RESET" op \n");}
-            | "<"                       {fprintf(yyout, MAG "Detected :" RESET"<"CYN" ->"RESET" op \n");}
-            | ">="                      {fprintf(yyout, MAG "Detected :" RESET">="CYN" ->"RESET" op \n");}
-            | "<="                      {fprintf(yyout, MAG "Detected :" RESET"<="CYN" ->"RESET" op \n");}
-            | AND                       {fprintf(yyout, MAG "Detected :" RESET"AND"CYN" ->"RESET" op \n");}
-            | OR                        {fprintf(yyout, MAG "Detected :" RESET"OR"CYN" ->"RESET" op \n");}
-            | NOT                       {fprintf(yyout, MAG "Detected :" RESET"NOT"CYN" ->"RESET" op \n");}
-            ;           
+expr        : assignexpr                {fprintf(yyout, MAG "Detected :" RESET"assignexpr"CYN" ->"RESET" expr \n");}
+            | term                      {fprintf(yyout, MAG "Detected :" RESET"term"CYN" ->"RESET" expr \n");}
+            | expr "+" expr              {fprintf(yyout, MAG "Detected :" RESET"expr + expr"CYN" ->"RESET" expr \n");}
+            | expr "*" expr              {fprintf(yyout, MAG "Detected :" RESET"expr * expr"CYN" ->"RESET" expr \n");}
+            | expr "-" expr              {fprintf(yyout, MAG "Detected :" RESET"expr - expr"CYN" ->"RESET" expr \n");}
+            | expr "/" expr              {fprintf(yyout, MAG "Detected :" RESET"expr / expr"CYN" ->"RESET" expr \n");}
+            | expr "%" expr              {fprintf(yyout, MAG "Detected :" RESET"expr % expr"CYN" ->"RESET" expr \n");}
+            | expr EQ expr               {fprintf(yyout, MAG "Detected :" RESET"expr == expr"CYN" ->"RESET" expr \n");}
+            | expr NEQ expr              {fprintf(yyout, MAG "Detected :" RESET"expr != expr"CYN" ->"RESET" expr \n");}
+            | expr GT expr               {fprintf(yyout, MAG "Detected :" RESET"expr > expr"CYN" ->"RESET" expr \n");}
+            | expr LT expr               {fprintf(yyout, MAG "Detected :" RESET"expr < expr"CYN" ->"RESET" expr \n");}
+            | expr GTE expr              {fprintf(yyout, MAG "Detected :" RESET"expr >= expr"CYN" ->"RESET" expr \n");}
+            | expr LTE expr              {fprintf(yyout, MAG "Detected :" RESET"expr <= expr"CYN" ->"RESET" expr \n");}
+            | expr AND expr              {fprintf(yyout, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");}
+            | expr OR expr               {fprintf(yyout, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");}
+            ;                    
 
 term        : "(" expr ")"              {fprintf(yyout, MAG "Detected :" RESET"( expr ) \n");}
-            | UMINUS expr               {fprintf(yyout, MAG "Detected :" RESET"UMINUS expr \n");}
+            | "-" expr %prec UMINUS     {fprintf(yyout, MAG "Detected :" RESET"UMINUS expr \n");}
             | NOT expr                  {fprintf(yyout, MAG "Detected :" RESET"NOT expr \n");}
             | "++" lvalue               {fprintf(yyout, MAG "Detected :" RESET"++ lvalue \n");}
             | lvalue "++"               {fprintf(yyout, MAG "Detected :" RESET"lvalue ++ \n");}
