@@ -43,9 +43,11 @@
 %token DOT     "."
 %token DDOT    ".."
 
-/* %token UMINUS */
-
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
+
+/*Kanones proseteristikotitas kai protereotitas (i protereotita einai bottom-up)*/
+%nonassoc LP_ELSE
+%nonassoc ELSE
 
 %right ASSIGN
 %left OR
@@ -58,13 +60,13 @@
 %left DOT DDOT  
 %left LBRACE RBRACE 
 %left LPAR RPAR 
- 
+
 %%  
 
 program     : stmtList                  {fprintf(yyout, MAG "Detected :" RESET"program stmtList \n");}
             ;   
 
-stmt        : expr ";"                  {fprintf(yyout, MAG "Detected :" RESET"expr ; \n");}
+stmt        : expr ";"                  {fprintf(yyout, MAG "Detected :" RESET"expr ;"CYN" ->"RESET" stmt \n");}
             | ifstmt                    {fprintf(yyout, MAG "Detected :" RESET"ifstmt \n");}
             | whilestmt                 {fprintf(yyout, MAG "Detected :" RESET"whilestmt \n");}
             | forstmt                   {fprintf(yyout, MAG "Detected :" RESET"forstmt \n");}
@@ -193,11 +195,8 @@ com_id_opt      : /* empty */           {fprintf(yyout, MAG "Detected :" RESET"c
                 | "," IDENT com_id_opt  {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n");}
                 ;
 
-ifstmt          : IF "(" expr ")" stmt else_stml_opt {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt else_stml_opt \n");}
-                ;
-
-else_stml_opt   : /* empty */               {fprintf(yyout, MAG "Detected :" RESET"else_stml_opt "YEL"(empty)"RESET"\n");}
-                | ELSE stmt                 {fprintf(yyout, MAG "Detected :" RESET"ELSE stmt \n");}
+ifstmt          : IF "(" expr ")" stmt %prec LP_ELSE {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt  \n");}
+                | IF "(" expr ")" stmt ELSE stmt     {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt ELSE stmt \n");}
                 ;
 
 whilestmt       : WHILE "(" expr ")" stmt   {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt \n");}
