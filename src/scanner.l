@@ -45,60 +45,60 @@ undefined [^\r\n]
 
 /*Rules*/
 %%
-"="        {return ASSIGN;}
-"+"        {return PLUS;}
-"-"        {return MINUS;}
-"*"        {return MUL;}
-"/"        {return DIV;}
-"%"        {return MOD;}
-"=="       {return EQ;}
-"!="       {return NEQ;}
-"++"       {return INC;}
-"--"       {return DEC;}
-">"        {return GT;}
-"<"        {return LT;}
-">="       {return GTE;}
-"<="       {return LTE;}   
-   
-"if"       {return IF;}
-"else"     {return ELSE;}
-"while"    {return WHILE;}
-"for"      {return FOR;}
-"function" {return FUNCTION;}
-"return"   {return RETURN;}
-"break"    {return BREAK;}
-"continue" {return CONTINUE;}
-"and"      {return AND;}
-"not"      {return NOT;}
-"or"       {return OR;}
-"local"    {return LOCAL;}
-"true"     {return TRUE;}
-"false"    {return FALSE;}
-"nil"      {return NIL;}  
-   
-"{"        {return LCBRACE;}
-"}"        {return RCBRACE;}
-"["        {return LBRACE;}
-"]"        {return RBRACE;}
-"("        {return LPAR;}
-")"        {return RPAR;}
-";"        {return SEMI;}
-","        {return COMMA;}
-":"        {return COLON;}
-"::"       {return DCOLON;}
-"."        {return DOT;}
-".."       {return DDOT;}
+"="        {if(!comm_counter) return ASSIGN;}
+"+"        {if(!comm_counter) return PLUS;}
+"-"        {if(!comm_counter) return MINUS;}
+"*"        {if(!comm_counter) return MUL;}
+"/"        {if(!comm_counter) return DIV;}
+"%"        {if(!comm_counter) return MOD;}
+"=="       {if(!comm_counter) return EQ;}
+"!="       {if(!comm_counter) return NEQ;}
+"++"       {if(!comm_counter) return INC;}
+"--"       {if(!comm_counter) return DEC;}
+">"        {if(!comm_counter) return GT;}
+"<"        {if(!comm_counter) return LT;}
+">="       {if(!comm_counter) return GTE;}
+"<="       {if(!comm_counter) return LTE;}   
 
+"if"       {if(!comm_counter) return IF;}
+"else"     {if(!comm_counter) return ELSE;}
+"while"    {if(!comm_counter) return WHILE;}
+"for"      {if(!comm_counter) return FOR;}
+"function" {if(!comm_counter) return FUNCTION;}
+"return"   {if(!comm_counter) return RETURN;}
+"break"    {if(!comm_counter) return BREAK;}
+"continue" {if(!comm_counter) return CONTINUE;}
+"and"      {if(!comm_counter) return AND;}
+"not"      {if(!comm_counter) return NOT;}
+"or"       {if(!comm_counter) return OR;}
+"local"    {if(!comm_counter) return LOCAL;}
+"true"     {if(!comm_counter) return TRUE;}
+"false"    {if(!comm_counter) return FALSE;}
+"nil"      {if(!comm_counter) return NIL;}  
 
-{id}       {yylval.stringVal = strdup(yytext); return IDENT;}
-{intVal}   {yylval.intVal    = atoi(yytext);   return INTCONST;}
-{RealVal}  {yylval.realVal   = atof(yytext);   return REALCONST;}
+"{"        {if(!comm_counter) return LCBRACE;}
+"}"        {if(!comm_counter) return RCBRACE;}
+"["        {if(!comm_counter) return LBRACE;}
+"]"        {if(!comm_counter) return RBRACE;}
+"("        {if(!comm_counter) return LPAR;}
+")"        {if(!comm_counter) return RPAR;}
+";"        {if(!comm_counter) return SEMI;}
+","        {if(!comm_counter) return COMMA;}
+":"        {if(!comm_counter) return COLON;}
+"::"       {if(!comm_counter) return DCOLON;}
+"."        {if(!comm_counter) return DOT;}
+".."       {if(!comm_counter) return DDOT;}
 
-{string}     {
+{id}       {if(!comm_counter) {yylval.stringVal = strdup(yytext); return IDENT;}}
+{intVal}   {if(!comm_counter) {yylval.intVal    = atoi(yytext);   return INTCONST;}}
+{RealVal}  {if(!comm_counter) {yylval.realVal   = atof(yytext);   return REALCONST;}}
+
+{string}     {if(!comm_counter) {
                     yytext = replace_escape_chars(yytext + 1, yyleng - 1);
                     str_nl_counter=0;
                     yylval.stringVal = strdup(yytext); 
                     return STRING;
+                }
             }
 
 {unclosed_string} {fprintf(stderr, RED"Error: "DEFAULT"Unclosed string: \"%s\" at line %d\n",yytext,yylineno); return 0;}
