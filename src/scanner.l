@@ -1,4 +1,3 @@
-/*Options*/
 %option noyywrap
 %option yylineno
 %option nounput
@@ -15,7 +14,7 @@
     #define BLU     "\x1b[34m"
     #define DEFAULT "\x1b[0m"
 
-    #define TOKEN(type,subtype,lc,tkn,text) //insert_alpha_token(yylval,lc,tkn,text,type,subtype)
+    #define TOKEN(type,subtype,lc,tkn,text)
 
     int  tkn_counter  = 0;
 
@@ -27,11 +26,7 @@
     int str_nl_counter = 0;
 
     char* replace_escape_chars(char *str, int yyleng);
-    /*char* commcat(char* comm, char *cat);*/
-
-    Stack* stack;
-
-    
+    Stack* stack; 
 %}
 
 /*Macros (Regex)*/
@@ -183,7 +178,7 @@ char * replace_escape_chars(char* str, int length){
                 case '"':
                     new_str[j] = '"';
                     break;
-                case '\'':              //auto einai peritto? (afou stin glwsa mas den uparxei mono quote den exoume logo kaneis nato kanei escape??)
+                case '\'':
                     new_str[j] = '\'';
                     break;
                 case '?':
