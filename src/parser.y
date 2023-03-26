@@ -146,16 +146,16 @@ com_expr_opt : /* empty */                  {fprintf(yyout, MAG "Detected :" RES
              | COMMA expr com_expr_opt      {fprintf(yyout, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");}
              ;
 
+/* this reduce/reduce conflict is solvable if we hack indexed to be non-empty */
 objectdef   : "[" indexed "]" {fprintf(yyout, MAG "Detected :" RESET"[ indexed ]"CYN" ->"RESET" objectdef \n");}
-            | "[" elist "]" {fprintf(yyout, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");}
+            | "[" elist   "]" {fprintf(yyout, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");}
             ;
 
 elist       : /* empty */       {fprintf(yyout, MAG "Detected :" RESET"elist "YEL"(empty)"RESET"\n");}
             | expr com_expr_opt {fprintf(yyout, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");}
             ;
             
-indexed     : /* empty */                       {fprintf(yyout, MAG "Detected :" RESET"indexed "YEL" (empty) "RESET"\n");}
-            | indexedelem com_indexedelem_opt   {fprintf(yyout, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");}
+indexed     : indexedelem com_indexedelem_opt   {fprintf(yyout, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");}
             ;
 
 indexedelem     : "{" expr ":" expr "}" {fprintf(yyout, MAG "Detected :" RESET"{ expr : expr }"CYN" ->"RESET" indexedelem \n");}
