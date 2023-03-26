@@ -10,6 +10,7 @@
     #include "parser.h"
 
     #define RED     "\033[31m"
+    #define BLU     "\x1b[34m"
     #define DEFAULT "\x1b[0m"
 
     #define TOKEN(type,subtype,lc,tkn,text) //insert_alpha_token(yylval,lc,tkn,text,type,subtype)
@@ -108,7 +109,7 @@ undefined [^\r\n]
                     REJECT;
                 }
                 else if(!comm_counter) {
-                    printf("Single line comment found!\n");
+                    fprintf(yyout, BLU "Single line comment found!"DEFAULT"\n");
                 }
             }
 
@@ -127,10 +128,10 @@ undefined [^\r\n]
                     REJECT;
                 }
                 else if(!comm_counter){ 
-                     printf("Block comment found!\n");
+                     fprintf(yyout, BLU "Block comment found!"DEFAULT"\n");
                 }
                 else {
-                    printf("Nested comment found!\n");
+                    fprintf(yyout, BLU "Nested comment found!"DEFAULT"\n");
                 }
             }
 

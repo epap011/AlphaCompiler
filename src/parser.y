@@ -122,9 +122,9 @@ lvalue      : IDENT                     {fprintf(yyout, MAG "Detected :" RESET"%
             ;   
 
 member      : lvalue "." IDENT          {fprintf(yyout, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");}
-            | lvalue "(" expr ")"       {fprintf(yyout, MAG "Detected :" RESET"lvalue ( expr )"CYN" ->"RESET" member \n");}
+            | lvalue "[" expr "]"       {fprintf(yyout, MAG "Detected :" RESET"lvalue ( expr )"CYN" ->"RESET" member \n");}
             | call "." IDENT            {fprintf(yyout, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");}
-            | call "(" expr ")"         {fprintf(yyout, MAG "Detected :" RESET"call ( expr )"CYN" ->"RESET" member \n");}
+            | call "[" expr "]"         {fprintf(yyout, MAG "Detected :" RESET"call ( expr )"CYN" ->"RESET" member \n");}
             ;
 
 call        : call "(" elist ")"            {fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");}
@@ -147,7 +147,7 @@ com_expr_opt : /* empty */                  {fprintf(yyout, MAG "Detected :" RES
              ;
 
 objectdef   : "[" indexed "]" {fprintf(yyout, MAG "Detected :" RESET"[ indexed ]"CYN" ->"RESET" objectdef \n");}
-            | "[" elist   "]" {fprintf(yyout, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");}
+            | "[" elist "]" {fprintf(yyout, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");}
             ;
 
 elist       : /* empty */       {fprintf(yyout, MAG "Detected :" RESET"elist "YEL"(empty)"RESET"\n");}
@@ -202,7 +202,7 @@ ifstmt          : IF "(" expr ")" stmt %prec LP_ELSE {fprintf(yyout, MAG "Detect
 whilestmt       : WHILE "(" expr ")" stmt   {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");}
                 ;
 
-forstmt         : FOR "(" expr ";" expr ";" expr ")" stmt {fprintf(yyout, MAG "Detected :" RESET"FOR ( expr ; expr ; expr ) stmt"CYN"-> "RESET"forstmt \n");}
+forstmt         : FOR "(" elist ";" expr ";" elist ")" stmt {fprintf(yyout, MAG "Detected :" RESET"FOR ( expr ; expr ; expr ) stmt"CYN"-> "RESET"forstmt \n");}
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");}
