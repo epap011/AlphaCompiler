@@ -34,5 +34,6 @@ void               symbol_table_hide   (SymbolTable* symbol_table, unsigned int 
 
 Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable);
 void update_last_symbol_of_scope(SymbolTable* symbol_table, Symbol* symbol);
+int hash_function(const char* name, unsigned int size);
 
 #endif /* SYMBOL_TABLE_H */

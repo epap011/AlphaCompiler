@@ -5,6 +5,8 @@
 extern FILE* yyout;
 extern FILE* yyin;
 
+SymbolTable symTable;
+
 int main(int argc, char** argv) {
     if (argc == 2 || argc == 3) {
         if(!(yyin = fopen(argv[1], "r"))) {
@@ -30,5 +32,10 @@ int main(int argc, char** argv) {
         yyout = stdout;
     }
 
+    symTable = createSymbolTable();
+    insert_lib_functions(symTable);
+
     yyparse();
+
+    symbol_table_print(symTable);
 }
