@@ -61,11 +61,11 @@ void symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
     insert_at_the_end_to_linked_list(symbol_table->buckets[index]->symbol_list, symbol);
 }
 
-SymbolTableBucket* symbol_table_lookup(SymbolTable* symbol_table, const char* symbol, unsigned int scope) {
-    Symbol** first_symbol_of_scope = symbol_table_get_first_symbol_of_scope(symbol_table, scope);
+Symbol* symbol_table_lookup(SymbolTable* symbol_table, const char* symbol, unsigned int scope) {
+    Symbol* first_symbol_of_scope = symbol_table_get_first_symbol_of_scope(symbol_table, scope);
 
     if(first_symbol_of_scope != NULL) {
-        Symbol* current_symbol = *first_symbol_of_scope;
+        Symbol* current_symbol = first_symbol_of_scope;
 
         while(current_symbol != NULL) {
             if(current_symbol->is_active && strcmp(current_symbol->name, symbol) == 0) {
@@ -80,10 +80,10 @@ SymbolTableBucket* symbol_table_lookup(SymbolTable* symbol_table, const char* sy
 }
 
 void symbol_table_hide(SymbolTable* symbol_table, unsigned int scope) {
-    Symbol** first_symbol_of_scope = symbol_table_get_first_symbol_of_scope(symbol_table, scope);
+    Symbol* first_symbol_of_scope = symbol_table_get_first_symbol_of_scope(symbol_table, scope);
 
     if(first_symbol_of_scope != NULL) {
-        Symbol* current_symbol = *first_symbol_of_scope;
+        Symbol* current_symbol = first_symbol_of_scope;
 
         while(current_symbol != NULL) {
             current_symbol->is_active = 0;
