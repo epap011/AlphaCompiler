@@ -1,4 +1,4 @@
-#include "lib/symbol_table.h"
+#include "symbol_table.h"
 
 void insert_lib_functions(SymbolTable * symTable){
 
