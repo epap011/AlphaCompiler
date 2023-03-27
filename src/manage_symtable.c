@@ -19,6 +19,7 @@ void insert_lib_functions(SymbolTable * symTable){
 
     for(int i = 0; i < 12; i++){
         
+        char* name = lib_functions[i];
         Symbol * symbol = symbol_create(name, 0, 0, LIBFUNC, 0);
         symbol_table_insert(symTable, symbol);
 
@@ -28,17 +29,21 @@ void insert_lib_functions(SymbolTable * symTable){
 
 void symbol_table_print(SymbolTable * symTable){
 
-    while(symTable != NULL){
-            
-            printf("------- Scope #0 -------\n");
-            for(int i = 0; i < symTable->size; i++){
-                linked_list tmp = symTable->buckets[i]->symbol_list;
-                while(tmp != NULL){
-                    printf("\"%s\" [%s] (line %d) (scope %d) \n", tmp->symbol->value.var_var->name, tmp->symbol->value.var_var->type, tmp->symbol->line, tmp->symbol->scope);
+    int current_scope = 0;
+
+    for(int i = 0; i < symTable->size; i++){
+
+        
+
+        printf("------- Scope #%d -------\n",current_scope);
+
+        linked_list* tmp = symTable->buckets[i]->symbol_list;
+        while(tmp != NULL){
+            Symbol * symbol = tmp->head;
+            printf("\"%s\" [%s] (line %d) (scope %d) \n", symbol->name, symbol->symbol_type , symbol->line, symbol->scope);
                 
-                    tmp = tmp->next;
-                }
-            }
+            symbol = symbol->next;
+        }     
     }
 
 }

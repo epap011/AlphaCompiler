@@ -12,7 +12,7 @@ typedef struct Symbol {
     unsigned int scope;
     unsigned int line;
     enum SymbolType symbol_type;
-    Symbol* next_symbol_of_same_scope;
+    struct Symbol* next_symbol_of_same_scope;
 } Symbol;
 
 typedef struct SymbolTableBucket {
