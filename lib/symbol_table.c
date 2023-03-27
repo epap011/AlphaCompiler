@@ -42,6 +42,13 @@ void symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
         symbol_table->buckets[hash]->symbol_list = create_linked_list();
     }
 
+    if(symbol_table_get_first_symbol_of_scope(symbol_table, scope) == NULL) {
+        symbol_table->first_symbol_scopes[symbol->value.var_var->scope] = symbol;
+    }
+
+    update_last_symbol_of_scope(symbol_table, symbol);
+
+
     insert_at_the_end_to_linked_list(symbol_table->buckets[hash]->symbol_list, symbol);
 }
 
@@ -81,19 +88,13 @@ void symbol_table_hide(SymbolTable* symbol_table, unsigned int scope) {
     }
 }
 
-Symbol* symbol_create(SymbolTable* symbol_table, const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable) {
+Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable) {
     Symbol* symbol = (Symbol*)malloc(sizeof(Symbol));
     
     symbol->is_active   = 1;
     symbol->symbol_type = symbol_type;
     symbol->is_variable = is_variable;
     symbol->next_symbol_of_same_scope = NULL;
-
-    if(symbol_table_get_first_symbol_of_scope(symbol_table, scope) == NULL) {
-        symbol_table->first_symbol_scopes[symbol->value.var_var->scope] = symbol;
-    }
-
-    update_last_symbol_of_scope(symbol_table, symbol);
 
     if(is_variable) {
         symbol->value.var_var = (Variable*)malloc(sizeof(Variable));

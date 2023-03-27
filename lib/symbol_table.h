@@ -49,6 +49,6 @@ void               symbol_table_insert (SymbolTable* symbol_table, Symbol*      
 SymbolTableBucket* symbol_table_lookup (SymbolTable* symbol_table, const char*  id);
 void               symbol_table_hide   (SymbolTable* symbol_table, unsigned int scope );
 
-Symbol* symbol_create(SymbolTable* symbol_table, const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable);
-void update_last_symbol_of_scope(SymbolTable* symbol_table, Symbol* symbol)
+Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable);
+void update_last_symbol_of_scope(SymbolTable* symbol_table, Symbol* symbol);
 #endif /* SYMBOL_TABLE_H */
