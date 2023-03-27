@@ -3,7 +3,7 @@
 
 #include "linked_list.h"
 
-enum SymbolType { GLOBAL, LOCAL, FORMAL, USERFUNC, LIBFUNC };
+enum SymbolType { GLOBAL, _LOCAL, FORMAL, USERFUNC, LIBFUNC };
 
 typedef struct Symbol {
     int is_active;

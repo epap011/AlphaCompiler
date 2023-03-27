@@ -34,8 +34,8 @@ void symbol_table_destroy(SymbolTable* symbol_table) {
     free(symbol_table);
 }
 
-int hash_function(const char* key, int size) {
-    int i    = 0;
+int hash_function(const char* key, unsigned int size) {
+    int i = 0;
     int ascii_sum = 0;
 
     while(key[i] != '\0')

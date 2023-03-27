@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "parser.h"
+#include "symbol_table.h"
 
 extern FILE* yyout;
 extern FILE* yyin;
-
-SymbolTable symTable;
 
 int main(int argc, char** argv) {
     if (argc == 2 || argc == 3) {
@@ -32,7 +31,7 @@ int main(int argc, char** argv) {
         yyout = stdout;
     }
 
-    symTable = createSymbolTable();
+    SymbolTable* symTable = symbol_table_create();
     insert_lib_functions(symTable);
 
     yyparse();
