@@ -7,16 +7,16 @@ SymbolTable* symbol_table_create() {
     SymbolTable* symbol_table = (SymbolTable*)malloc(sizeof(SymbolTable));
     symbol_table->size        = INITIAL_SYMBOL_TABLE_CAPACITY;
     symbol_table->buckets     = (SymbolTableBucket**)malloc(sizeof(SymbolTableBucket*) * INITIAL_SYMBOL_TABLE_CAPACITY);
-    symbol_table->first_symbol_scopes = hash_table_create(INITIAL_SCOPE_CAPACITY);
-    symbol_table->last_symbol_scopes  = hash_table_create(INITIAL_SCOPE_CAPACITY);
+    symbol_table->first_symbol_scopes = (Symbol**)malloc(sizeof(Symbol*) * INITIAL_SCOPE_CAPACITY);
+    symbol_table->last_symbol_scopes  = (Symbol**)malloc(sizeof(Symbol*) * INITIAL_SCOPE_CAPACITY);
 
     for(int i = 0; i < INITIAL_SYMBOL_TABLE_CAPACITY; i++) {
         symbol_table->buckets[i] = NULL;
     }
 
     for(int i = 0; i < INITIAL_SCOPE_CAPACITY; i++) {
-        hash_table_insert(symbol_table->first_symbol_scopes, i, NULL);
-        hash_table_insert(symbol_table->last_symbol_scopes,  i, NULL);
+        symbol_table->first_symbol_scopes[i] = NULL;
+        symbol_table->last_symbol_scopes[i]  = NULL;
     }
 
     return symbol_table;
