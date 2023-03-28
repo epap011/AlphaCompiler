@@ -120,9 +120,9 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
             ;   
 
-lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_lvalue(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno);}
-            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); manage_lvalue(symTable, yylval.stringVal, _LOCAL, scope, yylineno); }
-            | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_lvalue(symTable, yylval.stringVal, GLOBAL, scope, yylineno);}
+lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno);}
+            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); manage_id(symTable, yylval.stringVal, _LOCAL, scope, yylineno); }
+            | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, GLOBAL, scope, yylineno);}
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");}
             ;   
 

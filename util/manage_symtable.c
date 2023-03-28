@@ -78,17 +78,25 @@ void decrease_scope(unsigned int* scope){
 }
 
 //Managing function from now on
-void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
+void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
 
-    if(symbol_table_lookup(symTable, id, scope) != NULL) return;
+        if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;
 
-    char* name     = strdup(id);
-    Symbol* symbol = symbol_create(name, scope, line, type, VAR);
-    symbol_table_insert(symTable, symbol);
+        if(scope > 0) {
+            for(int i = 1; i < scope; i++) { 
+                if(symbol_table_scope_lookup(symTable, id, i) != NULL);
+                printf("Error: Variable "RED"%s"RESET" already exists in scope "GRN"%d"RESET" (line: "GRN"%d"RESET")\n", id, i, line);
+                return;
+            }
+        }
+
+        char* name     = strdup(id);
+        Symbol* symbol = symbol_create(name, scope, line, type, VAR);
+        symbol_table_insert(symTable, symbol);
 }
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
-    Symbol* tmp_symbol = symbol_table_lookup(symTable, id, scope);
+    Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
 
     if(tmp_symbol != NULL){
         if(tmp_symbol->symbol_type == LIBFUNC)
