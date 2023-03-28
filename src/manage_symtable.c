@@ -58,7 +58,7 @@ void symbol_table_print(SymbolTable* symTable){
         printf("-------- Scope #%d --------\n", i);
 
         while(current_symbol != NULL){
-            printf("\"%s\"[%s] (line: %d) (scope %d)\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
+            printf("\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET")\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
             current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
