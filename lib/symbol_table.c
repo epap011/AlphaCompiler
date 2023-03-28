@@ -62,7 +62,28 @@ void symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
     update_last_symbol_of_scope(symbol_table, symbol);
 }
 
-Symbol* symbol_table_lookup(SymbolTable* symbol_table, const char* symbol, unsigned int scope) {
+Symbol* symbol_table_lookup(SymbolTable* symbol_table, const char* symbol) {
+    unsigned int index = hash_function(symbol, symbol_table->size);
+    
+    if(symbol_table->buckets[index] != NULL) {
+        linked_list* symbol_list  = symbol_table->buckets[index]->symbol_list;
+        node*        current_node = symbol_list->head;
+
+        while(current_node != NULL) {
+            Symbol* current_symbol = (Symbol*)current_node->data;
+
+            if(strcmp(current_symbol->name, symbol) == 0 && current_symbol->is_active) {
+                return current_symbol;
+            }
+
+            current_node = current_node->next;
+        }
+    }
+
+    return NULL;
+}
+
+Symbol* symbol_table_scope_lookup(SymbolTable* symbol_table, const char* symbol, unsigned int scope) {
     Symbol* first_symbol_of_scope = symbol_table_get_first_symbol_of_scope(symbol_table, scope);
 
     if(first_symbol_of_scope != NULL) {

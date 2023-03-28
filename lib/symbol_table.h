@@ -27,11 +27,12 @@ typedef struct SymbolTable {
     Symbol**            last_symbol_scopes;
 }SymbolTable;
 
-SymbolTable*       symbol_table_create ();
-void               symbol_table_destroy(SymbolTable* symbol_table);
-void               symbol_table_insert (SymbolTable* symbol_table, Symbol*      symbol);
-Symbol*            symbol_table_lookup (SymbolTable* symbol_table, const char* symbol, unsigned int scope);
-void               symbol_table_hide   (SymbolTable* symbol_table, unsigned int scope );
+SymbolTable* symbol_table_create ();
+void         symbol_table_destroy(SymbolTable* symbol_table);
+void         symbol_table_insert (SymbolTable* symbol_table, Symbol*     symbol);
+Symbol*      symbol_table_lookup (SymbolTable* symbol_table, const char* symbol);
+void         symbol_table_hide   (SymbolTable* symbol_table, unsigned int scope );
+Symbol*      symbol_table_scope_lookup (SymbolTable* symbol_table, const char* symbol, unsigned int scope);
 
 Symbol* symbol_table_get_first_symbol_of_scope(SymbolTable* symbol_table, unsigned int scope);
 Symbol* symbol_table_get_last_symbol_of_scope(SymbolTable* symbol_table, unsigned int scope);
