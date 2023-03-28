@@ -1,8 +1,11 @@
 #include "symbol_table.h"
+#include <string.h>
+
+#define NUM_OF_LIB_FUNC 12
 
 void insert_lib_functions(SymbolTable * symTable){
 
-    char lib_functions[12][18] = {
+    char lib_functions[NUM_OF_LIB_FUNC][18] = {
         "print",
         "input",
         "objectmemberkeys",
@@ -17,18 +20,16 @@ void insert_lib_functions(SymbolTable * symTable){
         "sin"
     };
 
-    for(int i = 0; i < 12; i++) {   
-        char * name = strndup(lib_functions[i],18);    
-        Symbol * symbol = symbol_create(name, 0, 0, LIBFUNC, 0);
+    for(int i = 0; i < NUM_OF_LIB_FUNC; i++) {   
+        char* name     = strndup(lib_functions[i], strlen(lib_functions[i])+1);    
+        Symbol* symbol = symbol_create(name, 0, 0, LIBFUNC, 0);
         symbol_table_insert(symTable, symbol);
     }
-
 }
 
 //Move
 const char* str_type(enum SymbolType type){
     switch (type){
-
         case USERFUNC:  return "user function";
         case LIBFUNC:   return "library function";
         case GLOBAL:    return "global variable";
@@ -39,13 +40,9 @@ const char* str_type(enum SymbolType type){
     }
 }
 
-/*NOTE: To printarisma den ginetai me tin seira pou exoun mpei ston symbol table 
-*       alla me tin seira pou ta vriskei otan ton kanei traverse... (Eis ton mpiko mas?)
-*/
-void symbol_table_print(SymbolTable * symTable){
+void symbol_table_print(SymbolTable* symTable){
 
     printf("\n---------------- Scope #0 ----------------\n\n");
-
     for(int i = 0; i < symTable->size; i++){
 
         if(symTable->buckets[i] == NULL) continue;
