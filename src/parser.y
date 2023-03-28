@@ -6,7 +6,7 @@
 
     unsigned int scope = 0;
     unsigned int actual_line = 0;
-    Stack *func_line;
+    Stack *func_line_stack;
 %}
 
 %start program
@@ -179,10 +179,20 @@ stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
                                                                                 //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
-funcdef         : FUNCTION id_opt                       {if(!func_line){func_line=new_stack();} push(func_line,yylineno); check_if_declared(symTable,$2,scope);} 
+funcdef         : FUNCTION id_opt                       {
+                                                            if(!func_line_stack){func_line_stack=new_stack();}  
+                                                            unsigned int* tmp_line = malloc(sizeof(unsigned int)); 
+                                                            *tmp_line = yylineno;
+                                                            push(func_line_stack,tmp_line); 
+                                                            check_if_declared(symTable,$2,scope);
+                                                        } 
                                  "("                    {increase_scope(&scope);} 
                                     idlist ")"          {decrease_scope(&scope);} 
-                                               block    {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); manage_funcdef(symTable, $2, scope, pop(func_line)); formal_flag = 0;}
+                                               block    {
+                                                            fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
+                                                            manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
+                                                            formal_flag = 0;
+                                                }
                                                                                                              
                                                                                             
                 ;
@@ -200,7 +210,7 @@ const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d"CYN"-> "RE
                 ;
 
 idlist          : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"idlist"YEL" (empty)"RESET"\n");}
-                | IDENT com_id_opt     {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
+                | IDENT com_id_opt     {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n"); manage_formal_id(symTable, $1, scope, yylineno);}
                 
 
 com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"com_id_opt"YEL" (empty)"RESET"\n");}
