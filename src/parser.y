@@ -179,12 +179,13 @@ block           : "{" {increase_scope(&scope);} stmtList "}" {decrease_scope(&sc
 stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");}
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
-                                                                                //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
+                                                                                
 funcdef         : FUNCTION id_opt                       {
                                                             if(!func_line_stack){func_line_stack=new_stack();}  
                                                             unsigned int* tmp_line = malloc(sizeof(unsigned int)); 
                                                             *tmp_line = yylineno;
                                                             push(func_line_stack,tmp_line); 
+                                                            //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
                                                             check_if_declared(symTable,$2,scope);
                                                         } 
                                  "("                    {increase_scope(&scope);} 
