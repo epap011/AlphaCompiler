@@ -15,22 +15,24 @@
 
 #define NUM_OF_LIB_FUNC 12
 
-void insert_lib_functions(SymbolTable * symTable){
+int formal_flag = 0;
 
-    char lib_functions[NUM_OF_LIB_FUNC][19] = {
-        "print",
-        "input",
-        "objectmemberkeys",
-        "objecttotalmembers",
-        "objectcopy",
-        "totalarguments",
-        "argument",
-        "typeof",
-        "strtonum",
-        "sqrt",
-        "cos",
-        "sin"
-    };
+char lib_functions[NUM_OF_LIB_FUNC][19] = {
+    "print",
+    "input",
+    "objectmemberkeys",
+    "objecttotalmembers",
+    "objectcopy",
+    "totalarguments",
+    "argument",
+    "typeof",
+    "strtonum",
+    "sqrt",
+    "cos",
+    "sin"
+};
+
+void insert_lib_functions(SymbolTable * symTable){
 
     for(int i = 0; i < NUM_OF_LIB_FUNC; i++) {   
         char* name     = strdup(lib_functions[i]);    
@@ -77,6 +79,22 @@ void decrease_scope(unsigned int* scope){
     (*scope)--;
 }
 
+//Checks if a function with that name is already declared (also checks if it is a library function)
+void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope){
+    Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
+
+    if(tmp_symbol != NULL){
+        formal_flag = 1;
+        return;
+    }
+    for(int i = 0; i < NUM_OF_LIB_FUNC; i++){
+        if(strcmp(id, lib_functions[i]) == 0){
+            formal_flag = 1;
+            return;
+        }
+    }
+}
+
 //Managing function from now on
 void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
 
@@ -112,13 +130,22 @@ void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 }
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
-    Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
+   
+   for(int i = 0; i < NUM_OF_LIB_FUNC; i++){
+       if(strcmp(id, lib_functions[i]) == 0){
+           printf(RED"Error:"RESET" Cannot shadow library function "YEL"\"%s\""RESET" \n", id);
+           return;
+       }
+   }
+   
+   Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
 
     if(tmp_symbol != NULL){
         if(tmp_symbol->symbol_type == LIBFUNC)
             printf(RED"Error:"RESET" Cannot shadow library function \"%s\" \n", id);
         else
             printf(RED"Error:"RESET" Function \"%s\" already declared in scope %d\n", id, scope);
+
         return;
     }
 
@@ -126,11 +153,14 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
     Symbol* symbol = symbol_create(name, scope, line, USERFUNC, FUNC);
     symbol_table_insert(symTable, symbol);
 }
-/*
+
 void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
-    if(symbol_table_lookup(symTable, id, scope) != NULL){
-        printf(RED"Error:"RESET" Formal variable \"%s\" already declared in scope %d",scope);
+    if(formal_flag)
+        return;
+         
+    if(symbol_table_scope_lookup(symTable, id, scope) != NULL){
+        printf(RED"Error:"RESET" Formal variable \"%s\" already declared in function \n", id);
         return;
     } 
 
@@ -138,4 +168,4 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
     Symbol* symbol = symbol_create(name, scope, line, FORMAL, VAR);
     symbol_table_insert(symTable, symbol);
 
-}*/
+}

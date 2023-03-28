@@ -14,6 +14,7 @@
 
 extern int   yylineno;
 extern char* yytext;
+extern int formal_flag;
 
 int yylex(void);
 int yyerror(char* yaccProvideMessage);

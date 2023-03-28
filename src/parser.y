@@ -5,6 +5,7 @@
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
 
     unsigned int scope = 0;
+    unsigned int actual_line = 0;
 %}
 
 %start program
@@ -49,7 +50,7 @@
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
-%type<stringVal> id_opt
+%type<stringVal> id_opt com_id_opt
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -176,10 +177,13 @@ block           : "{" {increase_scope(&scope);} stmtList "}" {decrease_scope(&sc
 stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");}
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
-
-funcdef         : FUNCTION id_opt "(" {increase_scope(&scope);} idlist ")" {decrease_scope(&scope);} block {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
-                                                                                                             manage_funcdef(symTable, $2, scope, yylineno);
-                                                                                                          }
+                                                                                //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
+funcdef         : FUNCTION id_opt                       {actual_line = yylineno; check_if_declared(symTable,$2,scope);} 
+                                 "("                    {increase_scope(&scope);} 
+                                    idlist ")"          {decrease_scope(&scope);} 
+                                               block    {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); manage_funcdef(symTable, $2, scope, actual_line); formal_flag = 0;}
+                                                                                                             
+                                                                                            
                 ;
 
 id_opt  : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n");}
@@ -195,11 +199,11 @@ const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d"CYN"-> "RE
                 ;
 
 idlist          : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"idlist"YEL" (empty)"RESET"\n");}
-                | IDENT com_id_opt     {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n"); /*manage_formal_id();*/}
-                ;
+                | IDENT com_id_opt     {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
+                
 
 com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"com_id_opt"YEL" (empty)"RESET"\n");}
-                | "," IDENT com_id_opt {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n");}
+                | "," IDENT com_id_opt {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
                 ;
 
 ifstmt          : IF "(" expr ")" stmt %prec LP_ELSE {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt"CYN"-> "RESET"ifstmt  \n");}
