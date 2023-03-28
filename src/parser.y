@@ -1,5 +1,8 @@
 %{
     #include "yacc_util.h"
+    #include "manage_symtable.h"
+
+    unsigned int scope = 0;
 %}
 
 %start program
@@ -113,9 +116,9 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
             ;   
 
-lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);}
-            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal);}
-            | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);}
+lvalue      : IDENT                 {manage_lvalue(symTable, yylval.stringVal, GLOBAL, scope, yylineno); fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);}
+            | LOCAL IDENT           {manage_lvalue(symTable, yylval.stringVal, _LOCAL, scope, yylineno); fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal);}
+            | "::" IDENT            {manage_lvalue(symTable, yylval.stringVal, GLOBAL, scope, yylineno); fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);}
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");}
             ;   
 

@@ -36,6 +36,15 @@ void insert_lib_functions(SymbolTable * symTable){
     }
 }
 
+void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
+
+    if(symbol_table_lookup(symTable, id, scope) != NULL) return;
+
+    char* name     = strndup(id, strlen(id)+1);    
+    Symbol* symbol = symbol_create(name, scope, line, type, 1);
+    symbol_table_insert(symTable, symbol);
+}
+
 //Move
 const char* str_type(enum SymbolType type){
     switch (type){
