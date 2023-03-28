@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "parser.h"
 #include "symbol_table.h"
+#include "manage_symtable.h"
+#include "parser.h"
 
 extern FILE* yyout;
 extern FILE* yyin;
-
-void symbol_table_print(SymbolTable * symTable);
-void insert_lib_functions(SymbolTable * symTable);
 
 int main(int argc, char** argv) {
     if (argc == 2 || argc == 3) {

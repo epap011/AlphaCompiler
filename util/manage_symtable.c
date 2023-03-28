@@ -1,5 +1,6 @@
-#include "symbol_table.h"
 #include <string.h>
+#include "symbol_table.h"
+#include "manage_symtable.h"
 
 #define RED   "\x1b[31m"
 #define GRN   "\x1b[32m"

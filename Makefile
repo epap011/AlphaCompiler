@@ -56,7 +56,7 @@ $(LLIST).o: $(LIB_DIR)/$(LLIST).c | $(OBJ_DIR)
 $(SYMTABLE).o: $(LIB_DIR)/$(SYMTABLE).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
-$(MANAGE).o: $(SRC_DIR)/$(MANAGE).c | $(OBJ_DIR)
+$(MANAGE).o: $(UTIL_DIR)/$(MANAGE).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
 #---< produce scanner.c from scanner.l
