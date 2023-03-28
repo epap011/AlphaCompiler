@@ -87,12 +87,19 @@ void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope){
         formal_flag = 1;
         return;
     }
+    
+    if(is_id_built_in_function(id))
+        formal_flag = 1;
+        
+}
+
+int is_id_built_in_function(char* id){
     for(int i = 0; i < NUM_OF_LIB_FUNC; i++){
         if(strcmp(id, lib_functions[i]) == 0){
-            formal_flag = 1;
-            return;
+            return 1;
         }
     }
+    return 0;
 }
 
 //Managing function from now on
@@ -118,6 +125,11 @@ void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsign
 
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
 
+        if(is_id_built_in_function(id)) {
+            printf(RED"Error:"RESET" Cannot shadow library function "YEL"\"%s\""RESET" \n", id);
+            return;
+        }
+
         char* name     = strdup(id);
         Symbol* symbol = symbol_create(name, scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR);
         symbol_table_insert(symTable, symbol);
@@ -131,11 +143,9 @@ void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
    
-   for(int i = 0; i < NUM_OF_LIB_FUNC; i++){
-       if(strcmp(id, lib_functions[i]) == 0){
-           printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" \n", id);
-           return;
-       }
+   if(is_id_built_in_function(id)) {
+        printf(RED"Error:"RESET" Cannot shadow library function "YEL"\"%s\""RESET" \n", id);
+        return;
    }
    
    Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
