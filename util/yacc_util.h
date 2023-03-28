@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "symbol_table.h"
+#include "stack.h"
 
 #define RED   "\x1b[31m"
 #define GRN   "\x1b[32m"

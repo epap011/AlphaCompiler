@@ -6,6 +6,7 @@
 
     unsigned int scope = 0;
     unsigned int actual_line = 0;
+    Stack *func_line;
 %}
 
 %start program
@@ -178,10 +179,10 @@ stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
                                                                                 //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
-funcdef         : FUNCTION id_opt                       {actual_line = yylineno; check_if_declared(symTable,$2,scope);} 
+funcdef         : FUNCTION id_opt                       {if(!func_line){func_line=new_stack();} push(func_line,yylineno); check_if_declared(symTable,$2,scope);} 
                                  "("                    {increase_scope(&scope);} 
                                     idlist ")"          {decrease_scope(&scope);} 
-                                               block    {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); manage_funcdef(symTable, $2, scope, actual_line); formal_flag = 0;}
+                                               block    {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); manage_funcdef(symTable, $2, scope, pop(func_line)); formal_flag = 0;}
                                                                                                              
                                                                                             
                 ;
