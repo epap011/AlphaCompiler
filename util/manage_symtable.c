@@ -10,6 +10,9 @@
 #define CYN   "\x1b[36m"
 #define RESET "\x1b[0m"
 
+#define FUNC 0
+#define VAR  1
+
 #define NUM_OF_LIB_FUNC 12
 
 void insert_lib_functions(SymbolTable * symTable){
@@ -30,7 +33,7 @@ void insert_lib_functions(SymbolTable * symTable){
     };
 
     for(int i = 0; i < NUM_OF_LIB_FUNC; i++) {   
-        char* name     = strndup(lib_functions[i], strlen(lib_functions[i])+1);    
+        char* name     = strdup(lib_functions[i]);    
         Symbol* symbol = symbol_create(name, 0, 0, LIBFUNC, 0);
         symbol_table_insert(symTable, symbol);
     }
@@ -75,12 +78,20 @@ void decrease_scope(unsigned int* scope){
 }
 
 //Managing function from now on
-
 void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
 
     if(symbol_table_lookup(symTable, id, scope) != NULL) return;
 
-    char* name     = strndup(id, strlen(id)+1);    
-    Symbol* symbol = symbol_create(name, scope, line, type, 1);
+    char* name     = strdup(id);
+    Symbol* symbol = symbol_create(name, scope, line, type, VAR);
+    symbol_table_insert(symTable, symbol);
+}
+
+void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+
+    if(symbol_table_lookup(symTable, id, scope) != NULL) return;
+
+    char* name     = strdup(id);
+    Symbol* symbol = symbol_create(name, scope, line, USERFUNC, FUNC);
     symbol_table_insert(symTable, symbol);
 }

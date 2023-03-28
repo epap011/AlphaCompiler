@@ -49,6 +49,8 @@
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
+%type<stringVal> id_opt
+
 %nonassoc LP_ELSE
 %nonassoc ELSE
 
@@ -175,7 +177,9 @@ stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
 
-funcdef         : FUNCTION id_opt "(" idlist ")" block {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n");}
+funcdef         : FUNCTION id_opt "(" {increase_scope(&scope);} idlist ")" {decrease_scope(&scope);} block {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
+                                                                                                             manage_funcdef(symTable, $2, scope, yylineno);
+                                                                                                          }
                 ;
 
 id_opt  : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n");}
