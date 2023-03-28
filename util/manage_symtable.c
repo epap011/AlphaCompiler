@@ -81,6 +81,8 @@ void decrease_scope(unsigned int* scope){
 
 //Checks if a function with that name is already declared (also checks if it is a library function)
 void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope){
+    if(id == NULL) return;
+    
     Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
 
     if(tmp_symbol != NULL){
@@ -143,6 +145,8 @@ void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
    
+    if(id == NULL) {id = "_myname"; }
+
    if(is_id_built_in_function(id)) {
         printf(RED"Error:"RESET" Cannot shadow library function "YEL"\"%s\""RESET" \n", id);
         return;

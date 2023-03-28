@@ -6,6 +6,7 @@
 
     unsigned int scope = 0;
     unsigned int actual_line = 0;
+    int anonym_cnt = 0;
     Stack *func_line_stack;
 %}
 
@@ -192,12 +193,17 @@ funcdef         : FUNCTION id_opt                       {
                                                             fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
                                                             manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
                                                             formal_flag = 0;
-                                                }
+                                                         }
                                                                                                              
                                                                                             
                 ;
 
-id_opt  : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n");}
+id_opt  : /* empty */ {
+                        fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n"); 
+                        char buffer[255]; 
+                        sprintf(buffer, "_anonymous_f%d", anonym_cnt++); 
+                        $$ = strdup(buffer); 
+                    }
         | IDENT       {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" -> "RESET"IDENT \n",yylval.stringVal);}
         ;
 
