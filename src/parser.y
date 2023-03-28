@@ -5,6 +5,7 @@
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
 
     unsigned int scope = 0;
+    unsigned int actual_line = 0;
 %}
 
 %start program
@@ -176,10 +177,13 @@ block           : "{" {increase_scope(&scope);} stmtList "}" {decrease_scope(&sc
 stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");}
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
-                            //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
-funcdef         : FUNCTION id_opt {check_if_declared(symTable,$2,scope);} "(" {increase_scope(&scope);} idlist ")" {decrease_scope(&scope);} block {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
-                                                                                                             manage_funcdef(symTable, $2, scope, yylineno); formal_flag = 0;
-                                                                                                          }
+                                                                                //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
+funcdef         : FUNCTION id_opt                       {actual_line = yylineno; check_if_declared(symTable,$2,scope);} 
+                                 "("                    {increase_scope(&scope);} 
+                                    idlist ")"          {decrease_scope(&scope);} 
+                                               block    {fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); manage_funcdef(symTable, $2, scope, actual_line); formal_flag = 0;}
+                                                                                                             
+                                                                                            
                 ;
 
 id_opt  : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n");}

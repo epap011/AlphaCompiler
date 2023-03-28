@@ -81,7 +81,7 @@ void decrease_scope(unsigned int* scope){
 
 //Checks if a function with that name is already declared (also checks if it is a library function)
 void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope){
-    Symbol* tmp_symbol = symbol_table_lookup(symTable, id, scope);
+    Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
 
     if(tmp_symbol != NULL){
         formal_flag = 1;
@@ -99,7 +99,7 @@ void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope){
 
 void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
 
-    if(symbol_table_lookup(symTable, id, scope) != NULL) return;
+    if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
 
     char* name     = strdup(id);
     Symbol* symbol = symbol_create(name, scope, line, type, VAR);
@@ -115,7 +115,7 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
        }
    }
    
-   Symbol* tmp_symbol = symbol_table_lookup(symTable, id, scope);
+   Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
 
     if(tmp_symbol != NULL){
         if(tmp_symbol->symbol_type == LIBFUNC)
@@ -136,7 +136,7 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
     if(formal_flag)
         return;
          
-    if(symbol_table_lookup(symTable, id, scope) != NULL){
+    if(symbol_table_scope_lookup(symTable, id, scope) != NULL){
         printf(RED"Error:"RESET" Formal variable \"%s\" already declared in function \n", id);
         return;
     } 
