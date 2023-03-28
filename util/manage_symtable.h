@@ -10,5 +10,6 @@ void increase_scope(unsigned int* scope);
 void decrease_scope(unsigned int* scope);
 void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line);
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
+void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 
 #endif /* MANAGE_SYMTABLE_H */

@@ -195,7 +195,7 @@ const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d"CYN"-> "RE
                 ;
 
 idlist          : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"idlist"YEL" (empty)"RESET"\n");}
-                | IDENT com_id_opt     {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n");}
+                | IDENT com_id_opt     {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n"); /*manage_formal_id();*/}
                 ;
 
 com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"com_id_opt"YEL" (empty)"RESET"\n");}

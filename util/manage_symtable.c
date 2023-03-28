@@ -88,10 +88,30 @@ void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsign
 }
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+    Symbol* tmp_symbol = symbol_table_lookup(symTable, id, scope);
 
-    if(symbol_table_lookup(symTable, id, scope) != NULL) return;
+    if(tmp_symbol != NULL){
+        if(tmp_symbol->symbol_type == LIBFUNC)
+            printf(RED"Error:"RESET" Cannot shadow library function \"%s\" \n", id);
+        else
+            printf(RED"Error:"RESET" Function \"%s\" already declared in scope %d\n", id, scope);
+        return;
+    }
 
     char* name     = strdup(id);
     Symbol* symbol = symbol_create(name, scope, line, USERFUNC, FUNC);
     symbol_table_insert(symTable, symbol);
 }
+/*
+void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+
+    if(symbol_table_lookup(symTable, id, scope) != NULL){
+        printf(RED"Error:"RESET" Formal variable \"%s\" already declared in scope %d",scope);
+        return;
+    } 
+
+    char* name     = strdup(id);
+    Symbol* symbol = symbol_create(name, scope, line, FORMAL, VAR);
+    symbol_table_insert(symTable, symbol);
+
+}*/
