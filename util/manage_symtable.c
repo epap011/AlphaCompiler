@@ -84,15 +84,31 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
 
         if(scope > 0) {
             for(int i = 1; i < scope; i++) { 
-                if(symbol_table_scope_lookup(symTable, id, i) != NULL);
-                printf("Error: Variable "RED"%s"RESET" already exists in scope "GRN"%d"RESET" (line: "GRN"%d"RESET")\n", id, i, line);
-                return;
+                if(symbol_table_scope_lookup(symTable, id, i) != NULL) {
+                    printf("Error: Variable "RED"%s"RESET" already exists in scope "GRN"%d"RESET" (line: "GRN"%d"RESET")\n", id, i, line);
+                    return;
+                }
             }
         }
 
         char* name     = strdup(id);
         Symbol* symbol = symbol_create(name, scope, line, type, VAR);
         symbol_table_insert(symTable, symbol);
+}
+
+void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+
+        if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
+
+        char* name     = strdup(id);
+        Symbol* symbol = symbol_create(name, scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR);
+        symbol_table_insert(symTable, symbol);
+}
+
+void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+
+        if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;
+        printf("Error: Variable "RED"%s"RESET" doesn't exists in global scope\n", id);
 }
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
