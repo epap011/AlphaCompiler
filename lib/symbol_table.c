@@ -9,6 +9,7 @@ SymbolTable* symbol_table_create() {
     symbol_table->buckets     = (SymbolTableBucket**)malloc(sizeof(SymbolTableBucket*) * INITIAL_SYMBOL_TABLE_CAPACITY);
     symbol_table->first_symbol_scopes = (Symbol**)malloc(sizeof(Symbol*) * INITIAL_SCOPE_CAPACITY);
     symbol_table->last_symbol_scopes  = (Symbol**)malloc(sizeof(Symbol*) * INITIAL_SCOPE_CAPACITY);
+    symbol_table->scope_size          = INITIAL_SCOPE_CAPACITY;
 
     for(int i = 0; i < INITIAL_SYMBOL_TABLE_CAPACITY; i++) {
         symbol_table->buckets[i] = NULL;
@@ -53,12 +54,12 @@ void symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
     }
 
     unsigned int scope = symbol->scope;
-    if(symbol_table_get_first_symbol_of_scope(symbol_table, scope) == NULL) {
+    if(symbol_table_get_first_symbol_of_scope(symbol_table, scope) == NULL)
         symbol_table->first_symbol_scopes[scope] = symbol;
-    }
+    else
+        symbol_table->last_symbol_scopes[scope]->next_symbol_of_same_scope = symbol;    
+    
     update_last_symbol_of_scope(symbol_table, symbol);
-
-    insert_at_the_end_to_linked_list(symbol_table->buckets[index]->symbol_list, symbol);
 }
 
 Symbol* symbol_table_lookup(SymbolTable* symbol_table, const char* symbol, unsigned int scope) {

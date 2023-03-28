@@ -1,11 +1,19 @@
 #include "symbol_table.h"
 #include <string.h>
 
+#define RED   "\x1b[31m"
+#define GRN   "\x1b[32m"
+#define YEL   "\x1b[33m"
+#define BLU   "\x1b[34m"
+#define MAG   "\x1b[35m"
+#define CYN   "\x1b[36m"
+#define RESET "\x1b[0m"
+
 #define NUM_OF_LIB_FUNC 12
 
 void insert_lib_functions(SymbolTable * symTable){
 
-    char lib_functions[NUM_OF_LIB_FUNC][18] = {
+    char lib_functions[NUM_OF_LIB_FUNC][19] = {
         "print",
         "input",
         "objectmemberkeys",
@@ -42,24 +50,17 @@ const char* str_type(enum SymbolType type){
 
 void symbol_table_print(SymbolTable* symTable){
 
-    printf("\n---------------- Scope #0 ----------------\n\n");
-    for(int i = 0; i < symTable->size; i++){
+    for(int i = 0; i < symTable->scope_size; i++){
 
-        if(symTable->buckets[i] == NULL) continue;
+        Symbol* current_symbol = symTable->first_symbol_scopes[i];
+        if(current_symbol == NULL) continue;
 
-        linked_list* bucket_list = symTable->buckets[i]->symbol_list;
-        node* tmp = bucket_list->head;
-        while(tmp != NULL){
-            Symbol* symbol = (Symbol*)tmp->data;
-            printf("\"%s\" [%s] (line %d) (scope %d)\n", symbol->name, str_type(symbol->symbol_type) , symbol->line, symbol->scope);
-            tmp = tmp->next;
+        printf("-------- Scope #%d --------\n", i);
+
+        while(current_symbol != NULL){
+            printf("\"%s\"[%s] (line: %d) (scope %d)\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
+            current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
     printf("\n");
 }
-
-
-
-
-
-

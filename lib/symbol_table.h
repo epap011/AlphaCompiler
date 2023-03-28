@@ -22,6 +22,7 @@ typedef struct SymbolTableBucket {
 typedef struct SymbolTable {
     SymbolTableBucket** buckets;
     unsigned int        size;
+    unsigned int        scope_size;
     Symbol**            first_symbol_scopes;
     Symbol**            last_symbol_scopes;
 }SymbolTable;
