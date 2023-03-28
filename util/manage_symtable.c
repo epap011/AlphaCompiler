@@ -36,15 +36,6 @@ void insert_lib_functions(SymbolTable * symTable){
     }
 }
 
-void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
-
-    if(symbol_table_lookup(symTable, id, scope) != NULL) return;
-
-    char* name     = strndup(id, strlen(id)+1);    
-    Symbol* symbol = symbol_create(name, scope, line, type, 1);
-    symbol_table_insert(symTable, symbol);
-}
-
 //Move
 const char* str_type(enum SymbolType type){
     switch (type){
@@ -65,12 +56,31 @@ void symbol_table_print(SymbolTable* symTable){
         Symbol* current_symbol = symTable->first_symbol_scopes[i];
         if(current_symbol == NULL) continue;
 
-        printf("-------- Scope #%d --------\n", i);
+        printf("-------- Scope #%d --------\n\n", i);
 
         while(current_symbol != NULL){
             printf("\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET")\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
             current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
-    printf("\n");
+    printf("\n\n");
+}
+
+void increase_scope(unsigned int* scope){
+    (*scope)++;
+}
+
+void decrease_scope(unsigned int* scope){
+    (*scope)--;
+}
+
+//Managing function from now on
+
+void manage_lvalue(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
+
+    if(symbol_table_lookup(symTable, id, scope) != NULL) return;
+
+    char* name     = strndup(id, strlen(id)+1);    
+    Symbol* symbol = symbol_create(name, scope, line, type, 1);
+    symbol_table_insert(symTable, symbol);
 }

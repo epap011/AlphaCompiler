@@ -2,6 +2,8 @@
     #include "yacc_util.h"
     #include "manage_symtable.h"
 
+    #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
+
     unsigned int scope = 0;
 %}
 
@@ -116,9 +118,9 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
             ;   
 
-lvalue      : IDENT                 {manage_lvalue(symTable, yylval.stringVal, GLOBAL, scope, yylineno); fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);}
-            | LOCAL IDENT           {manage_lvalue(symTable, yylval.stringVal, _LOCAL, scope, yylineno); fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal);}
-            | "::" IDENT            {manage_lvalue(symTable, yylval.stringVal, GLOBAL, scope, yylineno); fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);}
+lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_lvalue(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno);}
+            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); manage_lvalue(symTable, yylval.stringVal, _LOCAL, scope, yylineno); }
+            | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_lvalue(symTable, yylval.stringVal, GLOBAL, scope, yylineno);}
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");}
             ;   
 
@@ -166,7 +168,7 @@ com_indexedelem_opt : /* empty */                         {fprintf(yyout, MAG "D
                     | "," indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");}
                     ;
 
-block           : "{" stmtList "}" {fprintf(yyout, MAG "Detected :" RESET"{ stmtList }"CYN" ->"RESET" block \n");}
+block           : "{" {increase_scope(&scope);} stmtList "}" {decrease_scope(&scope); fprintf(yyout, MAG "Detected :" RESET"{ stmtList }"CYN" ->"RESET" block \n");}
                 ;
 
 stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");}
