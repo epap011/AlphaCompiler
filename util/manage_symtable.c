@@ -64,7 +64,7 @@ void symbol_table_print(SymbolTable* symTable){
         printf("-------- Scope #%d --------\n\n", i);
 
         while(current_symbol != NULL){
-            printf("\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET") [active "GRN"%d"RESET"]\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope, current_symbol->is_active);
+            printf("\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET")\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
             current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
@@ -142,13 +142,13 @@ void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsign
 void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
         if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;
-        printf(RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exists in global scope\n", id);
+        printf(RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exists in global scope (line: "GRN"%d"RESET") \n", id, line);
 }
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
    if(is_id_built_in_function(id)) {
-        printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" \n", id);
+        printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         return;
    }
    
@@ -179,7 +179,7 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
         }
 
     if(symbol_table_scope_lookup(symTable, id, scope) != NULL){
-        printf(RED"Error:"RESET" Formal variable \""YEL"%s"RESET"\" already declared in function \n", id);
+        printf(RED"Error:"RESET" Formal variable \""YEL"%s"RESET"\" already declared in function (line: "GRN"%d"RESET")\n", id, line);
         return;
     } 
 
@@ -218,20 +218,16 @@ int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned i
 }
 
 void manage_func_call(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line) {
-    printf("Checking function call: %s\n", id);
 
     if(is_id_built_in_function(id)) return;
 
-    for(int i = 0; i < scope; i++) {
+    for(int i = 0; i <= scope; i++) {
         Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
-        if(tmp_symbol != NULL && !tmp_symbol->is_variable) {
-            printf("Function call is valid\n");
+        if(tmp_symbol != NULL && !tmp_symbol->is_variable) 
             return;
-        }
     }
 
     printf(RED"Error:"RESET" Function \""YEL"%s"RESET"\" doesn't exists (line: "GRN"%d"RESET")\n", id, line);
-    printf("Hiding symbol %s..\n", id);
     hide_symbol_on_scope(symTable, id, scope);
 }
 
@@ -243,4 +239,19 @@ int hide_symbol_on_scope(SymbolTable* symTable, char* id, unsigned int scope) {
     }
 
     return 0;
+}
+
+void manage_assignment(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+    if(is_id_built_in_function(id)){
+        printf(RED"Error:"RESET" Cannot assign to a library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+        return;
+    }
+
+    for(int i = 0; i <= scope; i++) {
+        Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
+        if(tmp_symbol != NULL && !tmp_symbol->is_variable) {
+            printf(RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+            return;
+        }        
+    }
 }

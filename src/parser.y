@@ -113,8 +113,7 @@ term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( exp
             | primary               {fprintf(yyout, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");}
             ;   
 
-assignexpr  : lvalue "=" expr       {if(is_id_built_in_function($1))(fprintf(yyout, RED"Error:"RESET" Cannot assign to \""YEL"%s"RESET"\" as a built-in function\n", $1));
-                                    fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n");}
+assignexpr  : lvalue "=" expr       {fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n"); manage_assignment(symTable, $1, scope, yylineno);}
             ;   
 
 primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");}
@@ -245,7 +244,7 @@ forstmt         : FOR "(" elist ";" expr ";" elist ")" stmt {fprintf(yyout, MAG 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");}
                 ;
 
-expr_opt        : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (emp     ty)"RESET"\n");}
+expr_opt        : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (empty)"RESET"\n");}
                 | expr        {fprintf(yyout, MAG "Detected :" RESET"expr \n");}
                 ;
 
