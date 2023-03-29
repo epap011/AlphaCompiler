@@ -191,10 +191,14 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 
 void manage_lvalue_inc(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
-    if(symbol_table_scope_lookup(symTable, id, scope) == NULL){
-        printf(RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exists in scope "GRN"%d"RESET"\n", id, scope);
-        return;
-    } 
+    Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
 
+    if(tmp_symbol == NULL) //It's not declared so we add it to the symbol table (insertion happens in manage_id)
+        return;
+
+    if(tmp_symbol->symbol_type == LIBFUNC || tmp_symbol->symbol_type == USERFUNC){
+        printf(RED"Error:"RESET" Cannot increment function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET")\n", id, line);
+        return;
+    }
 
 }

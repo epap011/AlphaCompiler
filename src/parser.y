@@ -52,7 +52,7 @@
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
-%type<stringVal> id_opt com_id_opt
+%type<stringVal> id_opt com_id_opt lvalue
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -106,8 +106,8 @@ expr        : assignexpr    {fprintf(yyout, MAG "Detected :" RESET"assignexpr"CY
 term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");}
             | "-" expr %prec UMINUS {fprintf(yyout, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");}
             | NOT expr              {fprintf(yyout, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");}
-            | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n"); /*manage_lvalue_inc(symTable, $2, scope, yylineno);*/}
-            | lvalue "++"           {fprintf(yyout, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n");}
+            | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n"); manage_lvalue_inc(symTable, $2, scope, yylineno);}
+            | lvalue "++"           {fprintf(yyout, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n"); manage_lvalue_inc(symTable, $1, scope, yylineno);}
             | "--" lvalue           {fprintf(yyout, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n");}
             | lvalue "--"           {fprintf(yyout, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n");}
             | primary               {fprintf(yyout, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");}
@@ -191,12 +191,15 @@ funcdef         : FUNCTION id_opt                       {
                                                             push(func_line_stack,tmp_line); 
                                                             //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
                                                             check_if_declared(symTable,$2,scope);
+                                                            //Kanoume to manage edw giati olokliros o kanonas anagetai otan kleisei to block
+                                                            //alla emeis theloume na mpenei sto symbol table molis tin doume
+                                                            manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
                                                         } 
                                  "("                    {increase_scope(&scope);} 
                                     idlist ")"          {decrease_scope(&scope);} 
                                                block    {
                                                             fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
-                                                            manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
+                                                            //
                                                             formal_flag = 0;
                                                          }
                                                                                                              
