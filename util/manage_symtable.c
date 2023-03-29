@@ -64,7 +64,7 @@ void symbol_table_print(SymbolTable* symTable){
         printf("-------- Scope #%d --------\n\n", i);
 
         while(current_symbol != NULL){
-            printf("\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET")\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
+            printf("\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET") [active "GRN"%d"RESET"]\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope, current_symbol->is_active);
             current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
@@ -111,9 +111,9 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
 
         if(scope > 0) {
-            for(int i = 1; i < scope; i++) { 
-                if(symbol_table_scope_lookup(symTable, id, i) != NULL) {
-                    
+            for(int i = 1; i < scope; i++) {
+                Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
+                if(tmp_symbol != NULL && tmp_symbol->is_variable) {
                     printf(RED"Error:"RESET" Variable "YEL"\"%s\""RESET" is not accessible (line: "GRN"%d"RESET")\n", id, line);
                     return;
                 }
@@ -217,4 +217,30 @@ int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned i
     return 0;
 }
 
-//End of increamens and decrements
+void manage_func_call(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line) {
+    printf("Checking function call: %s\n", id);
+
+    if(is_id_built_in_function(id)) return;
+
+    for(int i = 0; i < scope; i++) {
+        Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
+        if(tmp_symbol != NULL && !tmp_symbol->is_variable) {
+            printf("Function call is valid\n");
+            return;
+        }
+    }
+
+    printf(RED"Error:"RESET" Function \""YEL"%s"RESET"\" doesn't exists (line: "GRN"%d"RESET")\n", id, line);
+    printf("Hiding symbol %s..\n", id);
+    hide_symbol_on_scope(symTable, id, scope);
+}
+
+int hide_symbol_on_scope(SymbolTable* symTable, char* id, unsigned int scope) {
+    Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
+    if(tmp_symbol != NULL) {
+        tmp_symbol->is_active = 0;
+        return 1;
+    }
+
+    return 0;
+}
