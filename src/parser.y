@@ -8,6 +8,9 @@
     unsigned int actual_line = 0;
     int anonym_cnt = 0;
     Stack *func_line_stack;
+
+    int loop_flag   = 0;
+    int return_flag = 0;
 %}
 
 %start program
@@ -78,8 +81,10 @@ stmt        : expr ";"      {fprintf(yyout, MAG "Detected :" RESET"expr;"CYN" ->
             | whilestmt     {fprintf(yyout, MAG "Detected :" RESET"whilestmt"CYN" ->"RESET" stmt \n");}
             | forstmt       {fprintf(yyout, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");}
             | returnstmt    {fprintf(yyout, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");}
-            | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n");}
-            | CONTINUE ";"  {fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> stmt ;\n");}
+            | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n"); 
+                                    if(!loop_flag) fprintf(stderr,RED"Error:"RESET" "YEL"\"break; \""RESET" should be part of a for/while loop (line: "GRN"%d"RESET")\n", yylineno);}
+            | CONTINUE ";"  {fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
+                                    if(!loop_flag) fprintf(stderr,RED"Error:"RESET" "YEL"\"continue\""RESET" should be part of a for/while loop (line: "GRN"%d"RESET")\n", yylineno);}
             | block         {fprintf(yyout, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");}
             | funcdef       {fprintf(yyout, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");}
             | ";"           {fprintf(yyout, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");}
@@ -195,11 +200,12 @@ funcdef         : FUNCTION id_opt                       {
                                                             manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
                                                         } 
                                  "("                    {increase_scope(&scope);} 
-                                    idlist ")"          {decrease_scope(&scope);} 
+                                    idlist ")"          {decrease_scope(&scope); return_flag++;} 
                                                block    {
                                                             fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
                                                             //
                                                             formal_flag = 0;
+                                                            return_flag--;
                                                          }
                                                                                                              
                                                                                             
@@ -237,10 +243,13 @@ ifstmt          : IF "(" expr ")" stmt %prec LP_ELSE {fprintf(yyout, MAG "Detect
 whilestmt       : WHILE "(" expr ")" stmt {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");}
                 ;
 
-forstmt         : FOR "(" elist ";" expr ";" elist ")" stmt {fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");}
+forstmt         : FOR "(" elist ";" expr ";" elist ")" {loop_flag++;} stmt {loop_flag--;} {fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");}
                 ;
 
-returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");}
+returnstmt      : RETURN expr_opt ";" { if(return_flag == 0) { 
+                                            fprintf(stderr,RED"Error:"RESET" "YEL"\"return\""RESET" should be part of a function (line: "GRN"%d"RESET")\n", yylineno);
+                                        } 
+                                        fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");}
                 ;
 
 expr_opt        : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (empty)"RESET"\n");}
