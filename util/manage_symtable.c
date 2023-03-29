@@ -189,16 +189,32 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 
 }
 
+//Arithmetic increamens and decrements
+
 void manage_lvalue_inc(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
-    Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
-
-    if(tmp_symbol == NULL) //It's not declared so we add it to the symbol table (insertion happens in manage_id)
-        return;
-
-    if(tmp_symbol->symbol_type == LIBFUNC || tmp_symbol->symbol_type == USERFUNC){
-        printf(RED"Error:"RESET" Cannot increment function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET")\n", id, line);
-        return;
-    }
+    check_lvalue(symTable, id, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
 
 }
+
+void manage_lvalue_dec(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+
+    check_lvalue(symTable, id, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+
+}
+
+int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+    
+    for (int i = 0; i <= scope; i++){   //we need to check all scopes 
+        Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
+        if(tmp_symbol != NULL && (tmp_symbol->symbol_type == USERFUNC || tmp_symbol->symbol_type == LIBFUNC)){
+            printf(RED "Error:" RESET " Cannot apply arithmetic operation on function \"" YEL "%s" RESET "\" (line: " GRN "%d" RESET ")\n", id, line);
+            return 1;
+        }
+        else        
+            return 0;
+    }
+    return 0;
+}
+
+//End of increamens and decrements

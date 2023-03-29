@@ -14,7 +14,9 @@ void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 void manage_funcdef  (SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_lvalue_inc(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
+void manage_lvalue_dec(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope);
+int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 int is_id_built_in_function(char* id);
 
 #endif /* MANAGE_SYMTABLE_H */
