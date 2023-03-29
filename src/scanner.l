@@ -29,13 +29,13 @@
     Stack* stack; 
 %}
 
-/*Macros (Regex)*/
+/*Macros (Regex)  old regex for comment 1 : "//"[^*].*   */
 intVal    [0-9]+
 RealVal   {intVal}+"."{intVal}+
 id        [a-zA-Z][a-zA-Z_0-9]*
 string    \"(\\.|[^"\\])*\"
 unclosed_string \"(\\.|[^"\\])*
-comment1  "//"[^*].*
+comment1  "//".*    
 comment2o "/\*"
 comment2c "\*/"
 blanks    [ \t\v]

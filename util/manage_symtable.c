@@ -107,18 +107,19 @@ int is_id_built_in_function(char* id){
 //Managing function from now on
 void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
 
-        if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;
-        if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
+        if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return; //check current scope
 
-        if(scope > 0) {
-            for(int i = 1; i < scope; i++) {
+        if(scope > 0) {                                     //check all other scopes except global
+            for(int i = scope - 1; i > 0; i--) {
                 Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
                 if(tmp_symbol != NULL && tmp_symbol->is_variable) {
-                    printf(RED"Error:"RESET" Variable "YEL"\"%s\""RESET" is not accessible (line: "GRN"%d"RESET")\n", id, line);
+                    fprintf(stderr,RED"Error:"RESET" Variable "YEL"\"%s\""RESET" is not accessible (line: "GRN"%d"RESET")\n", id, line);
                     return;
                 }
             }
         }
+
+        if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;  //check global scope
 
         char* name     = strdup(id);
         Symbol* symbol = symbol_create(name, scope, line, type, VAR);
@@ -247,11 +248,12 @@ void manage_assignment(SymbolTable* symTable, char* id, unsigned int scope, unsi
         return;
     }
 
-    for(int i = 0; i <= scope; i++) {
+    for(int i = scope; i >= 0; i--) {
         Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
-        if(tmp_symbol != NULL && !tmp_symbol->is_variable) {
-            printf(RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+        if(tmp_symbol != NULL){
+            if( tmp_symbol->symbol_type == USERFUNC) 
+                fprintf(stderr,RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
             return;
-        }        
+        } 
     }
 }
