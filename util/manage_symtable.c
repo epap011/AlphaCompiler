@@ -108,6 +108,7 @@ int is_id_built_in_function(char* id){
 void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
 
         if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;
+        if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
 
         if(scope > 0) {
             for(int i = 1; i < scope; i++) { 
