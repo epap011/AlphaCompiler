@@ -134,7 +134,7 @@ undefined [^\r\n]
 
 {blanks}     {}
 
-{undefined} { fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno); }
+{undefined} { if(!comm_counter) fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno); }
 
 \n           {}
 

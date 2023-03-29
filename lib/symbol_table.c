@@ -62,6 +62,7 @@ void symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
     update_last_symbol_of_scope(symbol_table, symbol);
 }
 
+//Lookup for a symbol in the whole symbol table
 Symbol* symbol_table_lookup(SymbolTable* symbol_table, const char* symbol) {
     unsigned int index = hash_function(symbol, symbol_table->size);
     
@@ -83,6 +84,7 @@ Symbol* symbol_table_lookup(SymbolTable* symbol_table, const char* symbol) {
     return NULL;
 }
 
+//Lookup for a symbol in a specific scope
 Symbol* symbol_table_scope_lookup(SymbolTable* symbol_table, const char* symbol, unsigned int scope) {
     Symbol* first_symbol_of_scope = symbol_table_get_first_symbol_of_scope(symbol_table, scope);
 

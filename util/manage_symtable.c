@@ -41,7 +41,7 @@ void insert_lib_functions(SymbolTable * symTable){
     }
 }
 
-//Move
+//Move to another file?
 const char* str_type(enum SymbolType type){
     switch (type){
         case USERFUNC:  return "user function";

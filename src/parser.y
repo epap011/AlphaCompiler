@@ -173,7 +173,11 @@ com_indexedelem_opt : /* empty */                         {fprintf(yyout, MAG "D
                     | "," indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");}
                     ;
 
-block           : "{" {increase_scope(&scope);} stmtList "}" {decrease_scope(&scope); fprintf(yyout, MAG "Detected :" RESET"{ stmtList }"CYN" ->"RESET" block \n");}
+block           : "{" {increase_scope(&scope);} stmtList "}" {
+                                                                symbol_table_hide(symTable,scope);
+                                                                decrease_scope(&scope);
+                                                                fprintf(yyout, MAG "Detected :" RESET"{ stmtList }"CYN" ->"RESET" block \n");
+                                                             }
                 ;
 
 stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");}
