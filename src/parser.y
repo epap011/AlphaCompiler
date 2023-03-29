@@ -113,7 +113,8 @@ term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( exp
             | primary               {fprintf(yyout, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");}
             ;   
 
-assignexpr  : lvalue "=" expr       {fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n");}
+assignexpr  : lvalue "=" expr       {if(is_id_built_in_function($1))(fprintf(yyout, RED"Error:"RESET" Cannot assign to \""YEL"%s"RESET"\" as a built-in function\n", $1));
+                                    fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n");}
             ;   
 
 primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");}
