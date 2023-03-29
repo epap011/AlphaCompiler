@@ -106,7 +106,7 @@ expr        : assignexpr    {fprintf(yyout, MAG "Detected :" RESET"assignexpr"CY
 term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");}
             | "-" expr %prec UMINUS {fprintf(yyout, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");}
             | NOT expr              {fprintf(yyout, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");}
-            | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n");}
+            | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n"); /*manage_lvalue_inc(symTable, $2, scope, yylineno);*/}
             | lvalue "++"           {fprintf(yyout, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n");}
             | "--" lvalue           {fprintf(yyout, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n");}
             | lvalue "--"           {fprintf(yyout, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n");}

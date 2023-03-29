@@ -113,6 +113,7 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
         if(scope > 0) {
             for(int i = 1; i < scope; i++) { 
                 if(symbol_table_scope_lookup(symTable, id, i) != NULL) {
+                    
                     printf(RED"Error:"RESET" Variable "YEL"\"%s\""RESET" is not accessible (line: "GRN"%d"RESET")\n", id, line);
                     return;
                 }
@@ -129,7 +130,7 @@ void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsign
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
 
         if(is_id_built_in_function(id)) {
-            printf(RED"Error:"RESET" Cannot shadow library function "YEL"\"%s\""RESET" \n", id);
+            printf(RED"Error:"RESET" Cannot shadow library function "YEL"\"%s\""RESET" (line: "GRN"%d"RESET") \n", id,line);
             return;
         }
 
@@ -147,7 +148,7 @@ void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
    if(is_id_built_in_function(id)) {
-        printf(RED"Error:"RESET" Cannot shadow library function "YEL"\"%s\""RESET" \n", id);
+        printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" \n", id);
         return;
    }
    
@@ -155,7 +156,7 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
 
     if(tmp_symbol != NULL){
         if(tmp_symbol->symbol_type == LIBFUNC)
-            printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" \n", id);
+            printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         else
             printf(RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope "GRN"%d"RESET"\n", id, scope);
 
@@ -172,6 +173,11 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
     if(formal_flag)
         return;
          
+    if(is_id_built_in_function(id)) {
+            printf(RED"Error:"RESET" Cannot declare variable \""YEL"%s"RESET"\", a library function exists with that name (line: "GRN"%d"RESET") \n", id, line);
+            return;
+        }
+
     if(symbol_table_scope_lookup(symTable, id, scope) != NULL){
         printf(RED"Error:"RESET" Formal variable \""YEL"%s"RESET"\" already declared in function \n", id);
         return;
@@ -180,5 +186,15 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
     char* name     = strdup(id);
     Symbol* symbol = symbol_create(name, scope, line, FORMAL, VAR);
     symbol_table_insert(symTable, symbol);
+
+}
+
+void manage_lvalue_inc(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+
+    if(symbol_table_scope_lookup(symTable, id, scope) == NULL){
+        printf(RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exists in scope "GRN"%d"RESET"\n", id, scope);
+        return;
+    } 
+
 
 }
