@@ -115,8 +115,8 @@ term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( exp
             | NOT expr              {fprintf(yyout, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");}
             | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n"); manage_lvalue_inc(symTable, $2, scope, yylineno);}
             | lvalue "++"           {fprintf(yyout, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n"); manage_lvalue_inc(symTable, $1, scope, yylineno);}
-            | "--" lvalue           {fprintf(yyout, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n");}
-            | lvalue "--"           {fprintf(yyout, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n");}
+            | "--" lvalue           {fprintf(yyout, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n"); manage_lvalue_dec(symTable, $2, scope, yylineno);}
+            | lvalue "--"           {fprintf(yyout, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n"); manage_lvalue_dec(symTable, $1, scope, yylineno);}
             | primary               {fprintf(yyout, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");}
             ;   
 

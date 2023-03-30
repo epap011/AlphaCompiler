@@ -110,6 +110,7 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
     
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return; //check current scope
 
+        //flag purpose: check if a variable with the same name is declared in a higher scope
         int flag = 0;
         ScopeStackList* tmp  = tail;
         if(scope > 0) {                                     //check all other scopes except global
@@ -118,7 +119,6 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
                 
                 if(tmp != NULL) flag = tmp->flag;
                 
-                printf("scope: %d, flag: %d\n", i, flag);
                 if(tmp_symbol != NULL && tmp_symbol->is_variable) {
                     if(flag == 1)
                         fprintf(stderr,RED"Error:"RESET" Variable "YEL"\"%s\""RESET" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
