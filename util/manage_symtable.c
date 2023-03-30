@@ -168,7 +168,7 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
         if(tmp_symbol->symbol_type == LIBFUNC)
             fprintf(out_file,RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         else
-            fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope "GRN"%d"RESET"\n", id, scope);
+            fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope (line: "GRN"%d"RESET") "GRN"%d"RESET"\n", id, scope);
 
         return;
     }
