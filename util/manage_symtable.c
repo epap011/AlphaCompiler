@@ -234,7 +234,7 @@ void manage_func_call(SymbolTable* symTable, char* id, unsigned int scope, unsig
 
     for(int i = 0; i <= scope; i++) {
         Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
-        if(tmp_symbol != NULL && !tmp_symbol->is_variable) 
+        if(tmp_symbol != NULL) 
             return;
     }
 
