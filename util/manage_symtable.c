@@ -107,18 +107,24 @@ int is_id_built_in_function(char* id){
 
 //Managing function from now on
 void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail){
-
-        //ScopeStackList *tmp=tail;
-
+    
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return; //check current scope
 
+        int flag = 0;
+        ScopeStackList* tmp  = tail;
         if(scope > 0) {                                     //check all other scopes except global
             for(int i = scope - 1; i > 0; i--) {
-                Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
+                Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
+                
+                if(tmp != NULL) flag = tmp->flag;
+                
+                printf("scope: %d, flag: %d\n", i, flag);
                 if(tmp_symbol != NULL && tmp_symbol->is_variable) {
-                    fprintf(stderr,RED"Error:"RESET" Variable "YEL"\"%s\""RESET" is not accessible (line: "GRN"%d"RESET")\n", id, line);
+                    if(flag == 1)
+                        fprintf(stderr,RED"Error:"RESET" Variable "YEL"\"%s\""RESET" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
                     return;
                 }
+                if(tmp != NULL) tmp = tmp->prev;
             }
         }
 
