@@ -12,6 +12,7 @@
 
     int loop_flag        = 0;
     int return_flag      = 0;
+    int normcall_skip        = 0;
 
     int is_function_block = 0;
 %}
@@ -136,14 +137,14 @@ lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CY
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");}
             ;   
 
-member      : lvalue "." IDENT      {fprintf(yyout, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");}
+member      : lvalue "." IDENT      {fprintf(yyout, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");normcall_skip = 1;}
             | lvalue "[" expr "]"   {fprintf(yyout, MAG "Detected :" RESET"lvalue [ expr ]"CYN" ->"RESET" member \n");}
-            | call "." IDENT        {fprintf(yyout, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");}
+            | call "." IDENT        {fprintf(yyout, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");normcall_skip = 1;}
             | call "[" expr "]"     {fprintf(yyout, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");}
             ;
 
 call        : call "(" elist ")"            {fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");}
-            | lvalue callsuffix             {fprintf(yyout, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n");  manage_func_call(symTable, $1, scope, yylineno);}
+            | lvalue callsuffix             {fprintf(yyout, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n"); if(!normcall_skip) {manage_func_call(symTable, $1, scope, yylineno);} normcall_skip=0;}
             | "(" funcdef ")" "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");}   
             ;
 
@@ -154,7 +155,7 @@ callsuffix  : normcall   {fprintf(yyout, MAG "Detected :" RESET"normcall"CYN" ->
 normcall    : "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");}
             ;
 
-methodcall  : ".." IDENT "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");}
+methodcall  : ".." IDENT "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");normcall_skip = 1;}
             ;
 
 com_expr_opt : /* empty */             {fprintf(yyout, MAG "Detected :" RESET"com_expr_opt"YEL" (empty) "RESET"\n");}
