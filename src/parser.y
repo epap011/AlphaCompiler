@@ -85,9 +85,9 @@ stmt        : expr ";"      {fprintf(yyout, MAG "Detected :" RESET"expr;"CYN" ->
             | forstmt       {fprintf(yyout, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");}
             | returnstmt    {fprintf(yyout, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");}
             | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n"); 
-                                    if(!loop_flag) fprintf(stderr,RED"Error:"RESET" "YEL"\"break; \""RESET" should be part of a for/while loop (line: "GRN"%d"RESET")\n", yylineno);}
+                                    if(!loop_flag) manage_break(yylineno); }
             | CONTINUE ";"  {fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
-                                    if(!loop_flag) fprintf(stderr,RED"Error:"RESET" "YEL"\"continue\""RESET" should be part of a for/while loop (line: "GRN"%d"RESET")\n", yylineno);}
+                                    if(!loop_flag) manage_continue(yylineno); }
             | block         {fprintf(yyout, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");}
             | funcdef       {fprintf(yyout, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");}
             | ";"           {fprintf(yyout, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");}
@@ -131,7 +131,7 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             ;   
 
 lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail);}
-            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); $$ = yylval.stringVal; manage_local_id(symTable, yylval.stringVal, scope, yylineno,in_function_tail); }
+            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); $$ = yylval.stringVal; manage_local_id(symTable, yylval.stringVal, scope, yylineno); }
             | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); $$ = yylval.stringVal; manage_global_id(symTable, yylval.stringVal, scope, yylineno);}
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");}
             ;   
@@ -265,7 +265,7 @@ forstmt         : FOR "(" elist ";" expr ";" elist ")" {loop_flag++;} stmt {loop
                 ;
 
 returnstmt      : RETURN expr_opt ";" { if(return_flag == 0) { 
-                                            fprintf(stderr,RED"Error:"RESET" "YEL"\"return\""RESET" should be part of a function (line: "GRN"%d"RESET")\n", yylineno);
+                                            manage_return(yylineno);
                                         } 
                                         fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");}
                 ;
