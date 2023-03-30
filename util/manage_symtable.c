@@ -17,6 +17,7 @@
 #define NUM_OF_LIB_FUNC 12
 
 int formal_flag = 0;
+extern FILE * out_file;
 
 char lib_functions[NUM_OF_LIB_FUNC][19] = {
     "print",
@@ -58,18 +59,17 @@ const char* str_type(enum SymbolType type){
 void symbol_table_print(SymbolTable* symTable){
 
     for(int i = 0; i < symTable->scope_size; i++){
-
         Symbol* current_symbol = symTable->first_symbol_scopes[i];
         if(current_symbol == NULL) continue;
 
-        printf("-------- Scope #%d --------\n\n", i);
+        fprintf(out_file,"\n-------- Scope #%d --------\n\n", i);
 
         while(current_symbol != NULL){
-            printf("\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET")\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
+            fprintf(out_file,"\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET")\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
             current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
-    printf("\n\n");
+    fprintf(out_file,"\n\n");
 }
 
 void increase_scope(unsigned int* scope){
@@ -121,7 +121,7 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
                 
                 if(tmp_symbol != NULL && tmp_symbol->is_variable) {
                     if(flag == 1)
-                        fprintf(stderr,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
+                        fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
                     return;
                 }
                 if(tmp != NULL) tmp = tmp->prev;
@@ -140,7 +140,7 @@ void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsign
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
 
         if(is_id_built_in_function(id)) {
-            printf(RED"Error:"RESET" Cannot declare (shadow) Variable with library function name \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id,line);
+            fprintf(out_file,RED"Error:"RESET" Cannot declare (shadow) Variable with library function name \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id,line);
             return;
         }
 
@@ -152,13 +152,13 @@ void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsign
 void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
         if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;
-        printf(RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
+        fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
 }
 
 void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
    if(is_id_built_in_function(id)) {
-        printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+        fprintf(out_file,RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         return;
    }
    
@@ -166,9 +166,9 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
 
     if(tmp_symbol != NULL){
         if(tmp_symbol->symbol_type == LIBFUNC)
-            printf(RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+            fprintf(out_file,RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         else
-            printf(RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope "GRN"%d"RESET"\n", id, scope);
+            fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope "GRN"%d"RESET"\n", id, scope);
 
         return;
     }
@@ -184,12 +184,12 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
         return;
          
     if(is_id_built_in_function(id)) {
-            printf(RED"Error:"RESET" Cannot declare variable \""YEL"%s"RESET"\", a library function exist with that name (line: "GRN"%d"RESET") \n", id, line);
+            fprintf(out_file,RED"Error:"RESET" Cannot declare variable \""YEL"%s"RESET"\", a library function exist with that name (line: "GRN"%d"RESET") \n", id, line);
             return;
         }
 
     if(symbol_table_scope_lookup(symTable, id, scope) != NULL){
-        printf(RED"Error:"RESET" Formal variable \""YEL"%s"RESET"\" already declared in function (line: "GRN"%d"RESET")\n", id, line);
+        fprintf(out_file,RED"Error:"RESET" Formal variable \""YEL"%s"RESET"\" already declared in function (line: "GRN"%d"RESET")\n", id, line);
         return;
     } 
 
@@ -218,7 +218,7 @@ int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned i
     for (int i = 0; i <= scope; i++){   //we need to check all scopes 
         Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
         if(tmp_symbol != NULL && (tmp_symbol->symbol_type == USERFUNC || tmp_symbol->symbol_type == LIBFUNC)){
-            printf(RED "Error:" RESET " Cannot apply arithmetic operation on function \"" YEL "%s" RESET "\" (line: " GRN "%d" RESET ")\n", id, line);
+            fprintf(out_file,RED "Error:" RESET " Cannot apply arithmetic operation on function \"" YEL "%s" RESET "\" (line: " GRN "%d" RESET ")\n", id, line);
             return 1;
         }
         else        
@@ -238,7 +238,7 @@ void manage_func_call(SymbolTable* symTable, char* id, unsigned int scope, unsig
             return;
     }
 
-    printf(RED"Error:"RESET" Function \""YEL"%s"RESET"\" doesn't exist (line: "GRN"%d"RESET")\n", id, line);
+    fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" doesn't exist (line: "GRN"%d"RESET")\n", id, line);
     hide_symbol_on_scope(symTable, id, scope);
 }
 
@@ -254,7 +254,7 @@ int hide_symbol_on_scope(SymbolTable* symTable, char* id, unsigned int scope) {
 
 void manage_assignment(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
     if(is_id_built_in_function(id)){
-        printf(RED"Error:"RESET" Cannot assign to a library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+        fprintf(out_file,RED"Error:"RESET" Cannot assign to a library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         return;
     }
 
@@ -262,7 +262,7 @@ void manage_assignment(SymbolTable* symTable, char* id, unsigned int scope, unsi
         Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
         if(tmp_symbol != NULL){
             if( tmp_symbol->symbol_type == USERFUNC) 
-                fprintf(stderr,RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+                fprintf(out_file,RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
             return;
         } 
     }
@@ -270,15 +270,15 @@ void manage_assignment(SymbolTable* symTable, char* id, unsigned int scope, unsi
 
 void manage_return(int line, int flag){
     if(!flag)
-        fprintf(stderr,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
+        fprintf(out_file,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
 }
 
 void manage_break(int line, int flag){
     if(!flag)
-        fprintf(stderr,RED"Error:"RESET" \""YEL"break; "RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+        fprintf(out_file,RED"Error:"RESET" \""YEL"break; "RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
 }
 
 void manage_continue(int line, int flag){
     if(!flag)
-        fprintf(stderr,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+        fprintf(out_file,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
 }

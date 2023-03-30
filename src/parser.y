@@ -14,7 +14,7 @@
     int return_flag      = 0;
     int normcall_skip        = 0;
 
-    int is_function_block = 0;
+    int is_function_block = 0;  // 0: not in function block, 1: in function block
 %}
 
 %start program
