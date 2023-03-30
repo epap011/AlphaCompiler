@@ -71,4 +71,4 @@ $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@
 
 clean:
-	rm -rf $(BIN_DIR) $(OBJ_DIR) $(SRC_DIR)/$(SCANNER).c $(SRC_DIR)/$(PARSER).c $(SRC_DIR)/$(PARSER).h
+	rm -rf $(BIN_DIR) $(OBJ_DIR) $(SRC_DIR)/$(SCANNER).c $(SRC_DIR)/$(PARSER).c $(SRC_DIR)/$(PARSER).h out_file.txt
