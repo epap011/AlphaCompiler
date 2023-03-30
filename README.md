@@ -1,5 +1,13 @@
 # Alpha Compiler - Phase 2
 
+## Authors  
+
+Παναγιώτης-Μιχαήλ Αλεξίου csd3665  
+
+Κουμάκης Εμμανουήλ csd4281  
+
+Ευθύμης Παπαγεωργίου csd4340
+
 # How to build
 > make
 
