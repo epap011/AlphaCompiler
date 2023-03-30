@@ -59,6 +59,7 @@
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
 %type<stringVal> id_opt com_id_opt lvalue
+%type<intVal>    callsuffix
 %nonassoc LP_ELSE
 %nonassoc ELSE
 
@@ -85,9 +86,9 @@ stmt        : expr ";"      {fprintf(yyout, MAG "Detected :" RESET"expr;"CYN" ->
             | forstmt       {fprintf(yyout, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");}
             | returnstmt    {fprintf(yyout, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");}
             | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n"); 
-                                    if(!loop_flag) manage_break(yylineno); }
+                                    manage_break(yylineno,loop_flag); }
             | CONTINUE ";"  {fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
-                                    if(!loop_flag) manage_continue(yylineno); }
+                                    manage_continue(yylineno,loop_flag); }
             | block         {fprintf(yyout, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");}
             | funcdef       {fprintf(yyout, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");}
             | ";"           {fprintf(yyout, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");}
@@ -143,12 +144,12 @@ member      : lvalue "." IDENT      {fprintf(yyout, MAG "Detected :" RESET"lvalu
             ;
 
 call        : call "(" elist ")"            {fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");}
-            | lvalue callsuffix             {fprintf(yyout, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n");  manage_func_call(symTable, $1, scope, yylineno);}
+            | lvalue callsuffix             {fprintf(yyout, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n"); if($2) manage_func_call(symTable, $1, scope, yylineno);}
             | "(" funcdef ")" "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");}   
             ;
 
-callsuffix  : normcall   {fprintf(yyout, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");}
-            | methodcall {fprintf(yyout, MAG "Detected :" RESET"methodcall"CYN" ->"RESET" callsuffix \n");}
+callsuffix  : normcall   {fprintf(yyout, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");    $$ = 1;} // if it is a function call, set callsuffix to 1
+            | methodcall {fprintf(yyout, MAG "Detected :" RESET"methodcall"CYN" ->"RESET" callsuffix \n");  $$ = 0;} // if it is a method call, set callsuffix to 0
             ;
 
 normcall    : "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");}
@@ -258,16 +259,14 @@ ifstmt          : IF "(" expr ")" stmt %prec LP_ELSE {fprintf(yyout, MAG "Detect
                 | IF "(" expr ")" stmt ELSE stmt     {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt ELSE stmt"CYN"-> "RESET"ifstmt \n");}
                 ;
 
-whilestmt       : WHILE "(" expr ")" stmt {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");}
+whilestmt       : WHILE "(" expr ")" {loop_flag++;} stmt {loop_flag--;} {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");}
                 ;
 
 forstmt         : FOR "(" elist ";" expr ";" elist ")" {loop_flag++;} stmt {loop_flag--;} {fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");}
                 ;
 
-returnstmt      : RETURN expr_opt ";" { if(return_flag == 0) { 
-                                            manage_return(yylineno);
-                                        } 
-                                        fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");}
+returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
+                                        manage_return(yylineno, return_flag);}
                 ;
 
 expr_opt        : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (empty)"RESET"\n");}

@@ -229,6 +229,7 @@ int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned i
 
 void manage_func_call(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line) {
 
+    //check if the function exists
     if(is_id_built_in_function(id)) return;
 
     for(int i = 0; i <= scope; i++) {
@@ -267,14 +268,17 @@ void manage_assignment(SymbolTable* symTable, char* id, unsigned int scope, unsi
     }
 }
 
-void manage_return(int line){
-    fprintf(stderr,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
+void manage_return(int line, int flag){
+    if(!flag)
+        fprintf(stderr,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
 }
 
-void manage_break(int line){
-    fprintf(stderr,RED"Error:"RESET" \""YEL"break; "RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+void manage_break(int line, int flag){
+    if(!flag)
+        fprintf(stderr,RED"Error:"RESET" \""YEL"break; "RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
 }
 
-void manage_continue(int line){
-    fprintf(stderr,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+void manage_continue(int line, int flag){
+    if(!flag)
+        fprintf(stderr,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
 }
