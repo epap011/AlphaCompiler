@@ -1,5 +1,6 @@
 #include <string.h>
 #include "symbol_table.h"
+#include "yacc_util.h"
 #include "manage_symtable.h"
 
 #define RED   "\x1b[31m"
@@ -105,7 +106,9 @@ int is_id_built_in_function(char* id){
 }
 
 //Managing function from now on
-void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line){
+void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail){
+
+        //ScopeStackList *tmp=tail;
 
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return; //check current scope
 
@@ -126,7 +129,7 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
         symbol_table_insert(symTable, symbol);
 }
 
-void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line, ScopeStackList *tail){
 
         if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
 

@@ -40,3 +40,46 @@ void delete_stack(Stack *stack) {
         free(node);
     }
 }
+
+/*ScopeStackList definitions*/
+
+ScopeStackList *SSL_Push(ScopeStackList *tail, int flag){
+	ScopeStackList *tmp=malloc(sizeof(ScopeStackList));
+	tmp->flag=flag;
+
+	if(tail)
+		tmp->prev=tail;
+	else
+		tmp->prev=NULL;
+
+	return tmp;	
+}
+
+ScopeStackList *SSL_Pop(ScopeStackList *tail){
+    ScopeStackList *tmp;
+	if(tail && tail->prev){
+		tmp=tail->prev;
+		free(tail);
+		return tmp;
+	}
+	else if(tail){
+		free(tail);
+		return NULL;
+	}
+	return NULL;
+}
+
+void SSL_Print(ScopeStackList *tail){
+    ScopeStackList *tmp=tail;
+
+    if(tmp){
+        while(tmp){
+            printf("%d <- ",tmp->flag);
+            tmp=tmp->prev;
+        }
+    }
+    else
+        printf("-> (empty)");
+
+    printf("\n");
+}

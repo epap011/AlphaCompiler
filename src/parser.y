@@ -8,9 +8,12 @@
     unsigned int actual_line = 0;
     int anonym_cnt = 0;
     Stack *func_line_stack;
+    ScopeStackList *in_function_tail;
 
-    int loop_flag   = 0;
-    int return_flag = 0;
+    int loop_flag        = 0;
+    int return_flag      = 0;
+
+    int is_function_block = 0;
 %}
 
 %start program
@@ -127,8 +130,8 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
             ;   
 
-lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno);}
-            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); $$ = yylval.stringVal; manage_local_id(symTable, yylval.stringVal, scope, yylineno); }
+lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail);}
+            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); $$ = yylval.stringVal; manage_local_id(symTable, yylval.stringVal, scope, yylineno,in_function_tail); }
             | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); $$ = yylval.stringVal; manage_global_id(symTable, yylval.stringVal, scope, yylineno);}
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");}
             ;   
@@ -177,9 +180,21 @@ com_indexedelem_opt : /* empty */                         {fprintf(yyout, MAG "D
                     | "," indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");}
                     ;
 
-block           : "{" {increase_scope(&scope);} stmtList "}" {
+block           : "{" {increase_scope(&scope); 
+                    if(is_function_block){
+                        in_function_tail = SSL_Push(in_function_tail,1);
+                        is_function_block=0;
+                    }
+                    else
+                        in_function_tail = SSL_Push(in_function_tail,0);
+                    //debug:: print SSL
+                    //SSL_Print(in_function_tail);
+                    //debug
+                        }     
+                                stmtList "}" {
                                                                 symbol_table_hide(symTable,scope);
                                                                 decrease_scope(&scope);
+                                                                in_function_tail = SSL_Pop(in_function_tail);
                                                                 fprintf(yyout, MAG "Detected :" RESET"{ stmtList }"CYN" ->"RESET" block \n");
                                                              }
                 ;
@@ -192,7 +207,7 @@ funcdef         : FUNCTION id_opt                       {
                                                             if(!func_line_stack){func_line_stack=new_stack();}  
                                                             unsigned int* tmp_line = malloc(sizeof(unsigned int)); 
                                                             *tmp_line = yylineno;
-                                                            push(func_line_stack,tmp_line); 
+                                                            push(func_line_stack,tmp_line);
                                                             //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
                                                             check_if_declared(symTable,$2,scope);
                                                             //Kanoume to manage edw giati olokliros o kanonas anagetai otan kleisei to block
@@ -200,7 +215,10 @@ funcdef         : FUNCTION id_opt                       {
                                                             manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
                                                         } 
                                  "("                    {increase_scope(&scope);} 
-                                    idlist ")"          {decrease_scope(&scope); return_flag++;} 
+                                    idlist ")"          {decrease_scope(&scope);
+                                                        return_flag++;
+                                                        is_function_block=1;
+                                                        } 
                                                block    {
                                                             fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
                                                             //
