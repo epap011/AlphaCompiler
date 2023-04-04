@@ -16,7 +16,7 @@
 
 #define NUM_OF_LIB_FUNC 12
 
-int formal_flag = 0;
+int formal_flag = 0;    //Usage: if a function is already declared (or is a built-in ), we don't want to insert it in the symbol table and wee need this flag to skip the formal arguments as well
 extern FILE * out_file;
 
 char lib_functions[NUM_OF_LIB_FUNC][19] = {
@@ -168,7 +168,7 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
         if(tmp_symbol->symbol_type == LIBFUNC)
             fprintf(out_file,RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         else
-            fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope (line: "GRN"%d"RESET") "GRN"%d"RESET"\n", id, scope);
+            fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope "GRN"%d"RESET" (line: "GRN"%d"RESET") \n", id, scope,line);
 
         return;
     }

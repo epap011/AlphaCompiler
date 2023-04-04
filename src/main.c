@@ -40,14 +40,12 @@ int main(int argc, char** argv) {
 
     symTable = symbol_table_create();
     insert_lib_functions(symTable);
-
     yyparse();
-    symbol_table_print(symTable);
 
+    symbol_table_print(symTable);
     fseek(out_file, 0, SEEK_SET);
 
     char ch;
-
     while ((ch = fgetc(out_file)) != EOF) {
         printf("%c", ch);
     }

@@ -8,11 +8,11 @@
     unsigned int actual_line = 0;
     int anonym_cnt = 0;
     Stack *func_line_stack;
-    ScopeStackList *in_function_tail;
+    ScopeStackList *in_function_tail; //we use this "stack" to add a flag for every new scope opening (1 if in function, 0 if not)
 
     int loop_flag        = 0;
     int return_flag      = 0;
-    int normcall_skip        = 0;
+    int normcall_skip    = 0;       // we want to manage_function_call only when a function is called, not when a method is called
 
     int is_function_block = 0;  // 0: not in function block, 1: in function block
 %}
@@ -150,8 +150,8 @@ call        : call "(" elist ")"            {fprintf(yyout, MAG "Detected :" RES
             | "(" funcdef ")" "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");}   
             ;
 
-callsuffix  : normcall   {fprintf(yyout, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");    $$ = 1;} // if it is a function call, set callsuffix to 1
-            | methodcall {fprintf(yyout, MAG "Detected :" RESET"methodcall"CYN" ->"RESET" callsuffix \n");  $$ = 0;} // if it is a method call, set callsuffix to 0
+callsuffix  : normcall   {fprintf(yyout, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");} 
+            | methodcall {fprintf(yyout, MAG "Detected :" RESET"methodcall"CYN" ->"RESET" callsuffix \n");} 
             ;
 
 normcall    : "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");}
@@ -164,7 +164,6 @@ com_expr_opt : /* empty */             {fprintf(yyout, MAG "Detected :" RESET"co
              | COMMA expr com_expr_opt {fprintf(yyout, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");}
              ;
 
-/* this reduce/reduce conflict is solvable if we hack indexed to be non-empty */
 objectdef   : "[" indexed "]" {fprintf(yyout, MAG "Detected :" RESET"[ indexed ]"CYN" ->"RESET" objectdef \n");}
             | "[" elist   "]" {fprintf(yyout, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");}
             ;
@@ -184,15 +183,12 @@ com_indexedelem_opt : /* empty */                         {fprintf(yyout, MAG "D
                     ;
 
 block           : "{" {increase_scope(&scope); 
-                    if(is_function_block){
+                    if(is_function_block){          
                         in_function_tail = SSL_Push(in_function_tail,1);
                         is_function_block=0;
                     }
                     else
                         in_function_tail = SSL_Push(in_function_tail,0);
-                    //debug:: print SSL
-                    //SSL_Print(in_function_tail);
-                    //debug
                         }     
                                 stmtList "}" {
                                                                 symbol_table_hide(symTable,scope);
@@ -225,14 +221,14 @@ funcdef         : FUNCTION id_opt                       {
                                                block    {
                                                             fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
                                                             //
-                                                            formal_flag = 0;
+                                                            formal_flag = 0; //reset flag
                                                             return_flag--;
                                                          }
                                                                                                              
                                                                                             
                 ;
 
-id_opt  : /* empty */ {
+id_opt  : /* empty */ { //giving a name to anonymous functions
                         fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n"); 
                         char buffer[255]; 
                         sprintf(buffer, "_anonymous_f%d", anonym_cnt++); 
