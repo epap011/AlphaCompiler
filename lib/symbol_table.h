@@ -5,6 +5,7 @@
 
 enum SymbolType { GLOBAL, _LOCAL, FORMAL, USERFUNC, LIBFUNC };
 
+//ToDo add offset
 typedef struct Symbol {
     int is_active;
     int is_variable;
