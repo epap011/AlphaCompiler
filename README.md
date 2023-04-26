@@ -1,39 +1,21 @@
-# AlphaCompiler
+# Alpha Compiler - Phase 2
 
-AlphaCompiler is a program that translates a program written in the Alpha programming language into machine language for a specific machine.
+## Authors  
 
-Τhe following 5 roles give a picture of the architecture of Alpha Compiler
+Παναγιώτης-Μιχαήλ Αλεξίου csd3665  
 
-1. Lexical Analyzer
-2. Syntax Analyzer
-3. Semantic Analyzer
-4. Intermidiate Code Generator
-5. Targer Code Generator
+Κουμάκης Εμμανουήλ csd4281  
 
-# Lexical Analyzer
-Lexical Analyzer is a program that recognizes the elements of language Alpha
+Ευθύμης Παπαγεωργίου csd4340
 
-Τhe following categories(sets) define the elements of language Alpha
+# How to build
+> make
 
-### Keywords
-if, else, while, for, function, return, break, continue, and, not, or, local, true, false, nil
+# How to run (without file)
+> ./bin/scarser
 
-### Operators
-\+ = - * / % == != ++ -- > < >= <=
+# How to run (with file)
+> ./bin/scarser /path/to/test
 
-### Numbers
-Integer, Real
-
-### Strings
-"this is a string"
-
-### Punctuations
-{ } [ ] ( ) ;  , : :: . ..
-
-### Identifier Names
-Definition: letter and then letter or number
-
-### Comments
-1. Single line comments: //Comments
-2. Block comments: /\*Comment\*/
-
+# How to clean
+> make clean

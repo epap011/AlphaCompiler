@@ -19,10 +19,13 @@ STACK 	    = stack
 ALPHA_LIST  = alpha_token_list
 YACC_UTIL   = yacc_util
 ALPHA_TYPES = alpha_types
+LLIST	    = linked_list
+SYMTABLE    = symbol_table
+MANAGE 	    = manage_symtable
 
 #---< Final Targets >---#
 # exe target is the final product of the phase 2
-scarser: $(PARSER).o $(MAIN).o $(SCANNER).o $(STACK).o $(YACC_UTIL).o | $(BIN_DIR)
+scarser: $(PARSER).o $(MANAGE).o $(MAIN).o $(LLIST).o $(SYMTABLE).o $(SCANNER).o $(STACK).o $(YACC_UTIL).o | $(BIN_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o
 
 #---< Object Targets >---#
@@ -47,16 +50,25 @@ $(ALPHA_TYPES).o: $(LIB_DIR)/$(ALPHA_TYPES).c | $(OBJ_DIR)
 $(PARSER).o: $(SRC_DIR)/$(PARSER).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
+$(LLIST).o: $(LIB_DIR)/$(LLIST).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+
+$(SYMTABLE).o: $(LIB_DIR)/$(SYMTABLE).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+
+$(MANAGE).o: $(UTIL_DIR)/$(MANAGE).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+
 #---< produce scanner.c from scanner.l
 $(SRC_DIR)/$(SCANNER).c: $(SRC_DIR)/$(SCANNER).l
 	flex -o $@ -i $^
 
 #---< produce parcer.c & parser.h(optional) from parser.y
 $(SRC_DIR)/$(PARSER).c: $(SRC_DIR)/$(PARSER).y
-	bison --defines  --output=$@ $^
+	bison  -Wother --defines  --output=$@ $^
 
 $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@
 
 clean:
-	rm -rf $(BIN_DIR) $(OBJ_DIR) $(SRC_DIR)/$(SCANNER).c $(SRC_DIR)/$(PARSER).c $(SRC_DIR)/$(PARSER).h
+	rm -rf $(BIN_DIR) $(OBJ_DIR) $(SRC_DIR)/$(SCANNER).c $(SRC_DIR)/$(PARSER).c $(SRC_DIR)/$(PARSER).h out_file.txt

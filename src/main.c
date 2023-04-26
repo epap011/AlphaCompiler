@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "symbol_table.h"
+#include "manage_symtable.h"
+#include "parser.h"
 
 extern FILE* yyout;
 extern FILE* yyin;
+FILE* out_file;
+SymbolTable* symTable;
 
 int main(int argc, char** argv) {
     if (argc == 2 || argc == 3) {
@@ -29,5 +34,21 @@ int main(int argc, char** argv) {
         yyout = stdout;
     }
 
+    //initialize error file
+    out_file = fopen("out_file.txt", "w+");
+    fprintf(out_file, "\n-----------------------------\n\n");
+
+    symTable = symbol_table_create();
+    insert_lib_functions(symTable);
     yyparse();
+
+    symbol_table_print(symTable);
+    fseek(out_file, 0, SEEK_SET);
+
+    char ch;
+    while ((ch = fgetc(out_file)) != EOF) {
+        printf("%c", ch);
+    }
+
+    fclose(out_file);
 }

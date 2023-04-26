@@ -1,6 +1,7 @@
-/*Options*/
 %option noyywrap
 %option yylineno
+%option nounput
+%option noinput
 
 %{
     #include <stdio.h>
@@ -10,9 +11,10 @@
     #include "parser.h"
 
     #define RED     "\033[31m"
+    #define BLU     "\x1b[34m"
     #define DEFAULT "\x1b[0m"
 
-    #define TOKEN(type,subtype,lc,tkn,text) //insert_alpha_token(yylval,lc,tkn,text,type,subtype)
+    #define TOKEN(type,subtype,lc,tkn,text)
 
     int  tkn_counter  = 0;
 
@@ -24,20 +26,16 @@
     int str_nl_counter = 0;
 
     char* replace_escape_chars(char *str, int yyleng);
-    /*char* commcat(char* comm, char *cat);*/
-
-    Stack* stack;
-
-    
+    Stack* stack; 
 %}
 
-/*Macros (Regex)*/
+/*Macros (Regex)  old regex for comment 1 : "//"[^*].*   */
 intVal    [0-9]+
 RealVal   {intVal}+"."{intVal}+
 id        [a-zA-Z][a-zA-Z_0-9]*
 string    \"(\\.|[^"\\])*\"
 unclosed_string \"(\\.|[^"\\])*
-comment1  "//"[^*].*
+comment1  "//".*    
 comment2o "/\*"
 comment2c "\*/"
 blanks    [ \t\v]
@@ -45,58 +43,60 @@ undefined [^\r\n]
 
 /*Rules*/
 %%
-"="        {TOKEN(OPERATOR, ASSIGN,     yylineno, ++tkn_counter, yytext);}
-"+"        {TOKEN(OPERATOR, PLUS,       yylineno, ++tkn_counter, yytext);}
-"-"        {TOKEN(OPERATOR, MINUS,      yylineno, ++tkn_counter, yytext);}
-"*"        {TOKEN(OPERATOR, MUL,        yylineno, ++tkn_counter, yytext);}
-"/"        {TOKEN(OPERATOR, SLASH,      yylineno, ++tkn_counter, yytext);}
-"%"        {TOKEN(OPERATOR, MOD,        yylineno, ++tkn_counter, yytext);}
-"=="       {TOKEN(OPERATOR, EQ,         yylineno, ++tkn_counter, yytext);}
-"!="       {TOKEN(OPERATOR, NEQ,        yylineno, ++tkn_counter, yytext);}
-"++"       {TOKEN(OPERATOR, INC,        yylineno, ++tkn_counter, yytext);}
-"--"       {TOKEN(OPERATOR, DEC,        yylineno, ++tkn_counter, yytext);}
-">"        {TOKEN(OPERATOR, GT,         yylineno, ++tkn_counter, yytext);}
-"<"        {TOKEN(OPERATOR, LT,         yylineno, ++tkn_counter, yytext);}
-">="       {TOKEN(OPERATOR, GTE,        yylineno, ++tkn_counter, yytext);}
-"<="       {TOKEN(OPERATOR, LTE,        yylineno, ++tkn_counter, yytext);}   
-   
-"if"       {TOKEN(KEYWORD, IF,          yylineno, ++tkn_counter, yytext);}
-"else"     {TOKEN(KEYWORD, ELSE,        yylineno, ++tkn_counter, yytext);}
-"while"    {TOKEN(KEYWORD, WHILE,       yylineno, ++tkn_counter, yytext);}
-"for"      {TOKEN(KEYWORD, FOR,         yylineno, ++tkn_counter, yytext);}
-"function" {TOKEN(KEYWORD, FUNCTION,    yylineno, ++tkn_counter, yytext);}
-"return"   {TOKEN(KEYWORD, RETURN,      yylineno, ++tkn_counter, yytext);}
-"break"    {TOKEN(KEYWORD, BREAK,       yylineno, ++tkn_counter, yytext);}
-"continue" {TOKEN(KEYWORD, CONTINUE,    yylineno, ++tkn_counter, yytext);}
-"and"      {TOKEN(KEYWORD, AND,         yylineno, ++tkn_counter, yytext);}
-"not"      {TOKEN(KEYWORD, NOT,         yylineno, ++tkn_counter, yytext);}
-"or"       {TOKEN(KEYWORD, OR,          yylineno, ++tkn_counter, yytext);}
-"local"    {TOKEN(KEYWORD, LOCAL,       yylineno, ++tkn_counter, yytext);}
-"true"     {TOKEN(KEYWORD, TRUE,        yylineno, ++tkn_counter, yytext);}
-"false"    {TOKEN(KEYWORD, FALSE,       yylineno, ++tkn_counter, yytext);}
-"nil"      {TOKEN(KEYWORD, NIL,         yylineno, ++tkn_counter, yytext);}  
-   
-"{"        {TOKEN(PUNCTUATION, LCBRACE, yylineno, ++tkn_counter, yytext);}
-"}"        {TOKEN(PUNCTUATION, RCBRACE, yylineno, ++tkn_counter, yytext);}
-"["        {TOKEN(PUNCTUATION, LBRACE,  yylineno, ++tkn_counter, yytext);}
-"]"        {TOKEN(PUNCTUATION, RBRACE,  yylineno, ++tkn_counter, yytext);}
-"("        {TOKEN(PUNCTUATION, LPAR,    yylineno, ++tkn_counter, yytext);}
-")"        {TOKEN(PUNCTUATION, RPAR,    yylineno, ++tkn_counter, yytext);}
-";"        {TOKEN(PUNCTUATION, SEMI,    yylineno, ++tkn_counter, yytext);}
-","        {TOKEN(PUNCTUATION, COMMA,   yylineno, ++tkn_counter, yytext);}
-":"        {TOKEN(PUNCTUATION, COLON,   yylineno, ++tkn_counter, yytext);}
-"::"       {TOKEN(PUNCTUATION, DCOLON,  yylineno, ++tkn_counter, yytext);}
-"."        {TOKEN(PUNCTUATION, DOT,     yylineno, ++tkn_counter, yytext);}
-".."       {TOKEN(PUNCTUATION, DDOT,    yylineno, ++tkn_counter, yytext);}
+"="        {if(!comm_counter) return ASSIGN;}
+"+"        {if(!comm_counter) return PLUS;}
+"-"        {if(!comm_counter) return MINUS;}
+"*"        {if(!comm_counter) return MUL;}
+"/"        {if(!comm_counter) return DIV;}
+"%"        {if(!comm_counter) return MOD;}
+"=="       {if(!comm_counter) return EQ;}
+"!="       {if(!comm_counter) return NEQ;}
+"++"       {if(!comm_counter) return INC;}
+"--"       {if(!comm_counter) return DEC;}
+">"        {if(!comm_counter) return GT;}
+"<"        {if(!comm_counter) return LT;}
+">="       {if(!comm_counter) return GTE;}
+"<="       {if(!comm_counter) return LTE;}   
 
-{id}       {TOKEN(IDENT, NOSTYPE,       yylineno, ++tkn_counter, yytext);}
-{intVal}   {TOKEN(NUMBER, INTCONST,     yylineno, ++tkn_counter, yytext);}
-{RealVal}  {TOKEN(NUMBER, REALCONST,    yylineno, ++tkn_counter, yytext);}
+"if"       {if(!comm_counter) return IF;}
+"else"     {if(!comm_counter) return ELSE;}
+"while"    {if(!comm_counter) return WHILE;}
+"for"      {if(!comm_counter) return FOR;}
+"function" {if(!comm_counter) return FUNCTION;}
+"return"   {if(!comm_counter) return RETURN;}
+"break"    {if(!comm_counter) return BREAK;}
+"continue" {if(!comm_counter) return CONTINUE;}
+"and"      {if(!comm_counter) return AND;}
+"not"      {if(!comm_counter) return NOT;}
+"or"       {if(!comm_counter) return OR;}
+"local"    {if(!comm_counter) return LOCAL;}
+"true"     {if(!comm_counter) return TRUE;}
+"false"    {if(!comm_counter) return FALSE;}
+"nil"      {if(!comm_counter) return NIL;}  
 
-{string}     {
-                    yytext = replace_escape_chars(yytext + 1, yyleng - 1);     // +1 to skip the first quote
-                    TOKEN(STRING, NOSTYPE, yylineno - str_nl_counter, ++tkn_counter, yytext);
+"{"        {if(!comm_counter) return LCBRACE;}
+"}"        {if(!comm_counter) return RCBRACE;}
+"["        {if(!comm_counter) return LBRACE;}
+"]"        {if(!comm_counter) return RBRACE;}
+"("        {if(!comm_counter) return LPAR;}
+")"        {if(!comm_counter) return RPAR;}
+";"        {if(!comm_counter) return SEMI;}
+","        {if(!comm_counter) return COMMA;}
+":"        {if(!comm_counter) return COLON;}
+"::"       {if(!comm_counter) return DCOLON;}
+"."        {if(!comm_counter) return DOT;}
+".."       {if(!comm_counter) return DDOT;}
+
+{id}       {if(!comm_counter) {yylval.stringVal = strdup(yytext); return IDENT;}}
+{intVal}   {if(!comm_counter) {yylval.intVal    = atoi(yytext);   return INTCONST;}}
+{RealVal}  {if(!comm_counter) {yylval.realVal   = atof(yytext);   return REALCONST;}}
+
+{string}     {if(!comm_counter) {
+                    yytext = replace_escape_chars(yytext + 1, yyleng - 1);
                     str_nl_counter=0;
+                    yylval.stringVal = strdup(yytext); 
+                    return STRING;
+                }
             }
 
 {unclosed_string} {fprintf(stderr, RED"Error: "DEFAULT"Unclosed string: \"%s\" at line %d\n",yytext,yylineno); return 0;}
@@ -106,15 +106,12 @@ undefined [^\r\n]
                     REJECT;
                 }
                 else if(!comm_counter) {
-                    TOKEN(COMMENT, LINECOMM, yylineno, ++tkn_counter, NULL);
+                    fprintf(yyout, BLU "Single line comment found!"DEFAULT"\n");
                 }
             }
 
 {comment2o} {
                 comm_counter++;
-                int* line_no = (int*)malloc(sizeof(int));
-                *line_no = yylineno;
-                push(stack, line_no);
                 if(comm_counter==1){
                     comm_line=yylineno;
                 }
@@ -128,20 +125,17 @@ undefined [^\r\n]
                     REJECT;
                 }
                 else if(!comm_counter){ 
-                    TOKEN(COMMENT, BLOCKCOMM, comm_line, ++tkn_counter, NULL);
-                    free(comment);
+                     fprintf(yyout, BLU "Block comment found!"DEFAULT"\n");
                 }
-                else{
-                    TOKEN(COMMENT, NESTCOMM, *(int*)pop(stack), ++tkn_counter, NULL);
+                else {
+                    fprintf(yyout, BLU "Nested comment found!"DEFAULT"\n");
                 }
             }
 
 {blanks}     {}
 
-{undefined}  {
-                    TOKEN(UNDEFCHR, NOSTYPE, yylineno, -1, yytext); 
-                    fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno);
-            }
+{undefined} { if(!comm_counter) fprintf(stderr, RED"Warning: "DEFAULT"Detected Undefined character: \"%s\" at line %d\n",yytext,yylineno); }
+
 \n           {}
 
 <<EOF>>      {
@@ -184,7 +178,7 @@ char * replace_escape_chars(char* str, int length){
                 case '"':
                     new_str[j] = '"';
                     break;
-                case '\'':              //auto einai peritto? (afou stin glwsa mas den uparxei mono quote den exoume logo kaneis nato kanei escape??)
+                case '\'':
                     new_str[j] = '\'';
                     break;
                 case '?':
@@ -216,19 +210,3 @@ char * replace_escape_chars(char* str, int length){
     }
     return new_str;
 }
-/*
-char* commcat(char* comm, char *cat) {
-    size_t comm_len = comm ? strlen(comm) : 0;
-    size_t cat_len = strlen(cat);
-    char* result = malloc(comm_len + cat_len + 1);
-    if (!result) {
-        fprintf(stderr, "Failed to allocate memory for concatenated string\n");
-        exit(1);
-    }
-    if (comm_len > 0) {
-        memcpy(result, comm, comm_len);
-    }
-    memcpy(result + comm_len, cat, cat_len + 1);
-    return result;
-}
-*/
