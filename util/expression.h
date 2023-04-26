@@ -1,5 +1,4 @@
-#include "symboltable.h"
-
+#include "symbol_table.h"
 
 enum expr_t{
 
@@ -22,14 +21,14 @@ enum expr_t{
 
 };
 
-struct expr{
+typedef struct expr{
 
-    expr_t type;
+    enum expr_t type;
     Symbol* sym;
-    expr* index;
+    struct expr* index;
     double numConst;
     char* strConst;
     unsigned char boolConst;
-    expr* next;
+    struct expr* next;
 
-};
+} expr;

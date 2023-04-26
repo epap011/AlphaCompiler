@@ -3,6 +3,7 @@
 #include "symbol_table.h"
 #include "manage_symtable.h"
 #include "parser.h"
+#include "quad.h"
 
 extern FILE* yyout;
 extern FILE* yyin;
