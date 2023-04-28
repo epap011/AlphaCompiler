@@ -31,10 +31,6 @@ typedef struct quad{
 
 } quad;
 
-quad* quads = (quad *) 0;
-unsigned int total = 0;
-unsigned int currQuad = 0;
-
 void expand();
 
 void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label, unsigned line);

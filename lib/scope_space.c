@@ -1,6 +1,11 @@
 #include "scope_space.h"
 #include <assert.h>
 
+unsigned int programVarOffset    = 0;
+unsigned int functionLocalOffset = 0;
+unsigned int formalArgOffset     = 0;
+unsigned int scopeSpaceCounter   = 0;
+
 enum scopespace_t currScopeSpace(){
     
     if(scopeSpaceCounter == 1)

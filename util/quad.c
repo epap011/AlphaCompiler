@@ -1,5 +1,9 @@
 #include "quad.h"
 
+quad* quads = (quad *) 0;
+unsigned int total = 0;
+unsigned int currQuad = 0;
+
 void expand(){
 
     assert(total == currQuad);
