@@ -188,6 +188,7 @@ indexedelem     : "{" expr ":" expr "}" {fprintf(yyout, MAG "Detected :" RESET"{
 
 com_indexedelem_opt : /* empty */                         {fprintf(yyout, MAG "Detected :" RESET"com_indexedelem_opt "YEL"(empty)"RESET"\n");}
                     | "," indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");}
+                    ;
 
 block           : "{" {increase_scope(&scope); 
                     if(is_function_block){          
