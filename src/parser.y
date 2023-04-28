@@ -14,7 +14,8 @@
     int return_flag      = 0;
     int normcall_skip    = 0;       // we want to manage_function_call only when a function is called, not when a method is called
 
-    int is_function_block = 0;  // 0: not in function block, 1: in function block
+    int is_function_block  = 0;  // 0: not in function block, 1: in function block
+    int is_function_active = 0;  // 0: not in function, > 0 in function
 %}
 
 %start program
@@ -86,10 +87,10 @@ stmt        : expr ";"      {fprintf(yyout, MAG "Detected :" RESET"expr;"CYN" ->
             | whilestmt     {fprintf(yyout, MAG "Detected :" RESET"whilestmt"CYN" ->"RESET" stmt \n");}
             | forstmt       {fprintf(yyout, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");}
             | returnstmt    {fprintf(yyout, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");}
-            | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n"); 
-                                    manage_break(yylineno,loop_flag); }
+            | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n");
+                                    manage_break(yylineno,is_function_active > 0 ? 0 : loop_flag); }
             | CONTINUE ";"  {fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
-                                    manage_continue(yylineno,loop_flag); }
+                                    manage_continue(yylineno,is_function_active > 0 ? 0 : loop_flag); }
             | block         {fprintf(yyout, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");}
             | funcdef       {fprintf(yyout, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");}
             | ";"           {fprintf(yyout, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");}
@@ -180,7 +181,6 @@ indexedelem     : "{" expr ":" expr "}" {fprintf(yyout, MAG "Detected :" RESET"{
 
 com_indexedelem_opt : /* empty */                         {fprintf(yyout, MAG "Detected :" RESET"com_indexedelem_opt "YEL"(empty)"RESET"\n");}
                     | "," indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");}
-                    ;
 
 block           : "{" {increase_scope(&scope); 
                     if(is_function_block){          
@@ -217,12 +217,14 @@ funcdef         : FUNCTION id_opt                       {
                                     idlist ")"          {decrease_scope(&scope);
                                                         return_flag++;
                                                         is_function_block=1;
+                                                        is_function_active++;
                                                         } 
                                                block    {
                                                             fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
                                                             //
                                                             formal_flag = 0; //reset flag
                                                             return_flag--;
+                                                            is_function_active--;
                                                          }
                                                                                                              
                                                                                             
