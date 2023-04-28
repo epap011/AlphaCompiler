@@ -68,7 +68,7 @@ $(QUAD).o: $(UTIL_DIR)/$(QUAD).c | $(OBJ_DIR)
 $(EXPRESSION).o: $(UTIL_DIR)/$(EXPRESSION).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
-$(SCOPE_SPACE).o: $(UTIL_DIR)/$(SCOPE_SPACE).c | $(OBJ_DIR)
+$(SCOPE_SPACE).o: $(LIB_DIR)/$(SCOPE_SPACE).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@		
 
 #---< produce scanner.c from scanner.l

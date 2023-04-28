@@ -1,5 +1,3 @@
-#ifndef SCOPE_SPACE_H
-#define SCOPE_SPACE_H
 
 enum scopespace_t{ programvar, functionlocal, formalarg };     //phase 3   
 
@@ -14,5 +12,3 @@ unsigned int currScopeOffset();
 void incCurrOffset();
 void enterScopeSpace();
 void exitScopeSpace();
-
-#endif /* SCOPE_SPACE_H */

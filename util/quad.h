@@ -1,3 +1,6 @@
+#ifndef QUAD_H
+#define QUAD_H
+
 #include "expression.h"
 #include <assert.h>
 
@@ -28,12 +31,12 @@ typedef struct quad{
 
 } quad;
 
-
-
-quad* quads = (quad*) 0;
-unsigned total = 0;
+quad* quads = (quad *) 0;
+unsigned int total = 0;
 unsigned int currQuad = 0;
 
 void expand();
 
 void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label, unsigned line);
+
+#endif /* QUAD_H */

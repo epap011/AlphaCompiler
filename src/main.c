@@ -4,8 +4,7 @@
 #include "manage_symtable.h"
 #include "parser.h"
 #include "quad.h"
-#include "scope_space.h"
-
+    
 extern FILE* yyout;
 extern FILE* yyin;
 FILE* out_file;
