@@ -1,6 +1,7 @@
 %{
     #include "yacc_util.h"
     #include "manage_symtable.h"
+    #include "scope_space.h"
 
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
 
@@ -10,12 +11,18 @@
     Stack *func_line_stack;
     ScopeStackList *in_function_tail; //we use this "stack" to add a flag for every new scope opening (1 if in function, 0 if not)
 
-    int loop_flag        = 0;
-    int return_flag      = 0;
-    int normcall_skip    = 0;       // we want to manage_function_call only when a function is called, not when a method is called
+    int loop_flag          = 0;
+    int return_flag        = 0;
+    int normcall_skip      = 0;       // we want to manage_function_call only when a function is called, not when a method is called
 
     int is_function_block  = 0;  // 0: not in function block, 1: in function block
     int is_function_active = 0;  // 0: not in function, > 0 in function
+
+    //variable offset counters
+    extern unsigned int programVarOffset;
+    extern unsigned int functionLocalOffset;
+    extern unsigned int formalArgOffset;
+    extern unsigned int scopeSpaceCounter; //determines current offset
 %}
 
 %start program
@@ -133,7 +140,7 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
             ;   
 
-lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail);}
+lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail); }
             | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); $$ = yylval.stringVal; manage_local_id(symTable, yylval.stringVal, scope, yylineno); }
             | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); $$ = yylval.stringVal; manage_global_id(symTable, yylval.stringVal, scope, yylineno);}
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n"); $$ = $1;}
@@ -213,18 +220,18 @@ funcdef         : FUNCTION id_opt                       {
                                                             //alla emeis theloume na mpenei sto symbol table molis tin doume
                                                             manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
                                                         } 
-                                 "("                    {increase_scope(&scope);} 
-                                    idlist ")"          {decrease_scope(&scope);
+                                 "("                    {increase_scope(&scope); enterScopeSpace();} 
+                                    idlist ")"          {decrease_scope(&scope); enterScopeSpace();
                                                         return_flag++;
                                                         is_function_block=1;
                                                         is_function_active++;
                                                         } 
                                                block    {
                                                             fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
-                                                            //
                                                             formal_flag = 0; //reset flag
                                                             return_flag--;
                                                             is_function_active--;
+                                                            exitScopeSpace();
                                                          }
                                                                                                              
                                                                                             

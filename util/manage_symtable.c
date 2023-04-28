@@ -38,7 +38,7 @@ void insert_lib_functions(SymbolTable * symTable){
 
     for(int i = 0; i < NUM_OF_LIB_FUNC; i++) {   
         char* name     = strdup(lib_functions[i]);    
-        Symbol* symbol = symbol_create(name, 0, 0, LIBFUNC, 0);
+        Symbol* symbol = symbol_create(name, 0, 0, LIBFUNC, 0,libraryfunc_s,-1,-1);
         symbol_table_insert(symTable, symbol);
     }
 }
@@ -65,7 +65,7 @@ void symbol_table_print(SymbolTable* symTable){
         fprintf(out_file,"\n-------- Scope #%d --------\n\n", i);
 
         while(current_symbol != NULL){
-            fprintf(out_file,"\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET")\n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope);
+            fprintf(out_file,"\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET") space %d offset %d \n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope, current_symbol->space, current_symbol->offset);
             current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
@@ -131,7 +131,9 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
         if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;  //check global scope
 
         char* name     = strdup(id);
-        Symbol* symbol = symbol_create(name, scope, line, type, VAR);
+        Symbol* symbol = symbol_create(name, scope, line, type, VAR, var_s, currScopeSpace(), currScopeOffset());
+        incCurrScopeOffset();
+
         symbol_table_insert(symTable, symbol);
 }
 
@@ -145,7 +147,9 @@ void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsign
         }
 
         char* name     = strdup(id);
-        Symbol* symbol = symbol_create(name, scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR);
+        Symbol* symbol = symbol_create(name, scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
+        incCurrScopeOffset();
+
         symbol_table_insert(symTable, symbol);
 }
 
@@ -174,7 +178,7 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
     }
 
     char* name     = strdup(id);
-    Symbol* symbol = symbol_create(name, scope, line, USERFUNC, FUNC);
+    Symbol* symbol = symbol_create(name, scope, line, USERFUNC, FUNC, programfunc_s, -1, -1);
     symbol_table_insert(symTable, symbol);
 }
 
@@ -194,7 +198,9 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
     } 
 
     char* name     = strdup(id);
-    Symbol* symbol = symbol_create(name, scope, line, FORMAL, VAR);
+    Symbol* symbol = symbol_create(name, scope, line, FORMAL, VAR, var_s, currScopeSpace(), currScopeOffset());
+    incCurrScopeOffset();
+
     symbol_table_insert(symTable, symbol);
 
 }

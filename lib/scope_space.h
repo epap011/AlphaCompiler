@@ -5,7 +5,7 @@ enum scopespace_t{ programvar, functionlocal, formalarg };     //phase 3
 
 enum scopespace_t currScopeSpace();
 unsigned int currScopeOffset();
-void incCurrOffset();
+void incCurrScopeOffset();
 void enterScopeSpace();
 void exitScopeSpace();
 

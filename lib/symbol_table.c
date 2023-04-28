@@ -118,7 +118,7 @@ void symbol_table_hide(SymbolTable* symbol_table, unsigned int scope) {
     }
 }
 
-Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable) {
+Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable, enum symbol_t type, enum scopespace_t space, unsigned int offset) {
     Symbol* symbol = (Symbol*)malloc(sizeof(Symbol));
     
     symbol->is_active   = 1;
@@ -128,6 +128,9 @@ Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, i
     symbol->line  = line;
     symbol->symbol_type = symbol_type;
     symbol->next_symbol_of_same_scope = NULL;
+    symbol->type = type;
+    symbol->space = space;
+    symbol->offset = offset;
 
     return symbol;
 }

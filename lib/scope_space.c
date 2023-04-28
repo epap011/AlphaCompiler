@@ -4,7 +4,7 @@
 unsigned int programVarOffset    = 0;
 unsigned int functionLocalOffset = 0;
 unsigned int formalArgOffset     = 0;
-unsigned int scopeSpaceCounter   = 0;
+unsigned int scopeSpaceCounter   = 1;
 
 enum scopespace_t currScopeSpace(){
     
@@ -27,7 +27,7 @@ unsigned int currScopeOffset(){
     }
 }
 
-void inccurrScopeOffset(){
+void incCurrScopeOffset(){
     
     switch (currScopeSpace())
     {
@@ -38,11 +38,11 @@ void inccurrScopeOffset(){
     }
 }
 
-void enterscopespace(){
+void enterScopeSpace(){
     ++scopeSpaceCounter;
 }
 
-void exitscopespace(){
+void exitScopeSpace(){
     assert(scopeSpaceCounter > 1);
     scopeSpaceCounter -= 2;
 }
