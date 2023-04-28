@@ -1,4 +1,9 @@
 #include "expression.h"
+#include <assert.h>
+
+#define EXPAND_SIZE 1024
+#define CURR_SIZE (total*sizeof(quad))
+#define NEW_SIZE (EXPAND_SIZE*sizeof(quad)+CURR_SIZE)
 
 //to div einai dilomeno sto stdlib 
 enum iopcode{
@@ -12,7 +17,6 @@ enum iopcode{
     jump
 };
 
-
 typedef struct quad{
 
     enum iopcode op;
@@ -23,3 +27,13 @@ typedef struct quad{
     unsigned line;
 
 } quad;
+
+
+
+quad* quads = (quad*) 0;
+unsigned total = 0;
+unsigned int currQuad = 0;
+
+void expand();
+
+void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label, unsigned line);

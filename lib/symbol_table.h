@@ -2,10 +2,12 @@
 #define SYMBOL_TABLE_H
 
 #include "linked_list.h"
+#include "scope_space.h"
 
-enum SymbolType { GLOBAL, _LOCAL, FORMAL, USERFUNC, LIBFUNC };
+enum SymbolType { GLOBAL, _LOCAL, FORMAL, USERFUNC, LIBFUNC }; //phase 2
 
-//ToDo add offset
+enum symbol_t{ var_s, programfunc_s, libraryfunc_s};           //phase 3
+
 typedef struct Symbol {
     int is_active;
     int is_variable;
@@ -14,6 +16,12 @@ typedef struct Symbol {
     unsigned int line;
     enum SymbolType symbol_type;
     struct Symbol* next_symbol_of_same_scope;
+
+    //phase 3
+    enum symbol_t type;
+    enum scopespace_t space;
+    unsigned int offset;
+
 } Symbol;
 
 typedef struct SymbolTableBucket {
