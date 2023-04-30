@@ -2,6 +2,7 @@
 #include "symbol_table.h"
 #include "yacc_util.h"
 #include "manage_symtable.h"
+#include "quad.h"
 
 #define RED   "\x1b[31m"
 #define GRN   "\x1b[32m"
@@ -65,7 +66,10 @@ void symbol_table_print(SymbolTable* symTable){
         fprintf(out_file,"\n-------- Scope #%d --------\n\n", i);
 
         while(current_symbol != NULL){
-            fprintf(out_file,"\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET") space %d offset %d \n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope, current_symbol->space, current_symbol->offset);
+            if(current_symbol->type == var_s)
+                fprintf(out_file,"\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET") space %d offset %d \n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope, current_symbol->space, current_symbol->offset);
+            else
+                fprintf(out_file,"\""YEL"%s"RESET"\" "BLU"["RESET"%s"BLU"]"RESET" (line: "GRN"%d"RESET") (scope "GRN"%d"RESET") iaddress %d totalLocals %d \n", current_symbol->name, str_type(current_symbol->symbol_type), current_symbol->line, current_symbol->scope, current_symbol->iaddress, current_symbol->totalLocals);
             current_symbol = current_symbol->next_symbol_of_same_scope;
         }
     }
@@ -159,11 +163,11 @@ void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
         fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
 }
 
-void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
    if(is_id_built_in_function(id)) {
         fprintf(out_file,RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
-        return;
+        return NULL;
    }
    
    Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
@@ -174,12 +178,17 @@ void manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigne
         else
             fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope "GRN"%d"RESET" (line: "GRN"%d"RESET") \n", id, scope,line);
 
-        return;
+        return NULL;
     }
 
     char* name     = strdup(id);
     Symbol* symbol = symbol_create(name, scope, line, USERFUNC, FUNC, programfunc_s, -1, -1);
+    
+    //phase 3 quad number
+    symbol->iaddress    = nextQuadLabel();
+
     symbol_table_insert(symTable, symbol);
+    return symbol;
 }
 
 void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){

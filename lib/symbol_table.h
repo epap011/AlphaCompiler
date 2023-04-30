@@ -23,6 +23,10 @@ typedef struct Symbol {
     enum scopespace_t space;
     unsigned int offset;
 
+    //for functions
+    unsigned int totalLocals;
+    unsigned int iaddress;
+
 } Symbol;
 
 typedef struct SymbolTableBucket {

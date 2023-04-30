@@ -9,6 +9,7 @@
     unsigned int actual_line = 0;
     int anonym_cnt = 0;
     Stack *func_line_stack;
+    Stack *scope_offset_stack;
     ScopeStackList *in_function_tail; //we use this "stack" to add a flag for every new scope opening (1 if in function, 0 if not)
 
     int loop_flag          = 0;
@@ -17,6 +18,8 @@
 
     int is_function_block  = 0;  // 0: not in function block, 1: in function block
     int is_function_active = 0;  // 0: not in function, > 0 in function
+
+    Symbol* func_sym;
 
     //variable offset counters
     extern unsigned int programVarOffset;
@@ -219,10 +222,10 @@ funcdef         : FUNCTION id_opt                       {
                                                             check_if_declared(symTable,$2,scope);
                                                             //Kanoume to manage edw giati olokliros o kanonas anagetai otan kleisei to block
                                                             //alla emeis theloume na mpenei sto symbol table molis tin doume
-                                                            manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
+                                                           func_sym = manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
                                                         } 
-                                 "("                    {increase_scope(&scope); enterScopeSpace();} 
-                                    idlist ")"          {decrease_scope(&scope); enterScopeSpace();
+                                 "("                    {increase_scope(&scope); unsigned int x = currScopeOffset(); push(scope_offset_stack,&x); enterScopeSpace(); resetFormalArgsOffset();} 
+                                    idlist ")"          {decrease_scope(&scope); enterScopeSpace(); resetFunctionLocalsOffset();
                                                         return_flag++;
                                                         is_function_block=1;
                                                         is_function_active++;
@@ -232,7 +235,11 @@ funcdef         : FUNCTION id_opt                       {
                                                             formal_flag = 0; //reset flag
                                                             return_flag--;
                                                             is_function_active--;
+
+                                                            func_sym->totalLocals = currScopeOffset();
                                                             exitScopeSpace();
+
+                                                            restoreCurrScopeOffset(*(unsigned int *)pop(scope_offset_stack));
                                                          }
                                                                                                              
                                                                                             

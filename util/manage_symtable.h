@@ -12,7 +12,7 @@ void decrease_scope  (unsigned int* scope);
 void manage_id       (SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail);
 void manage_local_id (SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
-void manage_funcdef  (SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
+Symbol* manage_funcdef  (SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_lvalue_inc(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_lvalue_dec(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);

@@ -30,3 +30,12 @@ void emit(enum iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label,
     p->label = label;
     p->line = line;
 }
+
+unsigned int nextQuadLabel(){
+        return currQuad;
+}
+
+void patchLabel(unsigned quadNo, unsigned label){
+    assert(quadNo < currQuad);
+    quads[quadNo].label = label;
+}

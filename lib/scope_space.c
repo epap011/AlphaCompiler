@@ -44,5 +44,24 @@ void enterScopeSpace(){
 
 void exitScopeSpace(){
     assert(scopeSpaceCounter > 1);
-    scopeSpaceCounter -= 2;
+    scopeSpaceCounter-=2;
+}
+
+void resetFormalArgsOffset(){
+    formalArgOffset = 0;
+}
+
+void resetFunctionLocalsOffset(){
+    functionLocalOffset = 0;
+}
+
+void restoreCurrScopeOffset(unsigned int n){
+    switch (currScopeSpace())
+    {
+    case programvar     :  programVarOffset = n; break;
+    case functionlocal  : functionLocalOffset = n; break;
+    case formalarg      : formalArgOffset = n; break;
+    default: assert(0);
+    }
+
 }

@@ -9,4 +9,8 @@ void incCurrScopeOffset();
 void enterScopeSpace();
 void exitScopeSpace();
 
+void resetFormalArgsOffset();
+void resetFunctionLocalsOffset();
+void restoreCurrScopeOffset(unsigned int n);
+
 #endif
