@@ -85,7 +85,7 @@ void decrease_scope(unsigned int* scope){
 }
 
 //Checks if a function with that name is already declared (also checks if it is a library function)
-void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope){
+void check_if_declared(SymbolTable* symTable, const char* id, unsigned int scope){
     if(id[0] == '_') return; //If it is an unonymous function, don't check
     
     Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
@@ -100,7 +100,7 @@ void check_if_declared(SymbolTable* symTable, char* id, unsigned int scope){
         
 }
 
-int is_id_built_in_function(char* id){
+int is_id_built_in_function(const char* id){
     for(int i = 0; i < NUM_OF_LIB_FUNC; i++){
         if(strcmp(id, lib_functions[i]) == 0){
             return 1;
@@ -141,7 +141,7 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
         symbol_table_insert(symTable, symbol);
 }
 
-Symbol* manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+Symbol* manage_local_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
 
         Symbol* sym = symbol_table_scope_lookup(symTable, id, scope);
         if(sym != NULL) return sym;
@@ -160,11 +160,13 @@ Symbol* manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, uns
         return symbol;
 }
 
-Symbol* manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+Symbol* manage_global_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
 
         Symbol* sym =  symbol_table_scope_lookup(symTable, id, 0);
         if(sym != NULL) return sym;
         fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
+
+        return sym;
 }
 
 Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
@@ -195,7 +197,7 @@ Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsi
     return symbol;
 }
 
-void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
 
     if(formal_flag)
         return;
@@ -220,19 +222,19 @@ void manage_formal_id(SymbolTable* symTable, char* id, unsigned int scope, unsig
 
 //Arithmetic increamens and decrements
 
-void manage_lvalue_inc(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+void manage_lvalue_inc(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
 
     check_lvalue(symTable, id, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
 
 }
 
-void manage_lvalue_dec(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+void manage_lvalue_dec(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
 
     check_lvalue(symTable, id, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
 
 }
 
-int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
     
     for (int i = 0; i <= scope; i++){   //we need to check all scopes 
         Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
@@ -246,7 +248,7 @@ int check_lvalue(SymbolTable* symTable, char* id, unsigned int scope, unsigned i
     return 0;
 }
 
-void manage_func_call(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line) {
+void manage_func_call(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line) {
 
     //check if the function exists
     if(is_id_built_in_function(id)) return;
@@ -261,7 +263,7 @@ void manage_func_call(SymbolTable* symTable, char* id, unsigned int scope, unsig
     hide_symbol_on_scope(symTable, id, scope);
 }
 
-int hide_symbol_on_scope(SymbolTable* symTable, char* id, unsigned int scope) {
+int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int scope) {
     Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, scope);
     if(tmp_symbol != NULL) {
         tmp_symbol->is_active = 0;
