@@ -141,13 +141,14 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
         symbol_table_insert(symTable, symbol);
 }
 
-void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+Symbol* manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
-        if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return;
+        Symbol* sym = symbol_table_scope_lookup(symTable, id, scope);
+        if(sym != NULL) return sym;
 
         if(is_id_built_in_function(id)) {
             fprintf(out_file,RED"Error:"RESET" Cannot declare (shadow) Variable with library function name \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id,line);
-            return;
+            return NULL;
         }
 
         char* name     = strdup(id);
@@ -155,11 +156,14 @@ void manage_local_id(SymbolTable* symTable, char* id, unsigned int scope, unsign
         incCurrScopeOffset();
 
         symbol_table_insert(symTable, symbol);
+
+        return symbol;
 }
 
-void manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+Symbol* manage_global_id(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
-        if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;
+        Symbol* sym =  symbol_table_scope_lookup(symTable, id, 0);
+        if(sym != NULL) return sym;
         fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
 }
 
@@ -267,7 +271,7 @@ int hide_symbol_on_scope(SymbolTable* symTable, char* id, unsigned int scope) {
     return 0;
 }
 
-void manage_assignment(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
+void manage_assignment(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
     if(is_id_built_in_function(id)){
         fprintf(out_file,RED"Error:"RESET" Cannot assign to a library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
         return;
