@@ -36,4 +36,6 @@ typedef struct expr{
 
 } expr;
 
+expr* lvalue_expr(Symbol* sym);
+
 #endif /* EXPR_H */
