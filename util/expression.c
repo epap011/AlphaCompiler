@@ -19,5 +19,10 @@ expr* new_lvalue_expr(Symbol* sym){
 }
 
 expr* new_const_num(double n){
-    
+    expr* e = (expr*)malloc(sizeof(expr));
+    memset(e, 0, sizeof(expr));
+
+    e->next = (expr*)0;
+    e->numConst = n;
+    e->type = constnum_e;
 }

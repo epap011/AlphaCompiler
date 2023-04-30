@@ -37,5 +37,6 @@ typedef struct expr{
 } expr;
 
 expr* lvalue_expr(Symbol* sym);
+expr* new_const_num(double n);
 
 #endif /* EXPR_H */
