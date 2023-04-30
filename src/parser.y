@@ -1,6 +1,7 @@
 %{
     #include "yacc_util.h"
     #include "manage_symtable.h"
+    #include "symbol_table.h"
     #include "scope_space.h"
 
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
@@ -34,6 +35,7 @@
     int intVal;
     double realVal;
     char *stringVal;
+    struct Symbol *symbolVal;
 }
 
 %token <intVal>    INTCONST
@@ -72,6 +74,7 @@
 
 %type<stringVal> id_opt com_id_opt lvalue member
 %type<intVal>    callsuffix
+%type<symbolVal> funcprefix funcdef
 %nonassoc LP_ELSE
 %nonassoc ELSE
 
@@ -213,18 +216,15 @@ stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
                                                                                 
-funcdef         : FUNCTION id_opt                       {
-                                                            if(!func_line_stack){func_line_stack=new_stack();}  
-                                                            unsigned int* tmp_line = malloc(sizeof(unsigned int)); 
-                                                            *tmp_line = yylineno;
-                                                            push(func_line_stack,tmp_line);
-                                                            //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
-                                                            check_if_declared(symTable,$2,scope);
-                                                            //Kanoume to manage edw giati olokliros o kanonas anagetai otan kleisei to block
-                                                            //alla emeis theloume na mpenei sto symbol table molis tin doume
-                                                           func_sym = manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
+funcdef         : funcprefix                            
+                                 "("                    {   increase_scope(&scope); 
+                                                            unsigned int *p_x = (unsigned int*)malloc(sizeof(unsigned int));
+                                                            *p_x = currScopeOffset(); 
+                                                            if(!scope_offset_stack) scope_offset_stack = new_stack(); 
+                                                            push(scope_offset_stack,p_x); 
+                                                            enterScopeSpace(); 
+                                                            resetFormalArgsOffset();
                                                         } 
-                                 "("                    {increase_scope(&scope); unsigned int x = currScopeOffset(); push(scope_offset_stack,&x); enterScopeSpace(); resetFormalArgsOffset();} 
                                     idlist ")"          {decrease_scope(&scope); enterScopeSpace(); resetFunctionLocalsOffset();
                                                         return_flag++;
                                                         is_function_block=1;
@@ -236,7 +236,7 @@ funcdef         : FUNCTION id_opt                       {
                                                             return_flag--;
                                                             is_function_active--;
 
-                                                            func_sym->totalLocals = currScopeOffset();
+                                                            $1->totalLocals = currScopeOffset();
                                                             exitScopeSpace();
 
                                                             restoreCurrScopeOffset(*(unsigned int *)pop(scope_offset_stack));
@@ -244,6 +244,19 @@ funcdef         : FUNCTION id_opt                       {
                                                                                                              
                                                                                             
                 ;
+
+funcprefix : FUNCTION id_opt {
+                            if(!func_line_stack){func_line_stack=new_stack();}  
+                            unsigned int* tmp_line = malloc(sizeof(unsigned int)); 
+                            *tmp_line = yylineno;
+                            push(func_line_stack,tmp_line);
+                            //Kanoume check edw gia na settaroume to flag stin periptwsi pou i sunartisi uparxei (i einai lib)
+                            check_if_declared(symTable,$2,scope);
+                            //Kanoume to manage edw giati olokliros o kanonas anagetai otan kleisei to block
+                            //alla emeis theloume na mpenei sto symbol table molis tin doume
+                            $$ = manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
+                            }
+                            ;
 
 id_opt  : /* empty */ { //giving a name to anonymous functions
                         fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n"); 
@@ -264,7 +277,7 @@ const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d"CYN"-> "RE
 
 idlist          : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"idlist"YEL" (empty)"RESET"\n");}
                 | IDENT com_id_opt     {fprintf(yyout, MAG "Detected :" RESET"IDENT com_id_opt \n"); manage_formal_id(symTable, $1, scope, yylineno);}
-                
+                ;
 
 com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"com_id_opt"YEL" (empty)"RESET"\n");}
                 | "," IDENT com_id_opt {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
