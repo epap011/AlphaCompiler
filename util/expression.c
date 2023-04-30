@@ -25,4 +25,6 @@ expr* new_const_num(double n){
     e->next = (expr*)0;
     e->numConst = n;
     e->type = constnum_e;
+
+    return e;
 }

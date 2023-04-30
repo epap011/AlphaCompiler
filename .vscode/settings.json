@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "manage_symtable.h": "c"
+        "manage_symtable.h": "c",
+        "expression.h": "c"
     }
 }

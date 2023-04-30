@@ -2,6 +2,7 @@
 #define EXPR_H
 
 #include "symbol_table.h"
+#include <assert.h>
 
 enum expr_t{
 

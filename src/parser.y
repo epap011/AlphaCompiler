@@ -3,6 +3,7 @@
     #include "manage_symtable.h"
     #include "symbol_table.h"
     #include "scope_space.h"
+    #include "expression.h"
 
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
 
@@ -36,6 +37,7 @@
     double realVal;
     char *stringVal;
     struct Symbol *symbolVal;
+    struct expr *exprVal;
 }
 
 %token <intVal>    INTCONST
@@ -75,6 +77,8 @@
 %type<stringVal> id_opt com_id_opt lvalue member
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
+%type<exprVal>   const
+
 %nonassoc LP_ELSE
 %nonassoc ELSE
 
@@ -267,8 +271,8 @@ id_opt  : /* empty */ { //giving a name to anonymous functions
         | IDENT       {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" -> "RESET"IDENT \n",yylval.stringVal);}
         ;
 
-const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d"CYN"-> "RESET"INTCONST"CYN"-> "RESET"const \n",yylval.intVal);}
-                | REALCONST {fprintf(yyout, MAG "Detected :" RESET"%lf"CYN"-> "RESET"REALCONST"CYN"-> "RESET"const \n",yylval.realVal);}
+const           : INTCONST  {fprintf(yyout, MAG "Detected :" RESET"%d"CYN"-> "RESET"INTCONST"CYN"-> "RESET"const \n",yylval.intVal); $$ = new_const_num((double)$1);}
+                | REALCONST {fprintf(yyout, MAG "Detected :" RESET"%lf"CYN"-> "RESET"REALCONST"CYN"-> "RESET"const \n",yylval.realVal); $$ = new_const_num($1);}
                 | STRING    {fprintf(yyout, MAG "Detected :" RESET"%s"CYN"-> "RESET"STRING"CYN"-> "RESET"const \n",yylval.stringVal);}
                 | TRUE      {fprintf(yyout, MAG "Detected :" RESET"TRUE"CYN"-> "RESET"const \n");}
                 | FALSE     {fprintf(yyout, MAG "Detected :" RESET"FALSE"CYN"-> "RESET"const \n");}
