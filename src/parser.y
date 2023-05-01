@@ -74,10 +74,10 @@
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
-%type<stringVal> id_opt com_id_opt member
+%type<stringVal> id_opt com_id_opt
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
-%type<exprVal>   const lvalue
+%type<exprVal>   const lvalue member
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -150,7 +150,7 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
             ;   
 
-lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail); }
+lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); $$ = new_lvalue_expr(manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail)); }
             | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); $$ = new_lvalue_expr(manage_local_id(symTable, yylval.stringVal, scope, yylineno));}
             | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); $$ = new_lvalue_expr(manage_global_id(symTable, yylval.stringVal, scope, yylineno));}
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n"); $$ = $1;}
@@ -158,7 +158,12 @@ lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CY
 
 member      : lvalue "." IDENT      {fprintf(yyout, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");normcall_skip = 1;}
             | lvalue "[" expr "]"   {fprintf(yyout, MAG "Detected :" RESET"lvalue [ expr ]"CYN" ->"RESET" member \n");}
-            | call "." IDENT        {fprintf(yyout, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");normcall_skip = 1; $$ = $3;}
+            | call "." IDENT        {fprintf(yyout, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");normcall_skip = 1; 
+                                     //keep in mind that this expression has only the name of the symbol and nothing else
+                                     expr* e_for_name = (expr*)malloc(sizeof(expr));
+                                     e_for_name->sym = (Symbol*)malloc(sizeof(Symbol));
+                                     e_for_name->sym->name = $3;
+                                     $$ = e_for_name;}
             | call "[" expr "]"     {fprintf(yyout, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");}
             ;
 
@@ -235,12 +240,13 @@ funcdef         : funcprefix
                                                         is_function_active++;
                                                         } 
                                                block    {
-                                                            fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
+                                                            fprintf(yyout, MAG "Detected :" RESET"funcprefix ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
                                                             formal_flag = 0; //reset flag
                                                             return_flag--;
                                                             is_function_active--;
 
-                                                            $1->totalLocals = currScopeOffset();
+                                                //An einai null paei na pei oti einai i periptwsi pou uparxei idi sunartisi me auto to onoma (i lib) kai epomenos to agnooume (glitonei kai to seg :D)
+                                                            if($1 != NULL) $1->totalLocals = currScopeOffset(); 
                                                             exitScopeSpace();
 
                                                             restoreCurrScopeOffset(*(unsigned int *)pop(scope_offset_stack));
@@ -250,6 +256,7 @@ funcdef         : funcprefix
                 ;
 
 funcprefix : FUNCTION id_opt {
+                            fprintf(yyout, MAG "Detected :" RESET"FUNCTION id_opt "CYN" ->"RESET" funcprefix \n"); 
                             if(!func_line_stack){func_line_stack=new_stack();}  
                             unsigned int* tmp_line = malloc(sizeof(unsigned int)); 
                             *tmp_line = yylineno;

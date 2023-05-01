@@ -110,9 +110,10 @@ int is_id_built_in_function(const char* id){
 }
 
 //Managing function from now on
-void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail){
-    
-        if(symbol_table_scope_lookup(symTable, id, scope) != NULL) return; //check current scope
+Symbol*  manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail){
+        
+        Symbol* sym = symbol_table_scope_lookup(symTable, id, scope);
+        if(sym != NULL) return sym; //check current scope
 
         //flag purpose: check if a variable with the same name is declared in a higher scope
         int flag = 0;
@@ -126,19 +127,20 @@ void manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned i
                 if(tmp_symbol != NULL && tmp_symbol->is_variable) {
                     if(flag == 1)
                         fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
-                    return;
+                    return NULL; //KEEP THAT IN MIND!!!!
                 }
                 if(tmp != NULL) tmp = tmp->prev;
             }
         }
-
-        if(symbol_table_scope_lookup(symTable, id, 0) != NULL) return;  //check global scope
+        sym = symbol_table_scope_lookup(symTable, id, 0);//check global scope
+        if(sym != NULL) return sym;  
 
         char* name     = strdup(id);
         Symbol* symbol = symbol_create(name, scope, line, type, VAR, var_s, currScopeSpace(), currScopeOffset());
         incCurrScopeOffset();
 
         symbol_table_insert(symTable, symbol);
+        return symbol;
 }
 
 Symbol* manage_local_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){

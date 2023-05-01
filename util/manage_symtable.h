@@ -9,7 +9,7 @@ const char* str_type(enum SymbolType type);
 void        symbol_table_print(SymbolTable* symTable);
 void increase_scope  (unsigned int* scope);
 void decrease_scope  (unsigned int* scope);
-void manage_id       (SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail);
+Symbol* manage_id       (SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail);
 Symbol* manage_local_id (SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 Symbol* manage_global_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 Symbol* manage_funcdef  (SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
