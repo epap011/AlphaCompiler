@@ -2,7 +2,10 @@
 #define QUAD_H
 
 #include "expression.h"
+#include "symbol_table.h"
+#include "yacc_util.h"
 #include <assert.h>
+
 
 #define EXPAND_SIZE 1024
 #define CURR_SIZE (total*sizeof(quad))
@@ -33,6 +36,8 @@ typedef struct quad{
 
 void expand();
 void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label, unsigned line);
+const char* iopcode_tostring(enum iopcode);
+void printQuads();
 
 //for functions
 unsigned nextQuadLabel();
