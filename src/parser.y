@@ -5,6 +5,7 @@
     #include "scope_space.h"
     #include "expression.h"
 
+    #define DEBUG_PRINT 1
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
 
     unsigned int scope = 0;
@@ -78,7 +79,7 @@
 %type<stringVal> id_opt com_id_opt
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
-%type<exprVal>   const lvalue member
+%type<exprVal>   expr const lvalue member
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -114,21 +115,21 @@ stmt        : expr ";"      {fprintf(yyout, MAG "Detected :" RESET"expr;"CYN" ->
             | ";"           {fprintf(yyout, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");}
             ;           
 
-expr        : assignexpr    {fprintf(yyout, MAG "Detected :" RESET"assignexpr"CYN" ->"RESET" expr \n");}
-            | term          {fprintf(yyout, MAG "Detected :" RESET"term"CYN" ->"RESET" expr \n");}
-            | expr "+" expr {fprintf(yyout, MAG "Detected :" RESET"expr + expr"CYN" ->"RESET" expr \n");}
-            | expr "*" expr {fprintf(yyout, MAG "Detected :" RESET"expr * expr"CYN" ->"RESET" expr \n");}
-            | expr "-" expr {fprintf(yyout, MAG "Detected :" RESET"expr - expr"CYN" ->"RESET" expr \n");}
-            | expr "/" expr {fprintf(yyout, MAG "Detected :" RESET"expr / expr"CYN" ->"RESET" expr \n");}
-            | expr "%" expr {fprintf(yyout, MAG "Detected :" RESET"expr mod expr"CYN" ->"RESET" expr \n");}
-            | expr EQ expr  {fprintf(yyout, MAG "Detected :" RESET"expr == expr"CYN" ->"RESET" expr \n");}
-            | expr NEQ expr {fprintf(yyout, MAG "Detected :" RESET"expr != expr"CYN" ->"RESET" expr \n");}
-            | expr GT expr  {fprintf(yyout, MAG "Detected :" RESET"expr > expr"CYN" ->"RESET" expr \n");}
-            | expr LT expr  {fprintf(yyout, MAG "Detected :" RESET"expr < expr"CYN" ->"RESET" expr \n");}
-            | expr GTE expr {fprintf(yyout, MAG "Detected :" RESET"expr >= expr"CYN" ->"RESET" expr \n");}
-            | expr LTE expr {fprintf(yyout, MAG "Detected :" RESET"expr <= expr"CYN" ->"RESET" expr \n");}
-            | expr AND expr {fprintf(yyout, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");}
-            | expr OR expr  {fprintf(yyout, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");}
+expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
+            | term          {manage_expr_term      (DEBUG_PRINT, yyout);}
+            | expr "+" expr {manage_expr_plus_expr (DEBUG_PRINT, yyout, $1, $3);}
+            | expr "*" expr {manage_expr_mul_expr  (DEBUG_PRINT, yyout, $1, $3);}
+            | expr "-" expr {manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3);}
+            | expr "/" expr {manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3);}
+            | expr "%" expr {manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3);}
+            | expr EQ expr  {manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3);}
+            | expr NEQ expr {manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3);}
+            | expr GT expr  {manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3);}
+            | expr LT expr  {manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3);}
+            | expr GTE expr {manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3);}
+            | expr LTE expr {manage_expr_lte_expr  (DEBUG_PRINT, yyout, $1, $3);}
+            | expr AND expr {manage_expr_and_expr  (DEBUG_PRINT, yyout, $1, $3);}
+            | expr OR expr  {manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3);}
             ;                   
 
 term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");}

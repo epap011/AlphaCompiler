@@ -3,6 +3,7 @@
 
 #include "yacc_util.h"
 #include "symbol_table.h"
+#include "expression.h"
 
 void        insert_lib_functions(SymbolTable * symTable);
 const char* str_type(enum SymbolType type);
@@ -25,5 +26,21 @@ void manage_continue(int line, int flag);
 int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 int is_id_built_in_function(const char* id);
 int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int scope);
+
+void manage_expr_assignexpr(int debug, FILE* out);
+void manage_expr_term      (int debug, FILE* out);
+void manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_div_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_mod_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_eq_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_neq_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_gt_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_lt_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_gte_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_lte_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
+void manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
 
 #endif /* MANAGE_SYMTABLE_H */

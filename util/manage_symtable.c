@@ -308,3 +308,64 @@ void manage_continue(int line, int flag){
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
 }
+
+
+void manage_expr_assignexpr(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"assignexpr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_term(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"term"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_plus_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr + expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_mul_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr * expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr - expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_div_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr / expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_mod_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr MOD expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_eq_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr == expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_neq_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr != expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_gt_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr > expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_lt_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr < expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_gte_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr >= expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_lte_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr <= expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");
+}
