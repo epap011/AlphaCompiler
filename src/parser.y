@@ -1,6 +1,6 @@
 %{
     #include "yacc_util.h"
-    #include "manage_symtable.h"
+    #include "manage_parser.h"
     #include "symbol_table.h"
     #include "scope_space.h"
     #include "expression.h"

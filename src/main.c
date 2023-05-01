@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "symbol_table.h"
-#include "manage_symtable.h"
+#include "manage_parser.h"
 #include "parser.h"
 #include "quad.h"
     

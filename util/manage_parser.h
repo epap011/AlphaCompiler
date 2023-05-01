@@ -1,5 +1,5 @@
-#ifndef MANAGE_SYMTABLE_H
-#define MANAGE_SYMTABLE_H
+#ifndef MANAGE_PARSER_H
+#define MANAGE_PARSER_H
 
 #include "yacc_util.h"
 #include "symbol_table.h"
@@ -43,4 +43,4 @@ void manage_expr_lte_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
 void manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
 void manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
 
-#endif /* MANAGE_SYMTABLE_H */
+#endif /* MANAGE_PARSER_H */

@@ -1,7 +1,7 @@
 #include <string.h>
 #include "symbol_table.h"
 #include "yacc_util.h"
-#include "manage_symtable.h"
+#include "manage_parser.h"
 #include "quad.h"
 
 #define RED   "\x1b[31m"
