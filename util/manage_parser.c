@@ -225,20 +225,6 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
 
 }
 
-//Arithmetic increamens and decrements
-
-void manage_lvalue_inc(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
-
-    check_lvalue(symTable, id, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
-
-}
-
-void manage_lvalue_dec(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
-
-    check_lvalue(symTable, id, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
-
-}
-
 int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
     
     for (int i = 0; i <= scope; i++){   //we need to check all scopes 
@@ -405,4 +391,40 @@ void manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
 
 void manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");
+}
+
+void manage_term_lpar_expr_rpar(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");
+}
+
+void manage_term_uminus_expr(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");
+}
+
+void manage_term_not_expr(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");
+}
+
+void manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n");
+    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+}
+
+void manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n");
+    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+}
+
+void manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n");
+    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+}
+
+void manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n");
+    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+}
+
+void manage_term_primary(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");
 }

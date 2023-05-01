@@ -130,14 +130,14 @@ expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
             | expr OR expr  {manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3);}
             ;                   
 
-term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");}
-            | "-" expr %prec UMINUS {fprintf(yyout, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");}
-            | NOT expr              {fprintf(yyout, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");}
-            | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n"); if($2 != NULL)manage_lvalue_inc(symTable, $2->sym->name, scope, yylineno);}
-            | lvalue "++"           {fprintf(yyout, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n"); if($1 != NULL)manage_lvalue_inc(symTable, $1->sym->name, scope, yylineno);}
-            | "--" lvalue           {fprintf(yyout, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n"); if($2 != NULL)manage_lvalue_dec(symTable, $2->sym->name, scope, yylineno);}
-            | lvalue "--"           {fprintf(yyout, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n"); if($1 != NULL)manage_lvalue_dec(symTable, $1->sym->name, scope, yylineno);}
-            | primary               {fprintf(yyout, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");}
+term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, yyout);}
+            | "-" expr %prec UMINUS {manage_term_uminus_expr      (DEBUG_PRINT, yyout);}
+            | NOT expr              {manage_term_not_expr         (DEBUG_PRINT, yyout);}
+            | "++" lvalue           {manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
+            | lvalue "++"           {manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno);}
+            | "--" lvalue           {manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
+            | lvalue "--"           {manage_term_lvalue_minusminus(DEBUG_PRINT, yyout, symTable, $1, scope, yylineno);}
+            | primary               {manage_term_primary          (DEBUG_PRINT, yyout);}
             ;   
 
 assignexpr  : lvalue "=" expr       {fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n"); if($1 != NULL) manage_assignment(symTable, $1->sym->name, scope, yylineno);}
