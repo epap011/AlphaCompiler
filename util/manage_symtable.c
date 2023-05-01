@@ -168,7 +168,7 @@ Symbol* manage_global_id(SymbolTable* symTable, const char* id, unsigned int sco
         if(sym != NULL) return sym;
         fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
 
-        return sym;
+        return NULL;
 }
 
 Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){

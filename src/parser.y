@@ -133,14 +133,14 @@ expr        : assignexpr    {fprintf(yyout, MAG "Detected :" RESET"assignexpr"CY
 term        : "(" expr ")"          {fprintf(yyout, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");}
             | "-" expr %prec UMINUS {fprintf(yyout, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");}
             | NOT expr              {fprintf(yyout, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");}
-            | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n"); manage_lvalue_inc(symTable, $2->sym->name, scope, yylineno);}
-            | lvalue "++"           {fprintf(yyout, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n"); manage_lvalue_inc(symTable, $1->sym->name, scope, yylineno);}
-            | "--" lvalue           {fprintf(yyout, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n"); manage_lvalue_dec(symTable, $2->sym->name, scope, yylineno);}
-            | lvalue "--"           {fprintf(yyout, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n"); manage_lvalue_dec(symTable, $1->sym->name, scope, yylineno);}
+            | "++" lvalue           {fprintf(yyout, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n"); if($2 != NULL)manage_lvalue_inc(symTable, $2->sym->name, scope, yylineno);}
+            | lvalue "++"           {fprintf(yyout, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n"); if($1 != NULL)manage_lvalue_inc(symTable, $1->sym->name, scope, yylineno);}
+            | "--" lvalue           {fprintf(yyout, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n"); if($2 != NULL)manage_lvalue_dec(symTable, $2->sym->name, scope, yylineno);}
+            | lvalue "--"           {fprintf(yyout, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n"); if($1 != NULL)manage_lvalue_dec(symTable, $1->sym->name, scope, yylineno);}
             | primary               {fprintf(yyout, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");}
             ;   
 
-assignexpr  : lvalue "=" expr       {fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n"); manage_assignment(symTable, $1->sym->name, scope, yylineno);}
+assignexpr  : lvalue "=" expr       {fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n"); if($1 != NULL) manage_assignment(symTable, $1->sym->name, scope, yylineno);}
             ;   
 
 primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");}
@@ -150,9 +150,21 @@ primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalu
             | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
             ;   
 
-lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); $$ = new_lvalue_expr(manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail)); }
-            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); $$ = new_lvalue_expr(manage_local_id(symTable, yylval.stringVal, scope, yylineno));}
-            | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); $$ = new_lvalue_expr(manage_global_id(symTable, yylval.stringVal, scope, yylineno));}
+lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);
+                                     Symbol* sym = manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail);
+                                     if(sym != NULL) $$ = new_lvalue_expr(sym); 
+                                     else $$ = NULL;
+                                     }
+            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); 
+                                     Symbol* sym = manage_local_id(symTable, yylval.stringVal, scope, yylineno);
+                                     if(sym != NULL) $$ = new_lvalue_expr(sym);
+                                     else $$ = NULL;
+                                     }
+            | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); 
+                                     Symbol* sym = manage_global_id(symTable, yylval.stringVal, scope, yylineno);
+                                     if(sym != NULL) $$ = new_lvalue_expr(sym);
+                                     else $$ = NULL;
+                                     }
             | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n"); $$ = $1;}
             ;   
 
@@ -163,12 +175,13 @@ member      : lvalue "." IDENT      {fprintf(yyout, MAG "Detected :" RESET"lvalu
                                      expr* e_for_name = (expr*)malloc(sizeof(expr));
                                      e_for_name->sym = (Symbol*)malloc(sizeof(Symbol));
                                      e_for_name->sym->name = $3;
-                                     $$ = e_for_name;}
+                                     $$ = e_for_name;
+                                     }
             | call "[" expr "]"     {fprintf(yyout, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");}
             ;
 
 call        : call "(" elist ")"            {fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");}
-            | lvalue callsuffix             {fprintf(yyout, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n"); if(!normcall_skip) {manage_func_call(symTable, $1->sym->name, scope, yylineno);} normcall_skip=0;}
+            | lvalue callsuffix             {fprintf(yyout, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n"); if(!normcall_skip) { if($1 != NULL) manage_func_call(symTable, $1->sym->name, scope, yylineno);} normcall_skip=0;}
 
             | "(" funcdef ")" "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");}   
             ;
