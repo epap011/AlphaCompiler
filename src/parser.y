@@ -143,11 +143,11 @@ term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, 
 assignexpr  : lvalue "=" expr       {fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n"); if($1 != NULL) manage_assignment(symTable, $1->sym->name, scope, yylineno);}
             ;   
 
-primary     : lvalue                {fprintf(yyout, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");}
-            | call                  {fprintf(yyout, MAG "Detected :" RESET"call"CYN" ->"RESET" primary \n");}
-            | objectdef             {fprintf(yyout, MAG "Detected :" RESET"objectdef"CYN" ->"RESET" primary \n");}
-            | "(" funcdef ")"       {fprintf(yyout, MAG "Detected :" RESET"( funcdef )"CYN" ->"RESET" primary \n");}
-            | const                 {fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");}
+primary     : lvalue                {manage_primary_lvalue           (DEBUG_PRINT, yyout);}
+            | call                  {manage_primary_call             (DEBUG_PRINT, yyout);}
+            | objectdef             {manage_primary_objectdef        (DEBUG_PRINT, yyout);}
+            | "(" funcdef ")"       {manage_primary_lpar_funcdef_rpar(DEBUG_PRINT, yyout);}
+            | const                 {manage_primary_const            (DEBUG_PRINT, yyout);}
             ;   
 
 lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);

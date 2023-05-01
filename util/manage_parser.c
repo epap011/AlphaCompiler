@@ -428,3 +428,23 @@ void manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, 
 void manage_term_primary(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");
 }
+
+void manage_primary_lvalue(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");
+}
+
+void manage_primary_call(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"call"CYN" ->"RESET" primary \n");
+}
+
+void manage_primary_objectdef(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"objectdef"CYN" ->"RESET" primary \n");
+}
+
+void manage_primary_lpar_funcdef_rpar(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"( funcdef )"CYN" ->"RESET" primary \n");
+}
+
+void manage_primary_const(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");
+}

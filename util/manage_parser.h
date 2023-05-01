@@ -64,4 +64,11 @@ void manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, 
 void manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line);
 void manage_term_primary          (int debug, FILE* out);
 
+
+void manage_primary_lvalue           (int debug, FILE* out);
+void manage_primary_call             (int debug, FILE* out);
+void manage_primary_objectdef        (int debug, FILE* out);
+void manage_primary_lpar_funcdef_rpar(int debug, FILE* out);
+void manage_primary_const            (int debug, FILE* out);
+
 #endif /* MANAGE_PARSER_H */
