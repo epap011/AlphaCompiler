@@ -4,13 +4,15 @@
     #include "symbol_table.h"
     #include "scope_space.h"
     #include "expression.h"
+    #include "quad.h"
 
     #define DEBUG_PRINT 1
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
 
     unsigned int scope = 0;
     unsigned int actual_line = 0;
-    int anonym_cnt = 0;
+    int anonym_func_cnt = 0;
+    int anonym_var_cnt = 0;
     Stack *func_line_stack;
     Stack *scope_offset_stack;
     Stack *loop_flag_stack;
@@ -291,7 +293,7 @@ funcprefix : FUNCTION id_opt {
 id_opt  : /* empty */ { //giving a name to anonymous functions
                         fprintf(yyout, MAG "Detected :" RESET"id_opt "YEL" (empty) "RESET"\n"); 
                         char buffer[255]; 
-                        sprintf(buffer, "_anonymous_f%d", anonym_cnt++); 
+                        sprintf(buffer, "_anonymous_f%d", anonym_func_cnt++); 
                         $$ = strdup(buffer); 
                     }
         | IDENT       {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" -> "RESET"IDENT \n",yylval.stringVal);}
