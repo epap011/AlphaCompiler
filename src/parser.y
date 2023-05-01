@@ -101,18 +101,16 @@
 program     : stmtList      {fprintf(yyout, MAG "Detected :" RESET"program stmtList \n");}
             ;   
 
-stmt        : expr ";"      {fprintf(yyout, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");}
-            | ifstmt        {fprintf(yyout, MAG "Detected :" RESET"ifstmt"CYN" ->"RESET" stmt \n");}
-            | whilestmt     {fprintf(yyout, MAG "Detected :" RESET"whilestmt"CYN" ->"RESET" stmt \n");}
-            | forstmt       {fprintf(yyout, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");}
-            | returnstmt    {fprintf(yyout, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");}
-            | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n");
-                                    manage_break(yylineno, loop_flag); }
-            | CONTINUE ";"  {fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
-                                    manage_continue(yylineno, loop_flag); }
-            | block         {fprintf(yyout, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");}
-            | funcdef       {fprintf(yyout, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");}
-            | ";"           {fprintf(yyout, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");}
+stmt        : expr ";"      {manage_stmt_expr      (DEBUG_PRINT, yyout);}
+            | ifstmt        {manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
+            | whilestmt     {manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
+            | forstmt       {manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
+            | returnstmt    {manage_stmt_returnstmt(DEBUG_PRINT, yyout);}
+            | BREAK ";"     {manage_stmt_break     (DEBUG_PRINT, yyout, yylineno, loop_flag);}
+            | CONTINUE ";"  {manage_stmt_continue  (DEBUG_PRINT, yyout, yylineno, loop_flag);}
+            | block         {manage_stmt_block     (DEBUG_PRINT, yyout);}
+            | funcdef       {manage_stmt_funcdef   (DEBUG_PRINT, yyout);}
+            | ";"           {manage_stmt_semicolon (DEBUG_PRINT, yyout);}
             ;           
 
 expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}

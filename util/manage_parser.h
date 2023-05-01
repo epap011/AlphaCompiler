@@ -21,11 +21,21 @@ void manage_func_call(SymbolTable* symTable, const char* id, unsigned int scope,
 void manage_assignment(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 void check_if_declared(SymbolTable* symTable, const char* id, unsigned int scope);
 void manage_return(int line, int flag);
-void manage_break(int line, int flag);
-void manage_continue(int line, int flag);
+
 int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 int is_id_built_in_function(const char* id);
 int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int scope);
+
+void manage_stmt_expr      (int debug, FILE* out);
+void manage_stmt_ifstmt    (int debug, FILE* out);
+void manage_stmt_whilestmt (int debug, FILE* out);
+void manage_stmt_forstmt   (int debug, FILE* out);
+void manage_stmt_returnstmt(int debug, FILE* out);
+void manage_stmt_break     (int debug, FILE* out, int line, int flag);
+void manage_stmt_continue  (int debug, FILE* out, int line, int flag);
+void manage_stmt_block     (int debug, FILE* out);
+void manage_stmt_funcdef   (int debug, FILE* out);
+void manage_stmt_semicolon (int debug, FILE* out);
 
 void manage_expr_assignexpr(int debug, FILE* out);
 void manage_expr_term      (int debug, FILE* out);

@@ -299,16 +299,50 @@ void manage_return(int line, int flag){
         fprintf(out_file,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
 }
 
-void manage_break(int line, int flag){
+
+void manage_stmt_expr      (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
+}
+
+void manage_stmt_ifstmt    (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"ifstmt"CYN" ->"RESET" stmt \n");
+}
+
+void manage_stmt_whilestmt (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"whilestmt"CYN" ->"RESET" stmt \n");
+}
+
+void manage_stmt_forstmt   (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");
+}
+
+void manage_stmt_returnstmt(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");
+}
+
+void manage_stmt_block     (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");
+}
+
+void manage_stmt_break(int debug, FILE* out, int line, int flag){
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n");
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"break; "RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
 }
 
-void manage_continue(int line, int flag){
+void manage_stmt_continue(int debug, FILE* out, int line, int flag){
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
 }
 
+void manage_stmt_funcdef   (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");
+}
+
+void manage_stmt_semicolon (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");
+}
 
 void manage_expr_assignexpr(int debug, FILE* out) {
     if(debug) fprintf(yyout, MAG "Detected :" RESET"assignexpr"CYN" ->"RESET" expr \n");
