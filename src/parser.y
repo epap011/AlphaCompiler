@@ -98,7 +98,7 @@
 
 %%  
 
-program     : stmtList      {fprintf(yyout, MAG "Detected :" RESET"program stmtList \n");}
+program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
             ;   
 
 stmt        : expr ";"      {manage_stmt_expr      (DEBUG_PRINT, yyout);}

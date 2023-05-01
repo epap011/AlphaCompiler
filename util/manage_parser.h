@@ -26,6 +26,8 @@ int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsi
 int is_id_built_in_function(const char* id);
 int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int scope);
 
+void manage_program        (int debug, FILE* out);
+
 void manage_stmt_expr      (int debug, FILE* out);
 void manage_stmt_ifstmt    (int debug, FILE* out);
 void manage_stmt_whilestmt (int debug, FILE* out);

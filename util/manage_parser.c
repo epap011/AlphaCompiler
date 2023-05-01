@@ -299,20 +299,23 @@ void manage_return(int line, int flag){
         fprintf(out_file,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
 }
 
+void manage_program (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"program stmtList \n");
+}
 
-void manage_stmt_expr      (int debug, FILE* out) {
+void manage_stmt_expr(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
 }
 
-void manage_stmt_ifstmt    (int debug, FILE* out) {
+void manage_stmt_ifstmt(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"ifstmt"CYN" ->"RESET" stmt \n");
 }
 
-void manage_stmt_whilestmt (int debug, FILE* out) {
+void manage_stmt_whilestmt(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"whilestmt"CYN" ->"RESET" stmt \n");
 }
 
-void manage_stmt_forstmt   (int debug, FILE* out) {
+void manage_stmt_forstmt(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");
 }
 
