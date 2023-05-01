@@ -12,6 +12,7 @@
     int anonym_cnt = 0;
     Stack *func_line_stack;
     Stack *scope_offset_stack;
+    Stack *loop_flag_stack;
     ScopeStackList *in_function_tail; //we use this "stack" to add a flag for every new scope opening (1 if in function, 0 if not)
 
     int loop_flag          = 0;
@@ -105,9 +106,9 @@ stmt        : expr ";"      {fprintf(yyout, MAG "Detected :" RESET"expr;"CYN" ->
             | forstmt       {fprintf(yyout, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");}
             | returnstmt    {fprintf(yyout, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");}
             | BREAK ";"     {fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n");
-                                    manage_break(yylineno,is_function_active > 0 ? 0 : loop_flag); }
+                                    manage_break(yylineno, loop_flag); }
             | CONTINUE ";"  {fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
-                                    manage_continue(yylineno,is_function_active > 0 ? 0 : loop_flag); }
+                                    manage_continue(yylineno, loop_flag); }
             | block         {fprintf(yyout, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");}
             | funcdef       {fprintf(yyout, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");}
             | ";"           {fprintf(yyout, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");}
@@ -251,12 +252,18 @@ funcdef         : funcprefix
                                                         return_flag++;
                                                         is_function_block=1;
                                                         is_function_active++;
+                                                        if(!loop_flag_stack) loop_flag_stack = new_stack();
+                                                        int* loop_flag_ptr = malloc(sizeof(int));
+                                                        *loop_flag_ptr = loop_flag;
+                                                        push(loop_flag_stack,loop_flag_ptr);
+                                                        loop_flag = 0;
                                                         } 
                                                block    {
                                                             fprintf(yyout, MAG "Detected :" RESET"funcprefix ( idlist ) block"CYN" ->"RESET" funcdef \n"); 
                                                             formal_flag = 0; //reset flag
                                                             return_flag--;
                                                             is_function_active--;
+                                                            loop_flag = *(int*)pop(loop_flag_stack);
 
                                                 //An einai null paei na pei oti einai i periptwsi pou uparxei idi sunartisi me auto to onoma (i lib) kai epomenos to agnooume (glitonei kai to seg :D)
                                                             if($1 != NULL) $1->totalLocals = currScopeOffset(); 
@@ -311,10 +318,22 @@ ifstmt          : IF "(" expr ")" stmt %prec LP_ELSE {fprintf(yyout, MAG "Detect
                 | IF "(" expr ")" stmt ELSE stmt     {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt ELSE stmt"CYN"-> "RESET"ifstmt \n");}
                 ;
 
-whilestmt       : WHILE "(" expr ")" {loop_flag++;} stmt {loop_flag--;} {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");}
+whilestmt       : WHILE "(" expr ")"{   if(!loop_flag_stack) loop_flag_stack = new_stack();
+                                        int* loop_flag_ptr = malloc(sizeof(int));
+                                        *loop_flag_ptr = loop_flag;
+                                        push(loop_flag_stack,loop_flag_ptr);
+                                        loop_flag = 1;
+                                    } 
+                                    stmt {loop_flag = *(int*)pop(loop_flag_stack);} {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");}
                 ;
 
-forstmt         : FOR "(" elist ";" expr ";" elist ")" {loop_flag++;} stmt {loop_flag--;} {fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");}
+forstmt         : FOR "(" elist ";" expr ";" elist ")"  {   if(!loop_flag_stack) loop_flag_stack = new_stack();
+                                                            int* loop_flag_ptr = malloc(sizeof(int));
+                                                            *loop_flag_ptr = loop_flag;
+                                                            push(loop_flag_stack,loop_flag_ptr);
+                                                            loop_flag = 1;
+                                                        } 
+                                                        stmt {loop_flag = *(int*)pop(loop_flag_stack);} {fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");}
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
