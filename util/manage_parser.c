@@ -264,22 +264,6 @@ int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int sco
     return 0;
 }
 
-void manage_assignment(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
-    if(is_id_built_in_function(id)){
-        fprintf(out_file,RED"Error:"RESET" Cannot assign to a library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
-        return;
-    }
-
-    for(int i = scope; i >= 0; i--) {
-        Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
-        if(tmp_symbol != NULL){
-            if( tmp_symbol->symbol_type == USERFUNC) 
-                fprintf(out_file,RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
-            return;
-        } 
-    }
-}
-
 void manage_return(int line, int flag){
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
@@ -429,22 +413,41 @@ void manage_term_primary(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");
 }
 
+void manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, expr* expr1, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n");
+    if(lvalue != NULL) {
+        if(is_id_built_in_function(lvalue->sym->name)){
+            fprintf(out_file,RED"Error:"RESET" Cannot assign to a library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", lvalue->sym->name, line);
+            return;
+        }
+
+        for(int i = scope; i >= 0; i--) {
+            Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, lvalue->sym->name, i); 
+            if(tmp_symbol != NULL){
+                if( tmp_symbol->symbol_type == USERFUNC) 
+                    fprintf(out_file,RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", lvalue->sym->name, line);
+                return;
+            } 
+        }
+    }
+}
+
 void manage_primary_lvalue(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");
 }
 
 void manage_primary_call(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"call"CYN" ->"RESET" primary \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"call"CYN" ->"RESET" primary \n");
 }
 
 void manage_primary_objectdef(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"objectdef"CYN" ->"RESET" primary \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"objectdef"CYN" ->"RESET" primary \n");
 }
 
 void manage_primary_lpar_funcdef_rpar(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"( funcdef )"CYN" ->"RESET" primary \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"( funcdef )"CYN" ->"RESET" primary \n");
 }
 
 void manage_primary_const(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");
 }

@@ -64,6 +64,7 @@ void manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, 
 void manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line);
 void manage_term_primary          (int debug, FILE* out);
 
+void manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, expr* expr1, unsigned int scope, unsigned int line);
 
 void manage_primary_lvalue           (int debug, FILE* out);
 void manage_primary_call             (int debug, FILE* out);

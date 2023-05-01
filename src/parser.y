@@ -140,7 +140,7 @@ term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, 
             | primary               {manage_term_primary          (DEBUG_PRINT, yyout);}
             ;   
 
-assignexpr  : lvalue "=" expr       {fprintf(yyout, MAG "Detected :" RESET"lvalue = expr"CYN" ->"RESET" assignexpr \n"); if($1 != NULL) manage_assignment(symTable, $1->sym->name, scope, yylineno);}
+assignexpr  : lvalue "=" expr       {manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
             ;   
 
 primary     : lvalue                {manage_primary_lvalue           (DEBUG_PRINT, yyout);}
