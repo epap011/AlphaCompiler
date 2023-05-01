@@ -125,9 +125,12 @@ Symbol*  manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsign
                 if(tmp != NULL) flag = tmp->flag;
                 
                 if(tmp_symbol != NULL && tmp_symbol->is_variable) {
-                    if(flag == 1)
+                    if(flag == 1){
                         fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
-                    return NULL; //KEEP THAT IN MIND!!!!
+                        return NULL; //KEEP THAT IN MIND!!!!
+                    }
+                    else
+                        return tmp_symbol;
                 }
                 if(tmp != NULL) tmp = tmp->prev;
             }
