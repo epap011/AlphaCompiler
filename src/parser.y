@@ -197,11 +197,11 @@ elist       : /* empty */       {manage_elist_empty          (DEBUG_PRINT, yyout
 indexed     : indexedelem com_indexedelem_opt {manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout);}
             ;
 
-indexedelem     : "{" expr ":" expr "}" {fprintf(yyout, MAG "Detected :" RESET"{ expr : expr }"CYN" ->"RESET" indexedelem \n");}
+indexedelem     : "{" expr ":" expr "}" {manage_indexedele_lcbrace_expr_colon_expr_rcbrace(DEBUG_PRINT, yyout);}
                 ;
 
-com_indexedelem_opt : /* empty */                         {fprintf(yyout, MAG "Detected :" RESET"com_indexedelem_opt "YEL"(empty)"RESET"\n");}
-                    | "," indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");}
+com_indexedelem_opt : /* empty */                         {manage_comindexedelemopt_empty(DEBUG_PRINT, yyout);}
+                    | "," indexedelem com_indexedelem_opt {manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout);}
                     ;
 
 block           : "{" {increase_scope(&scope); 

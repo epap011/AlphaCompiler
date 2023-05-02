@@ -614,16 +614,31 @@ expr* manage_objectdef_lbrace_elist_rbrace  (int debug, FILE* out) {
 }
 
 expr* manage_elist_empty(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"elist"YEL" (empty)"RESET"\n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"elist"YEL" (empty)"RESET"\n");
     return NULL;
 }
 
 expr* manage_elist_expr_comexpropt(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");
     return NULL;
 }
 
 expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");
+    return NULL;
+}
+
+expr* manage_indexedele_lcbrace_expr_colon_expr_rcbrace(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"{ expr : expr }"CYN" ->"RESET" indexedelem \n");
+    return NULL;
+}
+
+expr* manage_comindexedelemopt_empty(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"com_indexedelem_opt "YEL"(empty)"RESET"\n");
+    return NULL;
+}
+
+expr* manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");
     return NULL;
 }
