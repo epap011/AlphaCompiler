@@ -172,8 +172,8 @@ call        : call "(" elist ")"            {manage_call_call_lpar_elist_rpar(DE
             | "(" funcdef ")" "(" elist ")" {manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout);}
             ;
 
-callsuffix  : normcall   {fprintf(yyout, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");} 
-            | methodcall {fprintf(yyout, MAG "Detected :" RESET"methodcall"CYN" ->"RESET" callsuffix \n");} 
+callsuffix  : normcall   {manage_callsuffix_normcall  (DEBUG_PRINT, yyout);} 
+            | methodcall {manage_callsuffix_methodcall(DEBUG_PRINT, yyout);} 
             ;
 
 normcall    : "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");}

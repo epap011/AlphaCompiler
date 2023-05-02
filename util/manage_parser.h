@@ -88,4 +88,7 @@ expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out);
 expr* manage_call_lvalue_callsuffix     (int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line);
 expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out);
 
+expr* manage_callsuffix_normcall  (int debug, FILE* out);
+expr* manage_callsuffix_methodcall(int debug, FILE* out);
+
 #endif /* MANAGE_PARSER_H */

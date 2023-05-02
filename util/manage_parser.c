@@ -571,3 +571,13 @@ expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");
     return NULL;
 }
+
+expr* manage_callsuffix_normcall  (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");
+    return NULL;
+}
+
+expr* manage_callsuffix_methodcall(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"methodcall"CYN" ->"RESET" callsuffix \n");
+    return NULL;
+}
