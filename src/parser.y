@@ -220,8 +220,8 @@ block           : "{" {increase_scope(&scope);
                                                              }
                 ;
 
-stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");}
-                | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
+stmtList        : /* empty */   {manage_stmtList_empty        (DEBUG_PRINT, yyout);}
+                | stmt stmtList {manage_stmtList_stmt_stmtList(DEBUG_PRINT, yyout);}
                 ;
 
                 /*Please for the shake of our sanity leave that as it is.*/                                                           

@@ -111,4 +111,7 @@ expr* manage_indexedele_lcbrace_expr_colon_expr_rcbrace(int debug, FILE* out);
 expr* manage_comindexedelemopt_empty(int debug, FILE* out);
 expr* manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(int debug, FILE* out);
 
+expr* manage_stmtList_empty(int debug, FILE* out);
+expr* manage_stmtList_stmt_stmtList(int debug, FILE* out);
+
 #endif /* MANAGE_PARSER_H */

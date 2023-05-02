@@ -639,6 +639,16 @@ expr* manage_comindexedelemopt_empty(int debug, FILE* out) {
 }
 
 expr* manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");
+    return NULL;
+}
+
+expr* manage_stmtList_empty(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");
+    return NULL;
+}
+
+expr* manage_stmtList_stmt_stmtList(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");
     return NULL;
 }
