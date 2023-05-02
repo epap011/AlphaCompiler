@@ -1,4 +1,5 @@
 #include "expression.h"
+#include "quad.h"
 
 expr* new_expr(enum expr_t type){
     expr* e = (expr*)malloc(sizeof(expr));
@@ -40,7 +41,7 @@ expr* new_const_num(double n){
 expr* new_const_string(char *str){
     
     expr* e = new_expr(conststring_e);
-    e->strConst=strdup(str);
+    e->strConst = strdup(str);
 
     return e;
 }
@@ -59,4 +60,12 @@ expr* new_const_nil(){
      expr* e = new_expr(nil_e);
 
     return e;
+}
+
+expr* new_member_item(expr* lv, char* name, unsigned int scope, unsigned int line){
+    lv = emit_if_tableitem(lv, scope, line);
+    expr* ti = new_expr(tableitem_e);
+    ti->sym = lv->sym;
+    ti->index = new_const_string(name);
+    return ti;
 }

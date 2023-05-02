@@ -36,13 +36,13 @@ typedef struct quad{
 
 void expand();
 void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label, unsigned line);
+expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line);
 const char* iopcode_tostring(enum iopcode);
 void printQuads();
 
 //for functions
 unsigned nextQuadLabel();
 void patchLabel(unsigned quadNo, unsigned label);
-
 
 
 #endif /* QUAD_H */

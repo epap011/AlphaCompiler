@@ -39,10 +39,13 @@ typedef struct expr{
 
 } expr;
 
+expr* new_expr(enum expr_t type);
+
 expr* new_lvalue_expr(Symbol* sym);
 expr* new_const_num(double n);
 expr* new_const_string(char *str);
 expr* new_const_bool(int flag);
 expr* new_const_nil();
+expr* new_member_item(expr* lv, char* name, unsigned int scope, unsigned int line);
 
 #endif /* EXPR_H */

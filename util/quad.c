@@ -31,6 +31,20 @@ void emit(enum iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label,
     p->line = line;
 }
 
+expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
+    if(e->type != tableitem_e)
+        return e;
+    else{
+        expr* result = new_expr(var_e);
+        //new temp symbol
+        result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, 1, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
+
+        emit(tablegetelem, e, e->index, result, nextQuadLabel(), yylineno);
+        return result;
+    }
+}
+
 unsigned int nextQuadLabel(){
         return currQuad;
 }
