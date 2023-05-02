@@ -95,4 +95,7 @@ expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out);
 
 expr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normcall_skip);
 
+expr* manage_comexpropt_empty(int debug, FILE* out);
+expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out);
+
 #endif /* MANAGE_PARSER_H */

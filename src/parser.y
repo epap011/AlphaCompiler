@@ -182,8 +182,8 @@ normcall    : "(" elist ")" {manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout)
 methodcall  : ".." IDENT "(" elist ")" {manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip);}
             ;
 
-com_expr_opt : /* empty */             {fprintf(yyout, MAG "Detected :" RESET"com_expr_opt"YEL" (empty) "RESET"\n");}
-             | COMMA expr com_expr_opt {fprintf(yyout, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");}
+com_expr_opt : /* empty */             {manage_comexpropt_empty                (DEBUG_PRINT, yyout);}
+             | COMMA expr com_expr_opt {manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout);}
              ;
 
 objectdef   : "[" indexed "]" {fprintf(yyout, MAG "Detected :" RESET"[ indexed ]"CYN" ->"RESET" objectdef \n");}

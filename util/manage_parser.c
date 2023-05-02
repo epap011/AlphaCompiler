@@ -583,12 +583,22 @@ expr* manage_callsuffix_methodcall(int debug, FILE* out) {
 }
 
 expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");
     return NULL;
 }
 
 expr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normallcall_skip) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");
     *normallcall_skip = 1;
+    return NULL;
+}
+
+expr* manage_comexpropt_empty(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"com_expr_opt"YEL" (empty) "RESET"\n");
+    return NULL;
+}
+
+expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");
     return NULL;
 }
