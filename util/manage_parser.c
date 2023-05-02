@@ -548,3 +548,26 @@ expr* manage_member_call_lbr_expr_rbr(int debug, FILE* out, expr* call, expr* ex
     if(debug) fprintf(out, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");
     return NULL;
 }
+
+expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");
+    return NULL;
+}
+
+expr* manage_call_lvalue_callsuffix(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n");
+
+    if(!normalcall_skip) {
+        if(lvalue != NULL) {
+            manage_func_call(symTable, lvalue->sym->name, scope, line);
+        }
+    }
+
+    *normalcall_skip = 0;
+    return NULL;
+}
+
+expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");
+    return NULL;
+}

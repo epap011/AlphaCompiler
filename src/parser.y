@@ -167,10 +167,9 @@ member      : lvalue "." IDENT      {     manage_memeber_lvalue_dot_ident   (DEB
             | call "[" expr "]"     {     manage_member_call_lbr_expr_rbr   (DEBUG_PRINT, yyout, $1, $3);}
             ;
 
-call        : call "(" elist ")"            {fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");}
-            | lvalue callsuffix             {fprintf(yyout, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n"); if(!normcall_skip) { if($1 != NULL) manage_func_call(symTable, $1->sym->name, scope, yylineno);} normcall_skip=0;}
-
-            | "(" funcdef ")" "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");}   
+call        : call "(" elist ")"            {manage_call_call_lpar_elist_rpar(DEBUG_PRINT, yyout);}
+            | lvalue callsuffix             {manage_call_lvalue_callsuffix   (DEBUG_PRINT, yyout, symTable, $1, &normcall_skip, scope, yylineno);}
+            | "(" funcdef ")" "(" elist ")" {manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout);}
             ;
 
 callsuffix  : normcall   {fprintf(yyout, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");} 

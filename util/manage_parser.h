@@ -84,4 +84,8 @@ expr* manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, exp
 expr* manage_member_call_dot_ident      (int debug, FILE* out, expr* call,  char* id, int* normalcall_skip);
 expr* manage_member_call_lbr_expr_rbr   (int debug, FILE* out, expr* call, expr* expr1);
 
+expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out);
+expr* manage_call_lvalue_callsuffix     (int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line);
+expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out);
+
 #endif /* MANAGE_PARSER_H */
