@@ -326,164 +326,9 @@ void manage_expr_term(int debug, FILE* out) {
     if(debug) fprintf(yyout, MAG "Detected :" RESET"term"CYN" ->"RESET" expr \n");
 }
 
-expr* manage_expr_plus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr + expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(add, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
+/**Arithmetic / relop expressions here**/
 
-expr* manage_expr_mul_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr * expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(mul, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr - expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(sub, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_div_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr / expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(i_div, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_mod_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr MOD expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(mod, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_eq_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr == expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(if_eq, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_neq_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr != expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(if_noteq, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_gt_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr > expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(if_greater, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_lt_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr < expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(if_less, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_gte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr >= expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(if_greatereq, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_lte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr <= expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(if_lesseq, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");
-    expr* result;
-    if ( (expr1->type == var_e || expr1->type == constnum_e) &&
-         (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
-        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-        incCurrScopeOffset();
-        emit(and, expr1, expr2, result, -1, line);
-        return result;
-    }
-    return NULL;
-}
-
-expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");
+expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op){
     expr* result;
     if ( (expr1->type == var_e || expr1->type == constnum_e) &&
          (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
@@ -494,6 +339,85 @@ expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsign
     }
     return NULL;
 }
+
+expr* manage_expr_plus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr + expr"CYN" ->"RESET" expr \n");
+
+    return manage_arith_relop_emits(expr1, expr2, scope, line, add);
+}
+
+expr* manage_expr_mul_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr * expr"CYN" ->"RESET" expr \n");
+    
+    return manage_arith_relop_emits(expr1, expr2, scope, line, mul);
+}
+
+expr* manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr - expr"CYN" ->"RESET" expr \n");
+
+    return manage_arith_relop_emits(expr1, expr2, scope, line, sub);
+}
+
+expr* manage_expr_div_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr / expr"CYN" ->"RESET" expr \n");
+
+    return manage_arith_relop_emits(expr1, expr2, scope, line, i_div);
+}
+
+expr* manage_expr_mod_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr MOD expr"CYN" ->"RESET" expr \n");
+ 
+    return manage_arith_relop_emits(expr1, expr2, scope, line, mod);
+}
+
+expr* manage_expr_eq_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr == expr"CYN" ->"RESET" expr \n");
+
+    return manage_arith_relop_emits(expr1, expr2, scope, line, if_eq);
+}
+
+expr* manage_expr_neq_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr != expr"CYN" ->"RESET" expr \n");
+    
+    return manage_arith_relop_emits(expr1, expr2, scope, line, if_noteq);
+}
+
+expr* manage_expr_gt_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr > expr"CYN" ->"RESET" expr \n");
+   
+    return manage_arith_relop_emits(expr1, expr2, scope, line, if_greater);
+}
+
+expr* manage_expr_lt_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr < expr"CYN" ->"RESET" expr \n");
+   
+    return manage_arith_relop_emits(expr1, expr2, scope, line, if_less);
+}
+
+expr* manage_expr_gte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr >= expr"CYN" ->"RESET" expr \n");
+  
+    return manage_arith_relop_emits(expr1, expr2, scope, line, if_greatereq);
+}
+
+expr* manage_expr_lte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr <= expr"CYN" ->"RESET" expr \n");
+    
+    return manage_arith_relop_emits(expr1, expr2, scope, line, if_lesseq);
+}
+
+expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");
+ 
+    return manage_arith_relop_emits(expr1, expr2, scope, line, and);
+}
+
+expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");
+    
+    return manage_arith_relop_emits(expr1, expr2, scope, line, or); 
+}
+/**End of Arithmetic / relop**/
 
 void manage_term_lpar_expr_rpar(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");
