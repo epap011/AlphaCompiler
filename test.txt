@@ -1,0 +1,10 @@
+function f(){
+   
+    function g(){
+
+    }
+   
+    x =3;
+
+}
+
