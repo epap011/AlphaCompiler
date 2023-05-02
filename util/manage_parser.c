@@ -599,6 +599,16 @@ expr* manage_comexpropt_empty(int debug, FILE* out) {
 }
 
 expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out) {
-    if(debug) fprintf(yyout, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");
+    if(debug) fprintf(out, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");
+    return NULL;
+}
+
+expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"[ indexed ]"CYN" ->"RESET" objectdef \n");
+    return NULL;
+}
+
+expr* manage_objectdef_lbrace_elist_rbrace  (int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");
     return NULL;
 }

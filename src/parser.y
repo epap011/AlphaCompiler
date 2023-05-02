@@ -186,8 +186,8 @@ com_expr_opt : /* empty */             {manage_comexpropt_empty                (
              | COMMA expr com_expr_opt {manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout);}
              ;
 
-objectdef   : "[" indexed "]" {fprintf(yyout, MAG "Detected :" RESET"[ indexed ]"CYN" ->"RESET" objectdef \n");}
-            | "[" elist   "]" {fprintf(yyout, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");}
+objectdef   : "[" indexed "]" {manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRINT, yyout);}
+            | "[" elist   "]" {manage_objectdef_lbrace_elist_rbrace  (DEBUG_PRINT, yyout);}
             ;
 
 elist       : /* empty */       {fprintf(yyout, MAG "Detected :" RESET"elist"YEL" (empty)"RESET"\n");}
