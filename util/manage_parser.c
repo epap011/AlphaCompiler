@@ -409,7 +409,7 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
                     emit(assign, expr1, NULL, lvalue, -1, line);
                     return lvalue;
                 }
-            } 
+            }
         }
     }
     return NULL;
@@ -474,7 +474,7 @@ expr* manage_lvalue_ident(int debug, FILE* out, SymbolTable* symTable, char* id,
     incCurrScopeOffset();
     symbol_table_insert(symTable, symbol);
 
-    return NULL;
+    return new_lvalue_expr(symbol);
 }
 
 expr* manage_lvalue_local_ident(int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line) {

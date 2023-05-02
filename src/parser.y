@@ -81,7 +81,7 @@
 %type<stringVal> id_opt com_id_opt
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
-%type<exprVal>   expr assignexpr const lvalue member
+%type<exprVal>   expr assignexpr term const lvalue member
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -132,13 +132,13 @@ expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
             | expr OR expr  {$$ = manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             ;                   
 
-term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, yyout);}
-            | "-" expr %prec UMINUS {manage_term_uminus_expr      (DEBUG_PRINT, yyout);}
-            | NOT expr              {manage_term_not_expr         (DEBUG_PRINT, yyout);}
-            | "++" lvalue           {manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
-            | lvalue "++"           {manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno);}
-            | "--" lvalue           {manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
-            | lvalue "--"           {manage_term_lvalue_minusminus(DEBUG_PRINT, yyout, symTable, $1, scope, yylineno);}
+term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, yyout); $$ = $2;}
+            | "-" expr %prec UMINUS {manage_term_uminus_expr      (DEBUG_PRINT, yyout); $$ = $2;}
+            | NOT expr              {manage_term_not_expr         (DEBUG_PRINT, yyout); $$ = $2;}
+            | "++" lvalue           {manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
+            | lvalue "++"           {manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
+            | "--" lvalue           {manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
+            | lvalue "--"           {manage_term_lvalue_minusminus(DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
             | primary               {manage_term_primary          (DEBUG_PRINT, yyout);}
             ;   
 
