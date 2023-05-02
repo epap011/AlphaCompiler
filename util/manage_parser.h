@@ -72,4 +72,8 @@ void manage_primary_objectdef        (int debug, FILE* out);
 void manage_primary_lpar_funcdef_rpar(int debug, FILE* out);
 void manage_primary_const            (int debug, FILE* out);
 
+expr* manage_lvalue_ident       (int debug, FILE* out, SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail);
+expr* manage_lvalue_local_ident (int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
+expr* manage_lvalue_global_ident(int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
+expr* manage_lvalue_member      (int debug, FILE* out, expr* member);
 #endif /* MANAGE_PARSER_H */

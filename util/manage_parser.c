@@ -109,71 +109,6 @@ int is_id_built_in_function(const char* id){
     return 0;
 }
 
-//Managing function from now on
-Symbol*  manage_id(SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail){
-        
-        Symbol* sym = symbol_table_scope_lookup(symTable, id, scope);
-        if(sym != NULL) return sym; //check current scope
-
-        //flag purpose: check if a variable with the same name is declared in a higher scope
-        int flag = 0;
-        ScopeStackList* tmp  = tail;
-        if(scope > 0) {                                     //check all other scopes except global
-            for(int i = scope - 1; i > 0; i--) {
-                Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
-                
-                if(tmp != NULL) flag = tmp->flag;
-                
-                if(tmp_symbol != NULL && tmp_symbol->is_variable) {
-                    if(flag == 1){
-                        fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
-                        return NULL; //KEEP THAT IN MIND!!!!
-                    }
-                    else
-                        return tmp_symbol;
-                }
-                if(tmp != NULL) tmp = tmp->prev;
-            }
-        }
-        sym = symbol_table_scope_lookup(symTable, id, 0);//check global scope
-        if(sym != NULL) return sym;  
-
-        char* name     = strdup(id);
-        Symbol* symbol = symbol_create(name, scope, line, type, VAR, var_s, currScopeSpace(), currScopeOffset());
-        incCurrScopeOffset();
-
-        symbol_table_insert(symTable, symbol);
-        return symbol;
-}
-
-Symbol* manage_local_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
-
-        Symbol* sym = symbol_table_scope_lookup(symTable, id, scope);
-        if(sym != NULL) return sym;
-
-        if(is_id_built_in_function(id)) {
-            fprintf(out_file,RED"Error:"RESET" Cannot declare (shadow) Variable with library function name \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id,line);
-            return NULL;
-        }
-
-        char* name     = strdup(id);
-        Symbol* symbol = symbol_create(name, scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
-        incCurrScopeOffset();
-
-        symbol_table_insert(symTable, symbol);
-
-        return symbol;
-}
-
-Symbol* manage_global_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
-
-        Symbol* sym =  symbol_table_scope_lookup(symTable, id, 0);
-        if(sym != NULL) return sym;
-        fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
-
-        return NULL;
-}
-
 Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsigned int line){
 
    if(is_id_built_in_function(id)) {
@@ -498,4 +433,81 @@ void manage_primary_lpar_funcdef_rpar(int debug, FILE* out) {
 
 void manage_primary_const(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"const"CYN" ->"RESET" primary \n");
+}
+
+expr* manage_lvalue_ident(int debug, FILE* out, SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail) {
+    
+    if(debug) fprintf(out, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",id);
+
+    Symbol* sym = symbol_table_scope_lookup(symTable, id, scope); //check current scope
+    if(sym != NULL) {
+        return new_lvalue_expr(sym);
+    }
+
+    //flag purpose: check if a variable with the same name is declared in a higher scope
+    int flag = 0;
+    ScopeStackList* tmp = tail;
+    if(scope > 0) { //check all other scopes except global
+        for(int i = scope - 1; i > 0; i--) {
+            Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
+            
+            if(tmp != NULL) flag = tmp->flag;
+            
+            if(tmp_symbol != NULL && tmp_symbol->is_variable) {
+                if(flag == 1){
+                    fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
+                    return NULL;
+                }
+                else {
+                    return new_lvalue_expr(tmp_symbol);
+                }
+            }
+            if(tmp != NULL) tmp = tmp->prev;
+        }
+    }
+
+    sym = symbol_table_scope_lookup(symTable, id, 0);//check global scope
+    if(sym != NULL) new_lvalue_expr(sym);  
+
+    char* name     = strdup(id);
+    Symbol* symbol = symbol_create(name, scope, line, type, VAR, var_s, currScopeSpace(), currScopeOffset());
+    incCurrScopeOffset();
+    symbol_table_insert(symTable, symbol);
+
+    return NULL;
+}
+
+expr* manage_lvalue_local_ident(int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", id);
+
+    Symbol* sym = symbol_table_scope_lookup(symTable, id, scope);
+    if(sym != NULL) return new_lvalue_expr(sym);
+
+    if(is_id_built_in_function(id)) {
+        fprintf(out_file,RED"Error:"RESET" Cannot declare (shadow) Variable with library function name \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id,line);
+        return NULL;
+    }
+
+    char* name     = strdup(id);
+    Symbol* symbol = symbol_create(name, scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
+    incCurrScopeOffset();
+
+    symbol_table_insert(symTable, symbol);
+
+    return new_lvalue_expr(symbol);
+}
+
+expr* manage_lvalue_global_ident(int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n", id);
+
+    Symbol* sym =  symbol_table_scope_lookup(symTable, id, 0);
+    if(sym != NULL) return new_lvalue_expr(sym);
+    fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
+
+    return NULL;
+}
+
+expr* manage_lvalue_member(int debug, FILE* out, expr* member) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");
+    return member;
 }

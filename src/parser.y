@@ -152,22 +152,10 @@ primary     : lvalue                {manage_primary_lvalue           (DEBUG_PRIN
             | const                 {manage_primary_const            (DEBUG_PRINT, yyout);}
             ;   
 
-lvalue      : IDENT                 {fprintf(yyout, MAG "Detected :" RESET"%s"CYN" ->"RESET" IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal);
-                                     Symbol* sym = manage_id(symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno,in_function_tail);
-                                     if(sym != NULL) $$ = new_lvalue_expr(sym); 
-                                     else $$ = NULL;
-                                     }
-            | LOCAL IDENT           {fprintf(yyout, MAG "Detected :" RESET"local \"%s\""CYN" ->"RESET" LOCAL IDENT"CYN" ->"RESET" lvalue \n", yylval.stringVal); 
-                                     Symbol* sym = manage_local_id(symTable, yylval.stringVal, scope, yylineno);
-                                     if(sym != NULL) $$ = new_lvalue_expr(sym);
-                                     else $$ = NULL;
-                                     }
-            | "::" IDENT            {fprintf(yyout, MAG "Detected :" RESET"::%s"CYN" ->"RESET" ::IDENT"CYN" ->"RESET" lvalue \n",yylval.stringVal); 
-                                     Symbol* sym = manage_global_id(symTable, yylval.stringVal, scope, yylineno);
-                                     if(sym != NULL) $$ = new_lvalue_expr(sym);
-                                     else $$ = NULL;
-                                     }
-            | member                {fprintf(yyout, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n"); $$ = $1;}
+lvalue      : IDENT                 {$$ = manage_lvalue_ident       (DEBUG_PRINT, yyout, symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno, in_function_tail);}
+            | LOCAL IDENT           {$$ = manage_lvalue_local_ident (DEBUG_PRINT, yyout, symTable, yylval.stringVal, scope, yylineno);}
+            | "::" IDENT            {$$ = manage_lvalue_global_ident(DEBUG_PRINT, yyout, symTable, yylval.stringVal, scope, yylineno);}
+            | member                {$$ = manage_lvalue_member      (DEBUG_PRINT, yyout, $1);}
             ;   
 
 member      : lvalue "." IDENT      {fprintf(yyout, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");normcall_skip = 1;}
