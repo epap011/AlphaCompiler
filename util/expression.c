@@ -14,6 +14,7 @@ expr* new_lvalue_expr(Symbol* sym){
         case libraryfunc_s  : e->type = libraryfunc_e; break;
         default : assert(0);
     }
+    e->hidden_var = NULL;
 
     return e;   
 }

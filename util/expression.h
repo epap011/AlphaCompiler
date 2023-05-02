@@ -35,6 +35,8 @@ typedef struct expr{
     unsigned char boolConst;
     struct expr* next;
 
+    struct expr* hidden_var;
+
 } expr;
 
 expr* new_lvalue_expr(Symbol* sym);

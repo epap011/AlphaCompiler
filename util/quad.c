@@ -43,7 +43,7 @@ void patchLabel(unsigned quadNo, unsigned label){
 void printQuads(){
     int i;
     for(i = 0; i < currQuad; i++){
-        printf("%d: OP: "BLU"%s"RESET"\t", i, iopcode_tostring(quads[i].op));
+        printf("%d: OP: "BLU"%s"RESET"\t", i + 1, iopcode_tostring(quads[i].op));
         if(quads[i].result != NULL){
             if(quads[i].result->type == var_e)
                 printf(" RESULT: "YEL"%s"RESET"\t", quads[i].result->sym->name);

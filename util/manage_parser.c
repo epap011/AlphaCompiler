@@ -407,6 +407,15 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
                 }
                 else{
                     emit(assign, expr1, NULL, lvalue, -1, line);
+
+                    //Creating an extra hidden var to store lvalue (FAQ : 18)
+                    expr* result;
+                    result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
+                    incCurrScopeOffset();
+                    emit(assign, lvalue, NULL, result, -1, line);
+
+                    lvalue->hidden_var = result; //making the lvalue point to the hidden var (to find it when we need it)
+
                     return lvalue;
                 }
             }

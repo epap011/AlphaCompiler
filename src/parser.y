@@ -227,7 +227,8 @@ block           : "{" {increase_scope(&scope);
 stmtList        : /* empty */   {fprintf(yyout, MAG "Detected :" RESET"stmtList"YEL" (empty)"RESET":\n");}
                 | stmt stmtList {fprintf(yyout, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");}
                 ;
-                                                                                
+
+                /*Please for the shake of our sanity leave that as it is.*/                                                           
 funcdef         : funcprefix                            
                                  "("                    {   increase_scope(&scope); 
                                                             unsigned int *p_x = (unsigned int*)malloc(sizeof(unsigned int));

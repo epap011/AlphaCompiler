@@ -4,6 +4,7 @@
 #include "yacc_util.h"
 #include "symbol_table.h"
 #include "expression.h"
+#include "quad.h"
 
 void        insert_lib_functions(SymbolTable * symTable);
 const char* str_type(enum SymbolType type);
@@ -41,6 +42,7 @@ void manage_stmt_semicolon (int debug, FILE* out);
 
 void manage_expr_assignexpr(int debug, FILE* out);
 void manage_expr_term      (int debug, FILE* out);
+expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
