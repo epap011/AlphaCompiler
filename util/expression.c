@@ -1,5 +1,15 @@
 #include "expression.h"
 
+expr* new_expr(enum expr_t type){
+    expr* e = (expr*)malloc(sizeof(expr));
+    memset(e, 0, sizeof(expr));
+
+    e->next = (expr*)0;
+    e->type = type;
+
+    return e;
+}
+
 expr* new_lvalue_expr(Symbol* sym){
     assert(sym);
     expr* e = (expr*)malloc(sizeof(expr));
@@ -20,44 +30,33 @@ expr* new_lvalue_expr(Symbol* sym){
 }
 
 expr* new_const_num(double n){
-    expr* e = (expr*)malloc(sizeof(expr));
-    memset(e, 0, sizeof(expr));
-
-    e->next = (expr*)0;
+    
+    expr* e = new_expr(constnum_e);
     e->numConst = n;
-    e->type = constnum_e;
 
     return e;
 }
 
 expr* new_const_string(char *str){
-    expr* e = (expr*)malloc(sizeof(expr));
-    memset(e, 0, sizeof(expr));
-
-    e->next = (expr*)0;
+    
+    expr* e = new_expr(conststring_e);
     e->strConst=strdup(str);
-    e->type = conststring_e;
 
     return e;
 }
 
 expr* new_const_bool(int flag){
-    expr* e = (expr*)malloc(sizeof(expr));
-    memset(e, 0, sizeof(expr));
-
-    e->next = (expr*)0;
+    
+    expr* e = new_expr(constbool_e);
     e->boolConst = flag;
-    e->type = constbool_e;
+
 
     return e;
 }
 
 expr* new_const_nil(){
-    expr* e = (expr*)malloc(sizeof(expr));
-    memset(e, 0, sizeof(expr));
-
-    e->next = (expr*)0;
-    e->type = nil_e;
+     
+     expr* e = new_expr(nil_e);
 
     return e;
 }
