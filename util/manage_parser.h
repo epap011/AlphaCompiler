@@ -91,4 +91,6 @@ expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out);
 expr* manage_callsuffix_normcall  (int debug, FILE* out);
 expr* manage_callsuffix_methodcall(int debug, FILE* out);
 
+expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out);
+
 #endif /* MANAGE_PARSER_H */

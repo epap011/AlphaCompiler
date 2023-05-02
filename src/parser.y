@@ -176,7 +176,7 @@ callsuffix  : normcall   {manage_callsuffix_normcall  (DEBUG_PRINT, yyout);}
             | methodcall {manage_callsuffix_methodcall(DEBUG_PRINT, yyout);} 
             ;
 
-normcall    : "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");}
+normcall    : "(" elist ")" {manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout);}
             ;
 
 methodcall  : ".." IDENT "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");normcall_skip = 1;}
