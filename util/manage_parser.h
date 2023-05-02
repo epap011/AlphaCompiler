@@ -78,4 +78,10 @@ expr* manage_lvalue_ident       (int debug, FILE* out, SymbolTable* symTable, ch
 expr* manage_lvalue_local_ident (int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 expr* manage_lvalue_global_ident(int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 expr* manage_lvalue_member      (int debug, FILE* out, expr* member);
+
+expr* manage_memeber_lvalue_dot_ident   (int debug, FILE* out, expr* lvalue, int* normalcall_skip);
+expr* manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr1);
+expr* manage_member_call_dot_ident      (int debug, FILE* out, expr* call,  char* id, int* normalcall_skip);
+expr* manage_member_call_lbr_expr_rbr   (int debug, FILE* out, expr* call, expr* expr1);
+
 #endif /* MANAGE_PARSER_H */

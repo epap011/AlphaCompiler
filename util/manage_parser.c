@@ -520,3 +520,31 @@ expr* manage_lvalue_member(int debug, FILE* out, expr* member) {
     if(debug) fprintf(out, MAG "Detected :" RESET"member"CYN" ->"RESET" lvalue \n");
     return member;
 }
+
+expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, int* normalcall_skip) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");
+    *normalcall_skip = 1;
+    return NULL;
+}
+
+expr* manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr1) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"lvalue [ expr ]"CYN" ->"RESET" member \n");
+    return NULL;
+}
+
+expr* manage_member_call_dot_ident(int debug, FILE* out, expr* call, char* id, int* normalcall_skip) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");
+    *normalcall_skip = 1;
+    
+    //keep in mind that this expression has only the name of the symbol and nothing else
+    expr* e_for_name = (expr*)malloc(sizeof(expr));
+    e_for_name->sym  = (Symbol*)malloc(sizeof(Symbol));
+    e_for_name->sym->name = id;
+    
+    return e_for_name;
+}
+
+expr* manage_member_call_lbr_expr_rbr(int debug, FILE* out, expr* call, expr* expr1) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");
+    return NULL;
+}

@@ -6,7 +6,7 @@
     #include "expression.h"
     #include "quad.h"
 
-    #define DEBUG_PRINT 1
+    #define DEBUG_PRINT 0
     #define IS_GLOBAL scope > 0 ? _LOCAL : GLOBAL
 
     unsigned int scope = 0;
@@ -84,7 +84,7 @@
 %type<stringVal> id_opt com_id_opt
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
-%type<exprVal>   expr assignexpr term const lvalue member
+%type<exprVal>   expr assignexpr term const lvalue member call
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -161,16 +161,10 @@ lvalue      : IDENT                 {$$ = manage_lvalue_ident       (DEBUG_PRINT
             | member                {$$ = manage_lvalue_member      (DEBUG_PRINT, yyout, $1);}
             ;   
 
-member      : lvalue "." IDENT      {fprintf(yyout, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");normcall_skip = 1;}
-            | lvalue "[" expr "]"   {fprintf(yyout, MAG "Detected :" RESET"lvalue [ expr ]"CYN" ->"RESET" member \n");}
-            | call "." IDENT        {fprintf(yyout, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");normcall_skip = 1; 
-                                     //keep in mind that this expression has only the name of the symbol and nothing else
-                                     expr* e_for_name = (expr*)malloc(sizeof(expr));
-                                     e_for_name->sym = (Symbol*)malloc(sizeof(Symbol));
-                                     e_for_name->sym->name = $3;
-                                     $$ = e_for_name;
-                                     }
-            | call "[" expr "]"     {fprintf(yyout, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");}
+member      : lvalue "." IDENT      {     manage_memeber_lvalue_dot_ident   (DEBUG_PRINT, yyout, $1, &normcall_skip);}
+            | lvalue "[" expr "]"   {     manage_memeber_lvalue_lbr_expr_rbr(DEBUG_PRINT, yyout, $1, $3);}
+            | call "." IDENT        {$$ = manage_member_call_dot_ident      (DEBUG_PRINT, yyout, $1, $3, &normcall_skip);}
+            | call "[" expr "]"     {     manage_member_call_lbr_expr_rbr   (DEBUG_PRINT, yyout, $1, $3);}
             ;
 
 call        : call "(" elist ")"            {fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");}
