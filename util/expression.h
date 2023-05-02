@@ -39,5 +39,8 @@ typedef struct expr{
 
 expr* new_lvalue_expr(Symbol* sym);
 expr* new_const_num(double n);
+expr* new_const_string(char *str);
+expr* new_const_bool(int flag);
+expr* new_const_nil();
 
 #endif /* EXPR_H */
