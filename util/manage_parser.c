@@ -334,7 +334,7 @@ expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, uns
          (expr2->type == var_e || expr2->type == constnum_e) ){ //check if arithmetic operands are variables or constants
         result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
         incCurrScopeOffset();
-        emit(or, expr1, expr2, result, -1, line);
+        emit(op, expr1, expr2, result, -1, line);
         return result;
     }
     return NULL;
