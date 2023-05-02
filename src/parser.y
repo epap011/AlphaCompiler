@@ -256,7 +256,7 @@ funcdef         : funcprefix
                                                             exitScopeSpace();
                                                             restoreCurrScopeOffset(*(unsigned int *)pop(scope_offset_stack));
 
-                                                            emit(funcend, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
+                                                            if($$ != NULL) emit(funcend, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
                                                             patchLabel(*(unsigned int *)pop(quad_stack), nextQuadLabel() +1);
                                                          }
                                                                                                              
@@ -280,7 +280,8 @@ funcprefix : FUNCTION id_opt {
                             *p_quad = currQuad; 
                             push(quad_stack, p_quad);
                             emit(jump, NULL, NULL, NULL, -1, yylineno);
-                            emit(funcstart, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
+                            if($$ != NULL) 
+                                emit(funcstart, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
                             }
                             ;
 
