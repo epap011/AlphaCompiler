@@ -190,8 +190,8 @@ objectdef   : "[" indexed "]" {manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRIN
             | "[" elist   "]" {manage_objectdef_lbrace_elist_rbrace  (DEBUG_PRINT, yyout);}
             ;
 
-elist       : /* empty */       {fprintf(yyout, MAG "Detected :" RESET"elist"YEL" (empty)"RESET"\n");}
-            | expr com_expr_opt {fprintf(yyout, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");}
+elist       : /* empty */       {manage_elist_empty          (DEBUG_PRINT, yyout);}
+            | expr com_expr_opt {manage_elist_expr_comexpropt(DEBUG_PRINT, yyout);}
             ;
             
 indexed     : indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");}

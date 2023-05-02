@@ -612,3 +612,13 @@ expr* manage_objectdef_lbrace_elist_rbrace  (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");
     return NULL;
 }
+
+expr* manage_elist_empty(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"elist"YEL" (empty)"RESET"\n");
+    return NULL;
+}
+
+expr* manage_elist_expr_comexpropt(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");
+    return NULL;
+}
