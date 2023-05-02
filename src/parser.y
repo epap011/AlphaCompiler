@@ -194,7 +194,7 @@ elist       : /* empty */       {manage_elist_empty          (DEBUG_PRINT, yyout
             | expr com_expr_opt {manage_elist_expr_comexpropt(DEBUG_PRINT, yyout);}
             ;
             
-indexed     : indexedelem com_indexedelem_opt {fprintf(yyout, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");}
+indexed     : indexedelem com_indexedelem_opt {manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout);}
             ;
 
 indexedelem     : "{" expr ":" expr "}" {fprintf(yyout, MAG "Detected :" RESET"{ expr : expr }"CYN" ->"RESET" indexedelem \n");}

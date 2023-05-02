@@ -104,4 +104,6 @@ expr* manage_objectdef_lbrace_elist_rbrace  (int debug, FILE* out);
 expr* manage_elist_empty          (int debug, FILE* out);
 expr* manage_elist_expr_comexpropt(int debug, FILE* out);
 
+expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out);
+
 #endif /* MANAGE_PARSER_H */

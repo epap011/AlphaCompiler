@@ -622,3 +622,8 @@ expr* manage_elist_expr_comexpropt(int debug, FILE* out) {
     if(debug) fprintf(yyout, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");
     return NULL;
 }
+
+expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");
+    return NULL;
+}
