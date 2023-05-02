@@ -42,6 +42,10 @@ int main(int argc, char** argv) {
     symTable = symbol_table_create();
     insert_lib_functions(symTable);
     yyparse();
+    
+    //debug
+    printf("\n----------- Quads -----------\n");
+    printQuads();
 
     symbol_table_print(symTable);
     fseek(out_file, 0, SEEK_SET);

@@ -81,7 +81,7 @@
 %type<stringVal> id_opt com_id_opt
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
-%type<exprVal>   expr const lvalue member
+%type<exprVal>   expr assignexpr const lvalue member
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -117,19 +117,19 @@ stmt        : expr ";"      {manage_stmt_expr      (DEBUG_PRINT, yyout);}
 
 expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
             | term          {manage_expr_term      (DEBUG_PRINT, yyout);}
-            | expr "+" expr {manage_expr_plus_expr (DEBUG_PRINT, yyout, $1, $3);}
-            | expr "*" expr {manage_expr_mul_expr  (DEBUG_PRINT, yyout, $1, $3);}
-            | expr "-" expr {manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3);}
-            | expr "/" expr {manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3);}
-            | expr "%" expr {manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3);}
-            | expr EQ expr  {manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3);}
-            | expr NEQ expr {manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3);}
-            | expr GT expr  {manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3);}
-            | expr LT expr  {manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3);}
-            | expr GTE expr {manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3);}
-            | expr LTE expr {manage_expr_lte_expr  (DEBUG_PRINT, yyout, $1, $3);}
-            | expr AND expr {manage_expr_and_expr  (DEBUG_PRINT, yyout, $1, $3);}
-            | expr OR expr  {manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3);}
+            | expr "+" expr {$$ = manage_expr_plus_expr (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "*" expr {$$ = manage_expr_mul_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "-" expr {$$ = manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "/" expr {$$ = manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "%" expr {$$ = manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr EQ expr  {$$ = manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr NEQ expr {$$ = manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr GT expr  {$$ = manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr LT expr  {$$ = manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr GTE expr {$$ = manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr LTE expr {$$ = manage_expr_lte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr AND expr {$$ = manage_expr_and_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr OR expr  {$$ = manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             ;                   
 
 term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, yyout);}
@@ -142,7 +142,7 @@ term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, 
             | primary               {manage_term_primary          (DEBUG_PRINT, yyout);}
             ;   
 
-assignexpr  : lvalue "=" expr       {manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
+assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
             ;   
 
 primary     : lvalue                {manage_primary_lvalue           (DEBUG_PRINT, yyout);}

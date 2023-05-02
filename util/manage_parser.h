@@ -41,19 +41,19 @@ void manage_stmt_semicolon (int debug, FILE* out);
 
 void manage_expr_assignexpr(int debug, FILE* out);
 void manage_expr_term      (int debug, FILE* out);
-void manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_div_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_mod_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_eq_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_neq_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_gt_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_lt_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_gte_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_lte_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2);
-void manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2);
+expr* manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_div_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_mod_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_eq_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_neq_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_gt_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_lt_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_gte_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_lte_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 
 void manage_term_lpar_expr_rpar   (int debug, FILE* out);
 void manage_term_uminus_expr      (int debug, FILE* out);
@@ -64,7 +64,7 @@ void manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, 
 void manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line);
 void manage_term_primary          (int debug, FILE* out);
 
-void manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, expr* expr1, unsigned int scope, unsigned int line);
+expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, expr* expr1, unsigned int scope, unsigned int line);
 
 void manage_primary_lvalue           (int debug, FILE* out);
 void manage_primary_call             (int debug, FILE* out);
