@@ -32,6 +32,9 @@
     extern unsigned int functionLocalOffset;
     extern unsigned int formalArgOffset;
     extern unsigned int scopeSpaceCounter; //determines current offset
+    
+    extern unsigned int currQuad;
+    Stack *quad_stack;   //for quad labels
 %}
 
 %start program
@@ -258,8 +261,10 @@ funcdef         : funcprefix
                                                 //An einai null paei na pei oti einai i periptwsi pou uparxei idi sunartisi me auto to onoma (i lib) kai epomenos to agnooume (glitonei kai to seg :D)
                                                             if($1 != NULL) $1->totalLocals = currScopeOffset(); 
                                                             exitScopeSpace();
-
                                                             restoreCurrScopeOffset(*(unsigned int *)pop(scope_offset_stack));
+
+                                                            emit(funcend, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
+                                                            patchLabel(*(unsigned int *)pop(quad_stack), nextQuadLabel() +1);
                                                          }
                                                                                                              
                                                                                             
@@ -276,6 +281,13 @@ funcprefix : FUNCTION id_opt {
                             //Kanoume to manage edw giati olokliros o kanonas anagetai otan kleisei to block
                             //alla emeis theloume na mpenei sto symbol table molis tin doume
                             $$ = manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
+                             
+                            if(!quad_stack) quad_stack = new_stack();
+                            unsigned int *p_quad = (unsigned int*)malloc(sizeof(unsigned int));
+                            *p_quad = currQuad; 
+                            push(quad_stack, p_quad);
+                            emit(jump, NULL, NULL, NULL, -1, yylineno);
+                            emit(funcstart, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
                             }
                             ;
 

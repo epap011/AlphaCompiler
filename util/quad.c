@@ -45,7 +45,7 @@ void printQuads(){
     for(i = 0; i < currQuad; i++){
         printf("%d: OP: "BLU"%s"RESET"\t", i + 1, iopcode_tostring(quads[i].op));
         if(quads[i].result != NULL){
-            if(quads[i].result->type == var_e)
+            if(quads[i].result->type == var_e || quads[i].result->type == programfunc_e)
                 printf(" RESULT: "YEL"%s"RESET"\t", quads[i].result->sym->name);
         }
         else
