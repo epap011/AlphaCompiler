@@ -586,3 +586,9 @@ expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out) {
     if(debug) fprintf(yyout, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");
     return NULL;
 }
+
+expr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normallcall_skip) {
+    if(debug) fprintf(yyout, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");
+    *normallcall_skip = 1;
+    return NULL;
+}

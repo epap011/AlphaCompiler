@@ -179,7 +179,7 @@ callsuffix  : normcall   {manage_callsuffix_normcall  (DEBUG_PRINT, yyout);}
 normcall    : "(" elist ")" {manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout);}
             ;
 
-methodcall  : ".." IDENT "(" elist ")" {fprintf(yyout, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");normcall_skip = 1;}
+methodcall  : ".." IDENT "(" elist ")" {manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip);}
             ;
 
 com_expr_opt : /* empty */             {fprintf(yyout, MAG "Detected :" RESET"com_expr_opt"YEL" (empty) "RESET"\n");}

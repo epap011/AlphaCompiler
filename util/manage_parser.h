@@ -93,4 +93,6 @@ expr* manage_callsuffix_methodcall(int debug, FILE* out);
 
 expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out);
 
+expr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normcall_skip);
+
 #endif /* MANAGE_PARSER_H */
