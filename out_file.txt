@@ -1,0 +1,23 @@
+
+-----------------------------
+
+
+-------- Scope #0 --------
+
+ [33mprint             [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33minput             [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mobjectmemberkeys  [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mobjecttotalmembers[0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mobjectcopy        [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mtotalarguments    [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33margument          [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mtypeof            [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mstrtonum          [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33msqrt              [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mcos               [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33msin               [0m [34m[[0mlibrary function[34m][0m (line: [32m0 [0m) (scope [32m0 [0m) (iaddress: [32m0 [0m) (totalLocals [32m0 [0m) 
+ [33mx                 [0m [34m[[0mglobal variable [34m][0m (line: [32m1 [0m) (scope [32m0 [0m) (space   : [32m0 [0m) (offset [32m0 [0m) 
+ [33m_t0               [0m [34m[[0mglobal variable [34m][0m (line: [32m1 [0m) (scope [32m0 [0m) (space   : [32m0 [0m) (offset [32m1 [0m) 
+ [33m_t1               [0m [34m[[0mglobal variable [34m][0m (line: [32m1 [0m) (scope [32m0 [0m) (space   : [32m0 [0m) (offset [32m2 [0m) 
+
+

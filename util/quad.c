@@ -59,36 +59,44 @@ void printQuads(){
     for(i = 0; i < currQuad; i++){
         printf("%-2d: OP: "BLU"%-12s"RESET"\t", i + 1, iopcode_tostring(quads[i].op));
         if(quads[i].result != NULL){
-            if(quads[i].result->type == var_e || quads[i].result->type == programfunc_e)
+            if(quads[i].result->type == var_e || quads[i].result->type == programfunc_e )
                 printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->sym->name);
         }
         else
             printf(" RESULT: "RED"NULL           "RESET"\t");        
         if(quads[i].arg1 != NULL){
-            if(quads[i].arg1->type == var_e)
+            if(quads[i].arg1->type == var_e )
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else if(quads[i].arg1->type == constnum_e)
                 printf(" ARG1: "YEL"%-15.2f"RESET"\t", quads[i].arg1->numConst);
             else if(quads[i].arg1->type == constbool_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->boolConst ? "true" : "false");
             else if(quads[i].arg1->type == conststring_e)
-                printf(" ARG1: "YEL"\"%-15s\""RESET"\t", quads[i].arg1->strConst);
+                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->strConst);
             else if(quads[i].arg1->type == nil_e)
                 printf(" ARG1: "YEL"nil            "RESET"\t");
+            else if(quads[i].arg1->type == tableitem_e)
+                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->index->strConst);
+            else 
+                printf("AAAAAAA edw\n");
         }
         else
             printf(" ARG1: "RED"NULL           "RESET"\t");
         if(quads[i].arg2 != NULL){
-            if(quads[i].arg2->type == var_e)
+            if(quads[i].arg2->type == var_e )
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else if(quads[i].arg2->type == constnum_e)
                 printf(" ARG2: "YEL"%-15.2f"RESET"\t", quads[i].arg2->numConst);
             else if(quads[i].arg2->type == constbool_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->boolConst ? "true" : "false");
             else if(quads[i].arg2->type == conststring_e)
-                printf(" ARG2: "YEL"\"%-15s\""RESET"\t", quads[i].arg2->strConst);
+                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->strConst);
             else if(quads[i].arg2->type == nil_e)
                 printf(" ARG2: "YEL"nil            "RESET"\t");
+            else if(quads[i].arg1->type == tableitem_e)
+                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg1->index->strConst);
+                else 
+                printf("AAAAAAA edw\n");
         }
         else
             printf(" ARG2: "RED"NULL           "RESET"\t");

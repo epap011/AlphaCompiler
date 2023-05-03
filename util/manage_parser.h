@@ -68,7 +68,7 @@ void manage_term_primary          (int debug, FILE* out);
 
 expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, expr* expr1, unsigned int scope, unsigned int line);
 
-void manage_primary_lvalue           (int debug, FILE* out);
+expr* manage_primary_lvalue(int debug, FILE* out, expr* lvalue, unsigned int scope, unsigned int line);
 void manage_primary_call             (int debug, FILE* out);
 void manage_primary_objectdef        (int debug, FILE* out);
 void manage_primary_lpar_funcdef_rpar(int debug, FILE* out);
@@ -79,7 +79,7 @@ expr* manage_lvalue_local_ident (int debug, FILE* out, SymbolTable* symTable, ch
 expr* manage_lvalue_global_ident(int debug, FILE* out, SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 expr* manage_lvalue_member      (int debug, FILE* out, expr* member);
 
-expr* manage_memeber_lvalue_dot_ident   (int debug, FILE* out, expr* lvalue, int* normalcall_skip);
+expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, char* name, unsigned int scope, unsigned int line, int* normalcall_skip);
 expr* manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr1);
 expr* manage_member_call_dot_ident      (int debug, FILE* out, expr* call,  char* id, int* normalcall_skip);
 expr* manage_member_call_lbr_expr_rbr   (int debug, FILE* out, expr* call, expr* expr1);

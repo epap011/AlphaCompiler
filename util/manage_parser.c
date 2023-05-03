@@ -424,8 +424,10 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
     return NULL;
 }
 
-void manage_primary_lvalue(int debug, FILE* out) {
+expr* manage_primary_lvalue(int debug, FILE* out, expr* lvalue, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");
+
+    return emit_if_tableitem(lvalue, scope, line);
 }
 
 void manage_primary_call(int debug, FILE* out) {
@@ -521,10 +523,12 @@ expr* manage_lvalue_member(int debug, FILE* out, expr* member) {
     return member;
 }
 
-expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, int* normalcall_skip) {
+expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, char* name, unsigned int scope, unsigned int line, int* normalcall_skip) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");
     *normalcall_skip = 1;
-    return NULL;
+
+
+    return new_member_item(lvalue, name, scope, line);
 }
 
 expr* manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr1) {
