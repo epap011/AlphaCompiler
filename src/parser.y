@@ -162,8 +162,8 @@ lvalue      : IDENT                 {$$ = manage_lvalue_ident       (DEBUG_PRINT
             ;   
 
 member      : lvalue "." IDENT      {$$ = manage_memeber_lvalue_dot_ident   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno, &normcall_skip);}
-            | lvalue "[" expr "]"   {     manage_memeber_lvalue_lbr_expr_rbr(DEBUG_PRINT, yyout, $1, $3);}
-            | call "." IDENT        {$$ = manage_member_call_dot_ident      (DEBUG_PRINT, yyout, $1, $3, &normcall_skip);}
+            | lvalue "[" expr "]"   {     manage_memeber_lvalue_lbr_expr_rbr(DEBUG_PRINT, yyout, $1, $3, &$$, scope, yylineno);} /*dollar assignment happens in function*/
+            | call "." IDENT        {$$ = manage_member_call_dot_ident      (DEBUG_PRINT, yyout, $1, $3, &normcall_skip);} 
             | call "[" expr "]"     {     manage_member_call_lbr_expr_rbr   (DEBUG_PRINT, yyout, $1, $3);}
             ;
 

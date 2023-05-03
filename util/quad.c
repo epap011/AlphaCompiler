@@ -32,8 +32,10 @@ void emit(enum iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label,
 }
 
 expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
-    if(e->type != tableitem_e)
+    if(e->type != tableitem_e){
+        printf("Gurnaw\n");
         return e;
+}
     else{
         expr* result = new_expr(var_e);
         //new temp symbol
@@ -41,6 +43,7 @@ expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
         incCurrScopeOffset();
 
         emit(tablegetelem, e, e->index, result, nextQuadLabel(), yylineno);
+        printf("Ekana emit re\n");
         return result;
     }
 }
@@ -78,7 +81,7 @@ void printQuads(){
             else if(quads[i].arg1->type == tableitem_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else 
-                printf("AAAAAAA kati paei lathos sta quads\n");
+                printf("ARG1: kati paei lathos sta quads");
         }
         else
             printf(" ARG1: "RED"NULL           "RESET"\t");
@@ -96,7 +99,7 @@ void printQuads(){
             else if(quads[i].arg2->type == tableitem_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else 
-                printf("AAAAAAA kati paei lathos sta quads\n");
+                printf("ARG2: kati paei lathos sta quads\n");
         }
         else
             printf(" ARG2: "RED"NULL           "RESET"\t");

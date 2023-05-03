@@ -427,6 +427,8 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
 expr* manage_primary_lvalue(int debug, FILE* out, expr* lvalue, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");
 
+    printf("Ela re mpika me %s\n",lvalue->sym->name);
+
     return emit_if_tableitem(lvalue, scope, line);
 }
 
@@ -531,9 +533,15 @@ expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, char* 
     return new_member_item(lvalue, name, scope, line);
 }
 
-expr* manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr1) {
+void manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr_list, expr** tableitem, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue [ expr ]"CYN" ->"RESET" member \n");
-    return NULL;
+    
+    printf("Mpenw twra me %s\n",lvalue->sym->name);
+    lvalue = emit_if_tableitem(lvalue,scope,line);
+    (*tableitem) = new_expr(tableitem_e);
+    (*tableitem)->sym = lvalue->sym;
+    (*tableitem)->index = expr_list;
+    
 }
 
 expr* manage_member_call_dot_ident(int debug, FILE* out, expr* call, char* id, int* normalcall_skip) {

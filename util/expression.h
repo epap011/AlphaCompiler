@@ -12,10 +12,11 @@ enum expr_t{
     programfunc_e,    //symbol
     libraryfunc_e,    //symbol
 
-    arithexpr_e, 
-    boolexpr_e,
-    assignexpr_e,
-    newtable_e,
+    arithexpr_e,      //unused
+    boolexpr_e,       //unused
+    assignexpr_e,     //unused
+
+    newtable_e,      //table create
 
     constnum_e,
     constbool_e,
