@@ -12,7 +12,7 @@ enum expr_t{
     programfunc_e,    //symbol
     libraryfunc_e,    //symbol
 
-    arithexpr_e,      //unused
+    arithexpr_e,      //hidden var - arithop
     boolexpr_e,       //unused
     assignexpr_e,     //unused
 
