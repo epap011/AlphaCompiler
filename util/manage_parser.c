@@ -275,34 +275,49 @@ expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, uns
     return NULL;
 }
 
+expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
+    expr* result = NULL;
+
+    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
+        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
+        
+        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        result = new_expr(arithexpr_e);
+        result->sym = tmp_symbol;
+        emit(op, expr1, expr2, result, -1, line);
+    }
+
+    return result;
+}
+
 expr* manage_expr_plus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr + expr"CYN" ->"RESET" expr \n");
 
-    return manage_arith_relop_emits(expr1, expr2, scope, line, add);
+    return manage_arithop_emits(expr1, expr2, scope, line, add);
 }
 
 expr* manage_expr_mul_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr * expr"CYN" ->"RESET" expr \n");
     
-    return manage_arith_relop_emits(expr1, expr2, scope, line, mul);
+    return manage_arithop_emits(expr1, expr2, scope, line, mul);
 }
 
 expr* manage_expr_minus_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr - expr"CYN" ->"RESET" expr \n");
 
-    return manage_arith_relop_emits(expr1, expr2, scope, line, sub);
+    return manage_arithop_emits(expr1, expr2, scope, line, sub);
 }
 
 expr* manage_expr_div_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr / expr"CYN" ->"RESET" expr \n");
 
-    return manage_arith_relop_emits(expr1, expr2, scope, line, i_div);
+    return manage_arithop_emits(expr1, expr2, scope, line, i_div);
 }
 
 expr* manage_expr_mod_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr MOD expr"CYN" ->"RESET" expr \n");
  
-    return manage_arith_relop_emits(expr1, expr2, scope, line, mod);
+    return manage_arithop_emits(expr1, expr2, scope, line, mod);
 }
 
 expr* manage_expr_eq_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
