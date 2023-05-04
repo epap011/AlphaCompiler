@@ -137,7 +137,7 @@ expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
             ;                   
 
 term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, yyout); $$ = $2;}
-            | "-" expr %prec UMINUS {manage_term_uminus_expr      (DEBUG_PRINT, yyout); $2->numConst = -$2->numConst;  $$ = $2;}
+            | "-" expr %prec UMINUS {manage_term_uminus_expr      (DEBUG_PRINT, yyout, $2, yylineno); $$ = $2;}
             | NOT expr              {manage_term_not_expr         (DEBUG_PRINT, yyout); $$ = $2;}
             | "++" lvalue           {manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
             | lvalue "++"           {manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
