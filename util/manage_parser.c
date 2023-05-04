@@ -406,17 +406,23 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
                     return NULL;
                 }
                 else{
-                    emit(assign, expr1, NULL, lvalue, -1, line);
+                    
+                    if(lvalue->type == tableitem_e){
+                        emit(tablesetelem, lvalue->index, expr1, lvalue, -1, line);
+                        return emit_if_tableitem(lvalue, scope, line);
+                    }
+                    else{
+                        emit(assign, expr1, NULL, lvalue, -1, line);
+                        //Creating an extra hidden var to store lvalue (FAQ : 18)
+                        expr* result;
+                        result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
+                        incCurrScopeOffset();
+                        emit(assign, lvalue, NULL, result, -1, line);
 
-                    //Creating an extra hidden var to store lvalue (FAQ : 18)
-                    expr* result;
-                    result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-                    incCurrScopeOffset();
-                    emit(assign, lvalue, NULL, result, -1, line);
+                        lvalue->hidden_var = result; //making the lvalue point to the hidden var (to find it when we need it)
 
-                    lvalue->hidden_var = result; //making the lvalue point to the hidden var (to find it when we need it)
-
-                    return lvalue;
+                        return result;  //if something breaks change this to lvalue
+                    }
                 }
             }
         }
@@ -426,8 +432,6 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
 
 expr* manage_primary_lvalue(int debug, FILE* out, expr* lvalue, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue"CYN" ->"RESET" primary \n");
-
-    printf("Ela re mpika me %s\n",lvalue->sym->name);
 
     return emit_if_tableitem(lvalue, scope, line);
 }
@@ -536,7 +540,6 @@ expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, char* 
 void manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr_list, expr** tableitem, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue [ expr ]"CYN" ->"RESET" member \n");
     
-    printf("Mpenw twra me %s\n",lvalue->sym->name);
     lvalue = emit_if_tableitem(lvalue,scope,line);
     (*tableitem) = new_expr(tableitem_e);
     (*tableitem)->sym = lvalue->sym;

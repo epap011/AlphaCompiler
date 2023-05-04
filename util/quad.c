@@ -32,10 +32,9 @@ void emit(enum iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label,
 }
 
 expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
-    if(e->type != tableitem_e){
-        printf("Gurnaw\n");
+    if(e->type != tableitem_e)
         return e;
-}
+
     else{
         expr* result = new_expr(var_e);
         //new temp symbol
@@ -43,7 +42,6 @@ expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
         incCurrScopeOffset();
 
         emit(tablegetelem, e, e->index, result, nextQuadLabel(), yylineno);
-        printf("Ekana emit re\n");
         return result;
     }
 }
@@ -62,7 +60,7 @@ void printQuads(){
     for(i = 0; i < currQuad; i++){
         printf("%-2d: OP: "BLU"%-12s"RESET"\t", i + 1, iopcode_tostring(quads[i].op));
         if(quads[i].result != NULL){
-            if(quads[i].result->type == var_e || quads[i].result->type == programfunc_e )
+            if(quads[i].result->type == var_e || quads[i].result->type == programfunc_e || quads[i].result->type == tableitem_e)
                 printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->sym->name);
         }
         else
