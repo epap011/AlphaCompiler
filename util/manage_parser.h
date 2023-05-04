@@ -26,6 +26,7 @@ void manage_return(int line, int flag);
 int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 int is_id_built_in_function(const char* id);
 int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int scope);
+int convert_to_bool(expr* expr);
 
 void manage_program        (int debug, FILE* out);
 
@@ -46,6 +47,7 @@ void manage_expr_term      (int debug, FILE* out);
 expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_arithop_emits    (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_relop_emits      (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
+expr* manage_boolop_emits     (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 
 expr* manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);

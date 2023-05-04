@@ -304,6 +304,29 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
 
 expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
     expr* result = NULL;
+    //int constbool_exists = (expr1->type == constbool_e || expr2->type == constbool_e);
+    
+    expr1->boolConst  = convert_to_bool(expr1);
+    expr2->boolConst  = convert_to_bool(expr2);
+
+    //An DEN exoume kati apo ta (==,!=) kai parallila toulaxiston ena apo ta 2 expr einai boolean, tote einai error.
+    //p.x den mporeis na peis 3 > true. Alla 3 == true mporeis na to peis.
+    if (op != if_eq && op != if_noteq) {
+        if(expr1->type == constbool_e || expr2->type == constbool_e) {
+            fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
+            return NULL;
+        }
+    }
+
+
+    // //Isws xreiazetai kapoia skepsi.. p.x sto 1 == true, exetazoume to 1 san true h san 1?An eixame 1 and/or true to 1 tha to kaname true,
+    // //isxuei omws to idio kai gia to == / != ?
+    // if (op == if_eq || op == if_noteq) {
+    //     if(constbool_exists) {
+            
+
+    //     }
+    // }
 
     if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
         (expr2->type == var_e || expr2->type == constnum_e || expr2->type == constbool_e ||expr1->type == boolexpr_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
@@ -314,14 +337,46 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
         result = new_expr(boolexpr_e);
         result->sym = tmp_symbol;
         
-        emit(op, expr1, expr2, result, nextQuadLabel()+3, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+4, line);
-        emit(assign, new_const_bool(1), NULL, result, -1, line);
+        emit(op, expr1, expr2, result, nextQuadLabel()+2, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
+        emit(assign, new_const_bool(1), NULL, result, -1, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
         emit(assign, new_const_bool(0), NULL, result, -1, line);
     }
     else {
         fprintf(out_file, RED"Error:"RESET" Invalid operands for relation operation (line: "GRN"%d"RESET")\n", line);
+    }
+    return result;
+}
+
+expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
+    expr* result = NULL;
+
+    expr1->boolConst = convert_to_bool(expr1);
+    expr2->boolConst = convert_to_bool(expr2);
+
+    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
+        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == constbool_e ||expr1->type == boolexpr_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
+        
+        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
+
+        result = new_expr(boolexpr_e);
+        result->sym = tmp_symbol;
+
+        expr* true_expr = new_expr(constbool_e);
+        true_expr->boolConst = 1;
+        
+        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
+        emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emmit prepei na lifthei ipopsi to const bool kai tws 2 expr
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
+        emit(assign, new_const_bool(1), NULL, result, -1, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+        emit(assign, new_const_bool(0), NULL, result, -1, line);
+    }
+    else {
+        fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
     }
     return result;
 }
@@ -395,13 +450,13 @@ expr* manage_expr_lte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsig
 expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");
  
-    return manage_arith_relop_emits(expr1, expr2, scope, line, and);
+    return manage_boolop_emits(expr1, expr2, scope, line, and);
 }
 
 expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");
     
-    return manage_arith_relop_emits(expr1, expr2, scope, line, or); 
+    return manage_boolop_emits(expr1, expr2, scope, line, or); 
 }
 /**End of Arithmetic / relop**/
 
@@ -755,4 +810,27 @@ expr* manage_stmtList_empty(int debug, FILE* out) {
 expr* manage_stmtList_stmt_stmtList(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");
     return NULL;
+}
+
+int convert_to_bool(expr* expr) {
+    switch(expr->type) {
+        case constbool_e:
+            return expr->boolConst;
+        case conststring_e:
+            if(strcmp(expr->strConst, "") == 0) return 0;
+            else return 1;
+        case constnum_e:
+            if(expr->numConst == 0) return 0;
+            else return 1;
+        case nil_e:
+            return 0;
+        case newtable_e:
+            return 1;
+        case programfunc_e:
+            return 1;
+        case libraryfunc_e:
+            return 1;
+        default:
+            return -1;
+    }
 }

@@ -260,7 +260,7 @@ funcdef         : funcprefix
                                                             restoreCurrScopeOffset(*(unsigned int *)pop(scope_offset_stack));
 
                                                             if($$ != NULL) emit(funcend, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
-                                                            patchLabel(*(unsigned int *)pop(quad_stack), nextQuadLabel() +1);
+                                                            patchLabel(*(unsigned int *)pop(quad_stack), nextQuadLabel());
                                                          }
                                                                                                              
                                                                                             

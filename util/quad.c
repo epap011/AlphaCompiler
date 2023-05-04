@@ -127,7 +127,7 @@ void printQuads(){
         if (quads[i].label == -1)
             printf(" LABEL: UNSET\t");
         else
-            printf(" LABEL: %d  \t", quads[i].label);
+            printf(" LABEL: %d  \t", quads[i].label+1);
         printf("LINE: "GRN"%d"RESET"\n", quads[i].line);
     }
 }
