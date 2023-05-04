@@ -282,6 +282,32 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
         (expr2->type == var_e || expr2->type == constnum_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
         
         Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        
+        if(expr1->type == constnum_e && expr2->type == constnum_e) {
+            result = new_expr(constnum_e);
+            result->numConst = expr1->numConst + expr2->numConst;
+        }
+        else {
+            result = new_expr(arithexpr_e);
+        }
+        result->sym = tmp_symbol;
+        
+        emit(op, expr1, expr2, result, -1, line);
+    }
+    else {
+        fprintf(out_file, RED"Error:"RESET" Invalid operands for arithmetic operation (line: "GRN"%d"RESET")\n", line);
+    }
+
+    return result;
+}
+
+expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
+    expr* result = NULL;
+
+    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
+        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
+        
+        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
         result = new_expr(arithexpr_e);
         result->sym = tmp_symbol;
         emit(op, expr1, expr2, result, -1, line);

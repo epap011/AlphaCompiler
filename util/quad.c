@@ -62,6 +62,8 @@ void printQuads(){
         if(quads[i].result != NULL){
             if(quads[i].result->type == var_e || quads[i].result->type == programfunc_e || quads[i].result->type == tableitem_e || quads[i].result->type == arithexpr_e)
                 printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->sym->name);
+            else if(quads[i].result->type == constnum_e)
+                printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->sym->name);
         }
         else
             printf(" RESULT: "RED"NULL           "RESET"\t");        
