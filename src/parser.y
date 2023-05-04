@@ -85,7 +85,9 @@
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr assignexpr term const lvalue member call primary
-%type<exprVal>   objectdef elist indexed com_expr_opt
+%type<exprVal>   objectdef
+%type<exprVal>   elist com_expr_opt
+%type<exprVal>   indexedelem com_indexedelem_opt indexed
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -187,7 +189,7 @@ com_expr_opt : /* empty */             {$$ = manage_comexpropt_empty            
              | COMMA expr com_expr_opt {$$ = manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout, $2, $3);}
              ;
 
-objectdef   : "[" indexed "]" {manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRINT, yyout);}
+objectdef   : "[" indexed "]" {$$ = manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRINT, yyout, $2, scope, yylineno);}
             | "[" elist   "]" {$$ = manage_objectdef_lbrace_elist_rbrace(DEBUG_PRINT, yyout,$2, scope, yylineno);}
             ;
 
@@ -195,14 +197,14 @@ elist       : /* empty */       {$$ = manage_elist_empty          (DEBUG_PRINT, 
             | expr com_expr_opt {$$ = manage_elist_expr_comexpropt(DEBUG_PRINT, yyout, $1, $2);}
             ;
             
-indexed     : indexedelem com_indexedelem_opt {manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout);}
+indexed     : indexedelem com_indexedelem_opt {$$ = manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout, $1, $2);}
             ;
 
-indexedelem     : "{" expr ":" expr "}" {manage_indexedele_lcbrace_expr_colon_expr_rcbrace(DEBUG_PRINT, yyout);}
+indexedelem     : "{" expr ":" expr "}" {$$ = manage_indexedele_lcbrace_expr_colon_expr_rcbrace(DEBUG_PRINT, yyout, $2, $4);}
                 ;
 
-com_indexedelem_opt : /* empty */                         {manage_comindexedelemopt_empty(DEBUG_PRINT, yyout);}
-                    | "," indexedelem com_indexedelem_opt {manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout);}
+com_indexedelem_opt : /* empty */                         {$$ = manage_comindexedelemopt_empty(DEBUG_PRINT, yyout);} //NULL
+                    | "," indexedelem com_indexedelem_opt {$$ = manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout, $2, $3);}
                     ;
 
 block           : "{" {increase_scope(&scope); 

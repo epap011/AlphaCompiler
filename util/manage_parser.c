@@ -677,9 +677,19 @@ expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out, expr* expr1,
     return expr1;
 }
 
-expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out) {
+expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out, expr* indexed, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"[ indexed ]"CYN" ->"RESET" objectdef \n");
-    return NULL;
+
+    expr* t = new_expr(newtable_e);
+    //create new temp
+    t->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+
+    emit(tablecreate, NULL, NULL, t, -1, line);
+    for(; indexed; indexed = indexed->next)
+        emit(tablesetelem, indexed, indexed->index, t, -1, line);
+
+    return t;
 }
 
 expr* manage_objectdef_lbrace_elist_rbrace(int debug, FILE* out, expr* elist, unsigned int scope, unsigned int line) {
@@ -709,14 +719,19 @@ expr* manage_elist_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_
     return expr1;
 }
 
-expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out) {
+expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out, expr* indexedelem, expr* com_indexedelem_opt) {
     if(debug) fprintf(out, MAG "Detected :" RESET"indexedelem com_indexedelem_opt"CYN" ->"RESET" indexed \n");
-    return NULL;
+
+    indexedelem->next = com_indexedelem_opt;
+    return indexedelem;
 }
 
-expr* manage_indexedele_lcbrace_expr_colon_expr_rcbrace(int debug, FILE* out) {
+expr* manage_indexedele_lcbrace_expr_colon_expr_rcbrace(int debug, FILE* out, expr* index, expr* value) {
     if(debug) fprintf(out, MAG "Detected :" RESET"{ expr : expr }"CYN" ->"RESET" indexedelem \n");
-    return NULL;
+    
+    index->index = value;
+
+    return index;
 }
 
 expr* manage_comindexedelemopt_empty(int debug, FILE* out) {
@@ -724,9 +739,11 @@ expr* manage_comindexedelemopt_empty(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(int debug, FILE* out) {
+expr* manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(int debug, FILE* out, expr* indexedelem, expr* com_indexedelem_opt) {
     if(debug) fprintf(out, MAG "Detected :" RESET", indexedelem com_indexedelem_opt \n");
-    return NULL;
+
+    indexedelem->next = com_indexedelem_opt;
+    return indexedelem;
 }
 
 expr* manage_stmtList_empty(int debug, FILE* out) {

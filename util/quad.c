@@ -71,6 +71,8 @@ void printQuads(){
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else if(quads[i].arg1->type == arithexpr_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
+            else if (quads[i].arg1->type == libraryfunc_e || quads[i].arg1->type == programfunc_e)
+                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else if(quads[i].arg1->type == constnum_e) {
                 if(quads[i].arg1->sym != NULL)
                     printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
@@ -98,6 +100,8 @@ void printQuads(){
             if(quads[i].arg2->type == var_e )
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else if(quads[i].arg2->type == arithexpr_e)
+                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
+            else if (quads[i].arg2->type == libraryfunc_e || quads[i].arg2->type == programfunc_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else if(quads[i].arg2->type == constnum_e) {
                 if(quads[i].arg2->sym != NULL)
