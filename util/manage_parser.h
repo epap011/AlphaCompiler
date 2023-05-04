@@ -62,7 +62,7 @@ expr* manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2, uns
 expr* manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 
 void manage_term_lpar_expr_rpar   (int debug, FILE* out);
-void manage_term_uminus_expr      (int debug, FILE* out, expr* u_expr, unsigned int line);
+expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int scope, unsigned int line);
 void manage_term_not_expr         (int debug, FILE* out);
 void manage_term_plusplus_lvalue  (int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line);
 void manage_term_lvalue_plusplus  (int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line);

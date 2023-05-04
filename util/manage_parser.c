@@ -409,15 +409,16 @@ void manage_term_lpar_expr_rpar(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"( expr )"CYN" ->"RESET" term \n");
 }
 
-void manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int line) {
+expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");
-    if(u_expr){
-        if (u_expr->type == constnum_e)
-            u_expr->numConst = -(u_expr->numConst);
-        else if(u_expr->type == var_e || 
-                u_expr->type == arithexpr_e)
-            emit(mul, new_const_num(-1), u_expr, u_expr, -1, line);
-    }
+    
+    expr *result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
+    emit(uminus, u_expr, NULL, result, -1, line);
+
+    result->numConst = -(u_expr->numConst);
+
+    return result;
+
 }
 
 void manage_term_not_expr(int debug, FILE* out) {
