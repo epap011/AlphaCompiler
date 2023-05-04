@@ -99,13 +99,13 @@ expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out);
 expr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normcall_skip);
 
 expr* manage_comexpropt_empty(int debug, FILE* out);
-expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out);
+expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt);
 
 expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out);
-expr* manage_objectdef_lbrace_elist_rbrace  (int debug, FILE* out);
+expr* manage_objectdef_lbrace_elist_rbrace(int debug, FILE* out, expr* elist, unsigned int scope, unsigned int line);
 
 expr* manage_elist_empty          (int debug, FILE* out);
-expr* manage_elist_expr_comexpropt(int debug, FILE* out);
+expr* manage_elist_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt);
 
 expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out);
 

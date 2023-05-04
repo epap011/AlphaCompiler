@@ -85,6 +85,7 @@
 %type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr assignexpr term const lvalue member call primary
+%type<exprVal>   objectdef elist indexed com_expr_opt
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -182,16 +183,16 @@ normcall    : "(" elist ")" {manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout)
 methodcall  : ".." IDENT "(" elist ")" {manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip);}
             ;
 
-com_expr_opt : /* empty */             {manage_comexpropt_empty                (DEBUG_PRINT, yyout);}
-             | COMMA expr com_expr_opt {manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout);}
+com_expr_opt : /* empty */             {$$ = manage_comexpropt_empty                (DEBUG_PRINT, yyout);} //NULL
+             | COMMA expr com_expr_opt {$$ = manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout, $2, $3);}
              ;
 
 objectdef   : "[" indexed "]" {manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRINT, yyout);}
-            | "[" elist   "]" {manage_objectdef_lbrace_elist_rbrace  (DEBUG_PRINT, yyout);}
+            | "[" elist   "]" {$$ = manage_objectdef_lbrace_elist_rbrace(DEBUG_PRINT, yyout,$2, scope, yylineno);}
             ;
 
-elist       : /* empty */       {manage_elist_empty          (DEBUG_PRINT, yyout);}
-            | expr com_expr_opt {manage_elist_expr_comexpropt(DEBUG_PRINT, yyout);}
+elist       : /* empty */       {$$ = manage_elist_empty          (DEBUG_PRINT, yyout);} //NULL
+            | expr com_expr_opt {$$ = manage_elist_expr_comexpropt(DEBUG_PRINT, yyout, $1, $2);}
             ;
             
 indexed     : indexedelem com_indexedelem_opt {manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout);}

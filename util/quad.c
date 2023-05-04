@@ -85,6 +85,8 @@ void printQuads(){
                 printf(" ARG1: "YEL"nil            "RESET"\t");
             else if(quads[i].arg1->type == tableitem_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
+            else if(quads[i].arg1->type == newtable_e)
+                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else 
                 printf("ARG1: kati paei lathos sta quads");
         }
@@ -94,7 +96,7 @@ void printQuads(){
             if(quads[i].arg2->type == var_e )
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else if(quads[i].arg2->type == arithexpr_e)
-                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
+                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else if(quads[i].arg2->type == constnum_e) {
                 if(quads[i].arg2->sym != NULL)
                     printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);

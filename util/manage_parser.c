@@ -654,9 +654,10 @@ expr* manage_comexpropt_empty(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out) {
+expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt) {
     if(debug) fprintf(out, MAG "Detected :" RESET"COMMA expr com_expr_opt \n");
-    return NULL;
+    expr1->next = com_expr_opt;
+    return expr1;
 }
 
 expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out) {
@@ -664,9 +665,19 @@ expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_objectdef_lbrace_elist_rbrace  (int debug, FILE* out) {
+expr* manage_objectdef_lbrace_elist_rbrace(int debug, FILE* out, expr* elist, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"[ elist ]"CYN" ->"RESET" objectdef \n");
-    return NULL;
+
+    expr* t = new_expr(newtable_e);
+    //create new temp
+    t->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+
+    emit(tablecreate, NULL, NULL, t, -1, line);
+    for(int i = 0; elist; elist = elist->next)
+        emit(tablesetelem, new_const_num(i++), elist, t, -1, line);
+    
+    return t;
 }
 
 expr* manage_elist_empty(int debug, FILE* out) {
@@ -674,9 +685,11 @@ expr* manage_elist_empty(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_elist_expr_comexpropt(int debug, FILE* out) {
+expr* manage_elist_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");
-    return NULL;
+    
+    expr1->next = com_expr_opt;
+    return expr1;
 }
 
 expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out) {

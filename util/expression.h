@@ -34,7 +34,7 @@ typedef struct expr{
     double numConst;
     char* strConst;
     unsigned char boolConst;
-    struct expr* next;
+    struct expr* next;          //for elist/indexed
 
     struct expr* hidden_var;
 
