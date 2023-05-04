@@ -79,6 +79,8 @@ void printQuads(){
             }
             else if(quads[i].arg1->type == constbool_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->boolConst ? "true" : "false");
+            else if(quads[i].arg1->type == boolexpr_e)
+                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else if(quads[i].arg1->type == conststring_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->strConst);
             else if(quads[i].arg1->type == nil_e)
@@ -105,6 +107,8 @@ void printQuads(){
             }
             else if(quads[i].arg2->type == constbool_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->boolConst ? "true" : "false");
+            else if(quads[i].arg1->type == boolexpr_e)
+                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else if(quads[i].arg2->type == conststring_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->strConst);
             else if(quads[i].arg2->type == nil_e)

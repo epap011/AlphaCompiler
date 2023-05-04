@@ -282,7 +282,8 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
         (expr2->type == var_e || expr2->type == constnum_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
         
         Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        
+        incCurrScopeOffset();
+
         if(expr1->type == constnum_e && expr2->type == constnum_e) {
             result = new_expr(constnum_e);
             result->numConst = expr1->numConst + expr2->numConst;
@@ -304,15 +305,24 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
 expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
     expr* result = NULL;
 
-    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
-        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
+    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
+        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == constbool_e ||expr1->type == boolexpr_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
         
         Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        result = new_expr(arithexpr_e);
-        result->sym = tmp_symbol;
-        emit(op, expr1, expr2, result, -1, line);
-    }
+        incCurrScopeOffset();
 
+        result = new_expr(boolexpr_e);
+        result->sym = tmp_symbol;
+        
+        emit(op, expr1, expr2, result, nextQuadLabel()+3, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+4, line);
+        emit(assign, new_const_bool(1), NULL, result, -1, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
+        emit(assign, new_const_bool(0), NULL, result, -1, line);
+    }
+    else {
+        fprintf(out_file, RED"Error:"RESET" Invalid operands for relation operation (line: "GRN"%d"RESET")\n", line);
+    }
     return result;
 }
 
@@ -349,37 +359,37 @@ expr* manage_expr_mod_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsig
 expr* manage_expr_eq_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr == expr"CYN" ->"RESET" expr \n");
 
-    return manage_arith_relop_emits(expr1, expr2, scope, line, if_eq);
+    return manage_relop_emits(expr1, expr2, scope, line, if_eq);
 }
 
 expr* manage_expr_neq_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr != expr"CYN" ->"RESET" expr \n");
     
-    return manage_arith_relop_emits(expr1, expr2, scope, line, if_noteq);
+    return manage_relop_emits(expr1, expr2, scope, line, if_noteq);
 }
 
 expr* manage_expr_gt_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr > expr"CYN" ->"RESET" expr \n");
    
-    return manage_arith_relop_emits(expr1, expr2, scope, line, if_greater);
+    return manage_relop_emits(expr1, expr2, scope, line, if_greater);
 }
 
 expr* manage_expr_lt_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr < expr"CYN" ->"RESET" expr \n");
    
-    return manage_arith_relop_emits(expr1, expr2, scope, line, if_less);
+    return manage_relop_emits(expr1, expr2, scope, line, if_less);
 }
 
 expr* manage_expr_gte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr >= expr"CYN" ->"RESET" expr \n");
   
-    return manage_arith_relop_emits(expr1, expr2, scope, line, if_greatereq);
+    return manage_relop_emits(expr1, expr2, scope, line, if_greatereq);
 }
 
 expr* manage_expr_lte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr <= expr"CYN" ->"RESET" expr \n");
     
-    return manage_arith_relop_emits(expr1, expr2, scope, line, if_lesseq);
+    return manage_relop_emits(expr1, expr2, scope, line, if_lesseq);
 }
 
 expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
