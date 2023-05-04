@@ -598,7 +598,7 @@ expr* manage_lvalue_ident(int debug, FILE* out, SymbolTable* symTable, char* id,
     }
 
     sym = symbol_table_scope_lookup(symTable, id, 0);//check global scope
-    if(sym != NULL) new_lvalue_expr(sym);  
+    if(sym != NULL) return new_lvalue_expr(sym);  
 
     char* name     = strdup(id);
     Symbol* symbol = symbol_create(name, scope, line, type, VAR, var_s, currScopeSpace(), currScopeOffset());
@@ -686,7 +686,7 @@ expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out) {
 expr* manage_call_lvalue_callsuffix(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n");
 
-    if(!normalcall_skip) {
+    if(!(*normalcall_skip)) {
         if(lvalue != NULL) {
             manage_func_call(symTable, lvalue->sym->name, scope, line);
         }
