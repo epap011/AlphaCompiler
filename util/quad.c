@@ -141,12 +141,12 @@ const char* iopcode_tostring(enum iopcode op){
         case and: return "and";
         case or: return "or";
         case not: return "not";
-        case if_eq: return "eq";
-        case if_noteq: return "neq";
-        case if_lesseq: return "leq";
-        case if_greatereq: return "geq";
-        case if_less: return "lt";
-        case if_greater: return "gt";
+        case if_eq: return "if_eq";
+        case if_noteq: return "if_noteq";
+        case if_lesseq: return "if_lesseq";
+        case if_greatereq: return "if_greatereq";
+        case if_less: return "if_less";
+        case if_greater: return "if_greater";
         case call: return "call";
         case param: return "param";
         case ret: return "ret";
