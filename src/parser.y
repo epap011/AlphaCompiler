@@ -151,11 +151,11 @@ term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, 
 assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
             ;   
 
-primary     : lvalue                {$$ = manage_primary_lvalue      (DEBUG_PRINT, yyout, $1, scope, yylineno);}
-            | call                  {manage_primary_call             (DEBUG_PRINT, yyout);}
-            | objectdef             {manage_primary_objectdef        (DEBUG_PRINT, yyout);}
-            | "(" funcdef ")"       {manage_primary_lpar_funcdef_rpar(DEBUG_PRINT, yyout);}
-            | const                 {manage_primary_const            (DEBUG_PRINT, yyout);}
+primary     : lvalue                {if($1 != NULL) $$ = manage_primary_lvalue(DEBUG_PRINT, yyout, $1, scope, yylineno);}
+            | call                  {manage_primary_call                      (DEBUG_PRINT, yyout);}
+            | objectdef             {manage_primary_objectdef                 (DEBUG_PRINT, yyout);}
+            | "(" funcdef ")"       {manage_primary_lpar_funcdef_rpar         (DEBUG_PRINT, yyout);}
+            | const                 {manage_primary_const                     (DEBUG_PRINT, yyout);}
             ;   
 
 lvalue      : IDENT                 {$$ = manage_lvalue_ident       (DEBUG_PRINT, yyout, symTable, yylval.stringVal, IS_GLOBAL, scope, yylineno, in_function_tail);}
