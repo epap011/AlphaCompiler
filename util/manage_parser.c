@@ -163,10 +163,14 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
 expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned int line) {
 
     expr* func = emit_if_tableitem(lvalue,scope,line);
-    while(elist){
-        emit(param,elist,NULL,NULL,-1,line);
-        elist = elist->next;
+    Stack* elist_s = new_stack();
+    expr* temp=elist;
+    while(temp){
+        push(elist_s,temp);
+        temp = temp->next;
     }
+    while( (temp = (expr*)pop(elist_s)) )
+        emit(param,temp,NULL,NULL,-1,line);
     emit(call,func,NULL,NULL,-1,line);
     expr* result = new_expr(var_e);
     result->sym = symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
@@ -746,7 +750,7 @@ expr* manage_lvalue_member(int debug, FILE* out, expr* member) {
 
 expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, char* name, unsigned int scope, unsigned int line, int* normalcall_skip) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue .IDENT"CYN" ->"RESET" member \n");
-    *normalcall_skip = 1;
+    *normalcall_skip = 0;
 
 
     return new_member_item(lvalue, name, scope, line);
@@ -764,7 +768,7 @@ void manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr
 
 expr* manage_member_call_dot_ident(int debug, FILE* out, expr* call, char* id, int* normalcall_skip) {
     if(debug) fprintf(out, MAG "Detected :" RESET"call . IDENT"CYN" ->"RESET" member \n");
-    *normalcall_skip = 1;
+    *normalcall_skip = 0;
     
     //keep in mind that this expression has only the name of the symbol and nothing else
     expr* e_for_name = (expr*)malloc(sizeof(expr));
@@ -789,14 +793,19 @@ expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out, unsigned int scop
 
 expr* manage_call_lvalue_callsuffix(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line, callexpr* c_expr) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n");
-
     if(!(*normalcall_skip)) {
         if(lvalue) {
             lvalue = emit_if_tableitem(lvalue,scope,line);
             if(c_expr->method){
-                expr *t = lvalue;
+                expr *temp,*t = lvalue;
                 lvalue = emit_if_tableitem(new_member_item(t,c_expr->name,scope,line),scope,line);
-                c_expr->elist->next = t;
+                temp = c_expr->elist;
+                if (!c_expr->elist)
+                    c_expr->elist = t;
+                else{
+                    c_expr->elist=t;
+                    t->next=temp;
+                }
             }
             return manage_func_call(lvalue, c_expr->elist, scope, line);
         }
@@ -831,10 +840,10 @@ callexpr* manage_normcall_lpar_elist_rpar(int debug, FILE* out, unsigned int met
     return new_callexpr(0,elist,name);
 }
 
-callexpr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normallcall_skip, unsigned int method, expr* elist, char* name) {
+callexpr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normalcall_skip, unsigned int method, expr* elist, char* name) {
     if(debug) fprintf(out, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");
 
-    *normallcall_skip = 1;
+    *normalcall_skip = 0;
     
     return new_callexpr(1,elist,name);
 }
