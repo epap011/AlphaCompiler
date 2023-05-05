@@ -266,9 +266,15 @@ funcdef         : funcprefix
 
                                                             if($$ != NULL) emit(funcend, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
                                                             patchLabel(*(unsigned int *)pop(quad_stack), nextQuadLabel());
+
+                                                            void *ret_s, *ret_s_s;
+                                                            ret_s = pop(ret_stack);
+                                                            while ( (ret_s_s = pop(ret_s) ))
+                                                                    patchLabel(*(unsigned int *)ret_s_s, nextQuadLabel());
+                                                            /*
                                                             void* ret_s;
                                                             if( (ret_s = pop(ret_stack)) )
-                                                                patchLabel(*(unsigned int *)ret_s, nextQuadLabel());
+                                                                patchLabel(*(unsigned int *)ret_s, nextQuadLabel());*/
                                                          }
                                                                                                              
                                                                                             
@@ -285,9 +291,11 @@ funcprefix : FUNCTION id_opt {
                             //Kanoume to manage edw giati olokliros o kanonas anagetai otan kleisei to block
                             //alla emeis theloume na mpenei sto symbol table molis tin doume
                             $$ = manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
-                             
-                            if(!quad_stack) quad_stack = new_stack();
+
                             if(!ret_stack) ret_stack = new_stack();
+                            push(ret_stack,new_stack());    //Stack of stacks for return quads.
+                            
+                            if(!quad_stack) quad_stack = new_stack();
                             unsigned int *p_quad = (unsigned int*)malloc(sizeof(unsigned int));
                             *p_quad = currQuad; 
                             push(quad_stack, p_quad);

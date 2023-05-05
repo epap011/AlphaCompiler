@@ -195,10 +195,14 @@ void manage_return(int line, int flag, expr* retval, Stack *retstack, unsigned i
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
     else{
+        emit(ret, retval ? retval : NULL, NULL, NULL, -1, line);
+        //Because of multiple returns in multiple funcdefs, a stack of stacks is required (funcdefs x returns).
         unsigned int *curr = malloc(sizeof(unsigned int));
         *curr=currQuad;
-        emit(ret, retval ? retval : NULL, NULL, NULL, -1, line);
-        push(retstack, curr);
+        void *ret_s = pop(retstack);
+        push(ret_s,curr);
+        push(retstack,ret_s);
+
         emit(jump, NULL, NULL, NULL, -1, line);
     }
 }
