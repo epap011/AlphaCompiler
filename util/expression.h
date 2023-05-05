@@ -46,6 +46,8 @@ typedef struct callexpr{
     char* name;
 } callexpr;
 
+int check_arith(expr* e, FILE* error_out, unsigned int line);
+
 expr* new_expr(enum expr_t type);
 
 expr* new_lvalue_expr(Symbol* sym);

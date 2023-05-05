@@ -160,20 +160,6 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
 
 }
 
-int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
-    
-    for (int i = 0; i <= scope; i++){   //we need to check all scopes 
-        Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
-        if(tmp_symbol != NULL && (tmp_symbol->symbol_type == USERFUNC || tmp_symbol->symbol_type == LIBFUNC)){
-            fprintf(out_file,RED "Error:" RESET " Cannot apply arithmetic operation on function \"" YEL "%s" RESET "\" (line: " GRN "%d" RESET ")\n", id, line);
-            return 1;
-        }
-        else        
-            return 0;
-    }
-    return 0;
-}
-
 expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned int line) {
 
     expr* func = emit_if_tableitem(lvalue,scope,line);
@@ -467,10 +453,12 @@ void manage_term_lpar_expr_rpar(int debug, FILE* out) {
 expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");
     
-    expr *result = new_lvalue_expr(symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset())));
-    emit(uminus, u_expr, NULL, result, -1, line);
+    if(check_arith(u_expr,out_file, line)) return NULL;  //An fas kana seg check edw an kai den nomizw :)
 
+    expr *result = new_expr(arithexpr_e);
+    result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
     result->numConst = -(u_expr->numConst);
+    emit(uminus, u_expr, NULL, result, -1, line);
 
     return result;
 
@@ -480,25 +468,55 @@ void manage_term_not_expr(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");
 }
 
-void manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+/*Start of ++ --*/
+
+//This is unused since we have check arith_() now
+int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
+    
+    for (int i = 0; i <= scope; i++){   //we need to check all scopes 
+        Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
+        if(tmp_symbol != NULL && (tmp_symbol->symbol_type == USERFUNC || tmp_symbol->symbol_type == LIBFUNC)){
+            fprintf(out_file,RED "Error:" RESET " Cannot apply arithmetic operation on function \"" YEL "%s" RESET "\" (line: " GRN "%d" RESET ")\n", id, line);
+            return 1;
+        }
+        else        
+            return 0;
+    }
+    return 0;
+}
+
+expr* manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n");
-    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+    
+    if(expr != NULL) check_arith(expr,out_file, line);
+
+    return NULL;
 }
 
-void manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+expr* manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n");
-    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+    
+    if(expr != NULL) check_arith(expr,out_file, line);
+
+    return NULL;
 }
 
-void manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+expr* manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n");
-    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+    
+    if(expr != NULL) check_arith(expr,out_file, line);
+
+    return NULL;
 }
 
-void manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+expr* manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n");
-    if(expr != NULL) check_lvalue(symTable, expr->sym->name, scope, line); //Gia tin fasi 3 -> an epistrepsei 1 paei na pei oti einai function kai den kanoume prakseis
+    
+    if(expr != NULL) check_arith(expr,out_file, line);
+
+    return NULL;
 }
+/*End of ++ --*/
 
 void manage_term_primary(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"primary"CYN" ->"RESET" term \n");
