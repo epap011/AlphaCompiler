@@ -828,6 +828,48 @@ expr* manage_stmtList_stmt_stmtList(int debug, FILE* out) {
     return NULL;
 }
 
+expr* manage_ifstmt(int debug, FILE* out, int ifprefix, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"IF ( expr ) stmt"CYN"-> "RESET"ifstmt  \n");
+
+    patchLabel(ifprefix, nextQuadLabel());
+    return NULL;
+}
+
+expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"IF ( expr ) stmt ELSE stmt"CYN"-> "RESET"ifstmt \n");
+
+    patchLabel(ifprefix, elseprefix+1);
+    patchLabel(elseprefix, nextQuadLabel());
+    return NULL;
+}
+
+int manage_ifprefix(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {
+    expr* result = NULL;
+
+    if(debug) fprintf(out, MAG "Detected :" RESET"ifprefix\n");
+
+    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+
+    result = new_expr(boolexpr_e);
+    result->sym = tmp_symbol;
+
+    expr* true_expr = new_expr(constbool_e);
+    true_expr->boolConst = 1;
+    
+    emit(if_eq, expr1, true_expr, result, nextQuadLabel()+2, line);
+    emit(jump, NULL, NULL, NULL, 0, line);
+
+    return nextQuadLabel()-1;
+}
+
+int manage_elseprefix (int debug, FILE* out, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"elseprefix\n");
+    
+    emit(jump, NULL, NULL, NULL, 0, line);
+    return nextQuadLabel()-1;
+}
+
 int convert_to_bool(expr* expr) {
     switch(expr->type) {
         case constbool_e:

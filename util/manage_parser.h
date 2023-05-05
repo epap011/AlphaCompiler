@@ -120,4 +120,9 @@ expr* manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(int debug, FI
 expr* manage_stmtList_empty(int debug, FILE* out);
 expr* manage_stmtList_stmt_stmtList(int debug, FILE* out);
 
+expr* manage_ifstmt     (int debug, FILE* out, int ifprefix, unsigned int scope, unsigned int line);
+expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line);
+int   manage_ifprefix   (int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line);
+int   manage_elseprefix (int debug, FILE* out, unsigned int scope, unsigned int line);
+
 #endif /* MANAGE_PARSER_H */

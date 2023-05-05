@@ -82,11 +82,12 @@
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
+%type<intVal>    ifprefix elseprefix
 %type<stringVal> id_opt com_id_opt
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr assignexpr term const lvalue member call primary
 %type<exprVal>   objectdef
-%type<exprVal>   elist com_expr_opt
+%type<exprVal>   elist com_expr_opt stmt
 %type<exprVal>   indexedelem com_indexedelem_opt indexed
 %type<callexprVal>   methodcall normcall callsuffix
 
@@ -314,8 +315,13 @@ com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"co
                 | "," IDENT com_id_opt {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
                 ;
 
-ifstmt          : IF "(" expr ")" stmt %prec LP_ELSE {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt"CYN"-> "RESET"ifstmt  \n");}
-                | IF "(" expr ")" stmt ELSE stmt     {fprintf(yyout, MAG "Detected :" RESET"IF ( expr ) stmt ELSE stmt"CYN"-> "RESET"ifstmt \n");}
+ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT, yyout, $1, scope, yylineno);}
+                | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+                ;
+
+ifprefix        : IF "(" expr ")" {$$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}
+
+elseprefix      : ELSE {$$ = manage_elseprefix(DEBUG_PRINT, yyout, scope, yylineno);}
                 ;
 
 whilestmt       : WHILE "(" expr ")"{   if(!loop_flag_stack) loop_flag_stack = new_stack();
