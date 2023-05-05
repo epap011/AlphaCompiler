@@ -264,7 +264,9 @@ funcdef         : funcprefix
 
                                                             if($$ != NULL) emit(funcend, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
                                                             patchLabel(*(unsigned int *)pop(quad_stack), nextQuadLabel());
-                                                            patchLabel(*(unsigned int *)pop(ret_stack), nextQuadLabel());
+                                                            void* ret_s;
+                                                            if( (ret_s = pop(ret_stack)) )
+                                                                patchLabel(*(unsigned int *)ret_s, nextQuadLabel());
                                                          }
                                                                                                              
                                                                                             
