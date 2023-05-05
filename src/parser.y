@@ -140,14 +140,14 @@ expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
             | expr OR expr  {$$ = manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             ;                   
 
-term        : "(" expr ")"          {manage_term_lpar_expr_rpar   (DEBUG_PRINT, yyout); $$ = $2;}
+term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PRINT, yyout); $$ = $2;}
             | "-" expr %prec UMINUS {$$ = manage_term_uminus_expr      (DEBUG_PRINT, yyout, $2,scope,  yylineno);}
-            | NOT expr              {manage_term_not_expr         (DEBUG_PRINT, yyout); $$ = $2;}
-            | "++" lvalue           {manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
-            | lvalue "++"           {manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
-            | "--" lvalue           {manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
-            | lvalue "--"           {manage_term_lvalue_minusminus(DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
-            | primary               {manage_term_primary          (DEBUG_PRINT, yyout);}
+            | NOT expr              {manage_term_not_expr              (DEBUG_PRINT, yyout); $$ = $2;}
+            | "++" lvalue           {$$ = manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
+            | lvalue "++"           {$$ = manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
+            | "--" lvalue           {$$ = manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
+            | lvalue "--"           {$$ = manage_term_lvalue_minusminus(DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
+            | primary               {manage_term_primary                (DEBUG_PRINT, yyout);}
             ;   
 
 assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}

@@ -1,6 +1,37 @@
 #include "expression.h"
 #include "quad.h"
 
+//Returns 1 if operation is illegal, 0 otherwise
+int check_arith(expr* e, FILE* out, unsigned int line){
+
+    if(e->type == constbool_e || e->type == boolexpr_e){
+        fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"Boolean"RESET"\" for arithmetic operation (line: " GRN "%d" RESET ")\n",line);
+        return 1;
+    }
+    else if(  e->type == conststring_e){
+        fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"String"RESET"\" for arithmetic operation (line: " GRN "%d" RESET ")\n",line);
+        return 1;
+    }
+    else if(e->type == nil_e){
+        fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"NIL"RESET"\" for arithmetic operation (line: " GRN "%d" RESET ")\n",line);
+        return 1;
+    }
+    else if ( e->type == newtable_e){
+        fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"table definition"RESET"\" for arithmetic operation (line: " GRN "%d" RESET ")\n",line);
+        return 1;
+    }
+    else if (e->type == programfunc_e){
+        fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"function"RESET"\" for arithmetic operation (line: " GRN "%d" RESET ")\n",line);
+        return 1;
+    }
+    else if(e->type == libraryfunc_e){
+        fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"Library function"RESET"\" for arithmetic operation (line: " GRN "%d" RESET ")\n",line);
+        return 1;
+    }
+
+    return 0;
+}
+
 expr* new_expr(enum expr_t type){
     expr* e = (expr*)malloc(sizeof(expr));
     memset(e, 0, sizeof(expr));
@@ -64,7 +95,7 @@ expr* new_const_bool(int flag){
 expr* new_const_nil(){
      
     expr* e = new_expr(nil_e);
-     
+
     e->hidden_var = NULL;
 
     return e;
