@@ -264,8 +264,7 @@ expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, uns
 expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
     expr* result = NULL;
 
-    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
-        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
+    if (check_arith(expr1, out_file,line) == 0 && check_arith(expr2, out_file,line) == 0) {
         
         Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
         incCurrScopeOffset();
@@ -280,9 +279,6 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
         result->sym = tmp_symbol;
         
         emit(op, expr1, expr2, result, -1, line);
-    }
-    else {
-        fprintf(out_file, RED"Error:"RESET" Invalid operands for arithmetic operation (line: "GRN"%d"RESET")\n", line);
     }
 
     return result;
@@ -485,36 +481,75 @@ int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsi
     return 0;
 }
 
-expr* manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+expr* manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n");
     
-    if(expr != NULL) check_arith(expr,out_file, line);
+    if(lvalue != NULL) {
+        if(check_arith(lvalue,out_file, line)) 
+            return NULL;
+    }
 
     return NULL;
 }
 
-expr* manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+expr* manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n");
     
-    if(expr != NULL) check_arith(expr,out_file, line);
+    if(lvalue != NULL) {
+        if(check_arith(lvalue,out_file, line)) 
+            return NULL;
+    }
 
-    return NULL;
+    expr* term = new_expr(var_e);
+    term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+
+    if(lvalue->type == tableitem_e){
+        expr * val = emit_if_tableitem(lvalue, scope, line);
+        emit(assign, val, NULL, term, -1, line);
+        emit(add, val, new_const_num(1), val, -1, line);
+        emit(tablesetelem, lvalue->index, val, lvalue, -1, line);
+    }
+    else{
+        emit(assign, lvalue, NULL, term, -1, line);
+        emit(add, lvalue, new_const_num(1), lvalue, -1, line);  
+    }
+    return term;
+    
 }
 
-expr* manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+expr* manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n");
     
-    if(expr != NULL) check_arith(expr,out_file, line);
+    if(lvalue != NULL) {
+        if(check_arith(lvalue,out_file, line)) 
+            return NULL;
+    }
 
     return NULL;
 }
 
-expr* manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* expr, unsigned int scope, unsigned int line) {
+expr* manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n");
     
-    if(expr != NULL) check_arith(expr,out_file, line);
+    if(lvalue != NULL) {
+        if(check_arith(lvalue,out_file, line)) 
+            return NULL;
+    }
 
-    return NULL;
+    expr* term = new_expr(var_e);
+    term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+
+    if(lvalue->type == tableitem_e){
+        expr * val = emit_if_tableitem(lvalue, scope, line);
+        emit(assign, val, NULL, term, -1, line);
+        emit(sub, val, new_const_num(1), val, -1, line);
+        emit(tablesetelem, lvalue->index, val, lvalue, -1, line);
+    }
+    else{
+        emit(assign, lvalue, NULL, term, -1, line);
+        emit(sub, lvalue, new_const_num(1), lvalue, -1, line);  
+    }
+    return term;
 }
 /*End of ++ --*/
 
