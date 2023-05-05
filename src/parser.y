@@ -35,6 +35,7 @@
     
     extern unsigned int currQuad;
     Stack *quad_stack;   //for quad labels
+    Stack *ret_stack;   //for return labels
 %}
 
 %start program
@@ -85,7 +86,7 @@
 %type<intVal>    ifprefix elseprefix whilestart whilecond
 %type<stringVal> id_opt com_id_opt
 %type<symbolVal> funcprefix funcdef
-%type<exprVal>   expr assignexpr term const lvalue member call primary
+%type<exprVal>   expr expr_opt assignexpr term const lvalue member call primary 
 %type<exprVal>   objectdef
 %type<exprVal>   elist com_expr_opt stmt
 %type<exprVal>   indexedelem com_indexedelem_opt indexed
@@ -263,6 +264,7 @@ funcdef         : funcprefix
 
                                                             if($$ != NULL) emit(funcend, NULL, NULL, new_lvalue_expr($$), -1, yylineno);
                                                             patchLabel(*(unsigned int *)pop(quad_stack), nextQuadLabel());
+                                                            patchLabel(*(unsigned int *)pop(ret_stack), nextQuadLabel());
                                                          }
                                                                                                              
                                                                                             
@@ -281,6 +283,7 @@ funcprefix : FUNCTION id_opt {
                             $$ = manage_funcdef(symTable, $2, scope,*(unsigned int *)pop(func_line_stack)); 
                              
                             if(!quad_stack) quad_stack = new_stack();
+                            if(!ret_stack) ret_stack = new_stack();
                             unsigned int *p_quad = (unsigned int*)malloc(sizeof(unsigned int));
                             *p_quad = currQuad; 
                             push(quad_stack, p_quad);
@@ -355,10 +358,10 @@ forstmt         : FOR "(" elist ";" expr ";" elist ")"  {   if(!loop_flag_stack)
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
-                                        manage_return(yylineno, return_flag);}
+                                        manage_return(yylineno, return_flag, $2, ret_stack, currQuad);}
                 ;
 
-expr_opt        : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (empty)"RESET"\n");}
+expr_opt        : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (empty)"RESET"\n"); $$ = NULL;}
                 | expr        {fprintf(yyout, MAG "Detected :" RESET"expr \n");}
                 ;
 

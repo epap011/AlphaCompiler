@@ -21,7 +21,7 @@ void manage_lvalue_dec(SymbolTable* symTable, const char* id, unsigned int scope
 expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned int line);
 void manage_assignment(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 void check_if_declared(SymbolTable* symTable, const char* id, unsigned int scope);
-void manage_return(int line, int flag);
+void manage_return(int line, int flag, expr* retval, Stack *retstack, unsigned int currQuad);
 
 int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 int is_id_built_in_function(const char* id);
