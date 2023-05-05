@@ -141,8 +141,8 @@ expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
             ;                   
 
 term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PRINT, yyout); $$ = $2;}
-            | "-" expr %prec UMINUS {$$ = manage_term_uminus_expr      (DEBUG_PRINT, yyout, $2,scope,  yylineno);}
-            | NOT expr              {manage_term_not_expr              (DEBUG_PRINT, yyout); $$ = $2;}
+            | "-" expr %prec UMINUS {$$ = manage_term_uminus_expr      (DEBUG_PRINT, yyout, $2, scope,  yylineno);}
+            | NOT expr              {$$ = manage_term_not_expr         (DEBUG_PRINT, yyout, $2, scope, yylineno);}
             | "++" lvalue           {$$ = manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
             | lvalue "++"           {$$ = manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno);}
             | "--" lvalue           {$$ = manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
@@ -156,7 +156,7 @@ assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(D
 primary     : lvalue                {if($1 != NULL) $$ = manage_primary_lvalue(DEBUG_PRINT, yyout, $1, scope, yylineno);}
             | call                  {manage_primary_call                      (DEBUG_PRINT, yyout);}
             | objectdef             {manage_primary_objectdef                 (DEBUG_PRINT, yyout);}
-            | "(" funcdef ")"       {manage_primary_lpar_funcdef_rpar         (DEBUG_PRINT, yyout);}
+            | "(" funcdef ")"       {manage_primary_lpar_funcdef_rpar         (DEBUG_PRINT, yyout);} //EDw file exeis douleia
             | const                 {manage_primary_const                     (DEBUG_PRINT, yyout);}
             ;   
 

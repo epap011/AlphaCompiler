@@ -331,6 +331,25 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
     return result;
 }
 
+expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");
+
+    expr* term = NULL;
+    expr1->boolConst = convert_to_bool(expr1);
+
+    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e)){
+      
+        term = new_expr(boolexpr_e);
+        term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
+        emit(not, expr1, NULL, term, -1, line);
+    }
+    else
+        fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
+
+    return term;
+}
+
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
     expr* result = NULL;
 
@@ -351,15 +370,15 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
         
         emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
-        emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emmit prepei na lifthei ipopsi to const bool kai tws 2 expr
+        emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
         emit(assign, new_const_bool(1), NULL, result, -1, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
         emit(assign, new_const_bool(0), NULL, result, -1, line);
     }
-    else {
+    else 
         fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
-    }
+    
     return result;
 }
 
@@ -453,6 +472,7 @@ expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int s
 
     expr *result = new_expr(arithexpr_e);
     result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
     result->numConst = -(u_expr->numConst);
     emit(uminus, u_expr, NULL, result, -1, line);
 
@@ -460,9 +480,7 @@ expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int s
 
 }
 
-void manage_term_not_expr(int debug, FILE* out) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");
-}
+
 
 /*Start of ++ --*/
 
@@ -499,6 +517,7 @@ expr* manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, e
         emit(add, lvalue, new_const_num(1), lvalue, -1, line);
         term = new_expr(arithexpr_e);
         term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
         emit(assign, lvalue, NULL, term, -1, line);
     }
 
@@ -515,6 +534,7 @@ expr* manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, e
 
     expr* term = new_expr(var_e);
     term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
 
     if(lvalue->type == tableitem_e){
         expr * val = emit_if_tableitem(lvalue, scope, line);
@@ -548,6 +568,7 @@ expr* manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable,
         emit(sub, lvalue, new_const_num(1), lvalue, -1, line);
         term = new_expr(arithexpr_e);
         term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
         emit(assign, lvalue, NULL, term, -1, line);
     }
 
@@ -564,6 +585,7 @@ expr* manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable,
 
     expr* term = new_expr(var_e);
     term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
 
     if(lvalue->type == tableitem_e){
         expr * val = emit_if_tableitem(lvalue, scope, line);
