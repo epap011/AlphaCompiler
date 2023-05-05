@@ -346,7 +346,15 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
         term = new_expr(boolexpr_e);
         term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
         incCurrScopeOffset();
-        emit(not, expr1, NULL, term, -1, line);
+
+        expr* true_expr = new_expr(constbool_e);
+        true_expr->boolConst = 1;
+
+        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel() + 4, line);
+        emit(jump,NULL,NULL,NULL,nextQuadLabel() + 1 ,line);
+        emit(assign, new_const_bool(1), NULL, term, -1, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel() + 2, line);
+        emit(assign, new_const_bool(0), NULL, term, -1, line);
     }
     else
         fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
