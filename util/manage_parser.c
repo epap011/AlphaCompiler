@@ -275,7 +275,7 @@ expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, uns
 expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
     expr* result = NULL;
 
-    if (check_arith(expr1, out_file,line) == 0 && check_arith(expr2, out_file,line) == 0) {
+    if (check_arith(expr1, out_file,line,"arithmetic") == 0 && check_arith(expr2, out_file,line,"arithmetic") == 0) {
         
         Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
         incCurrScopeOffset();
@@ -305,10 +305,12 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
     //An DEN exoume kati apo ta (==,!=) kai parallila toulaxiston ena apo ta 2 expr einai boolean, tote einai error.
     //p.x den mporeis na peis 3 > true. Alla 3 == true mporeis na to peis.
     if (op != if_eq && op != if_noteq) {
-        if(expr1->type == constbool_e || expr2->type == constbool_e) {
-            fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
-            return NULL;
-        }
+       
+        int check = 0; //xrisimopoioume metavliti apla gia na petaei kai gia ta 2 expr ta error an uparxei auto to case
+        check += check_arith(expr1, out_file,line,"relational");
+        check += check_arith(expr2, out_file,line,"relational");
+
+        if(check) return NULL;
     }
 
 
@@ -321,24 +323,17 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
     //     }
     // }
 
-    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
-        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == constbool_e ||expr1->type == boolexpr_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
-        
-        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        incCurrScopeOffset();
+    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+    result = new_expr(boolexpr_e);
+    result->sym = tmp_symbol;
+    
+    emit(op, expr1, expr2, result, nextQuadLabel()+2, line);
+    emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
+    emit(assign, new_const_bool(1), NULL, result, -1, line);
+    emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+    emit(assign, new_const_bool(0), NULL, result, -1, line);
 
-        result = new_expr(boolexpr_e);
-        result->sym = tmp_symbol;
-        
-        emit(op, expr1, expr2, result, nextQuadLabel()+2, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
-        emit(assign, new_const_bool(1), NULL, result, -1, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-        emit(assign, new_const_bool(0), NULL, result, -1, line);
-    }
-    else {
-        fprintf(out_file, RED"Error:"RESET" Invalid operands for relation operation (line: "GRN"%d"RESET")\n", line);
-    }
     return result;
 }
 
@@ -347,24 +342,17 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
 
     expr* term = NULL;
     expr1->boolConst = convert_to_bool(expr1);
-
-    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e)){
-      
-        term = new_expr(boolexpr_e);
-        term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        incCurrScopeOffset();
-
-        expr* true_expr = new_expr(constbool_e);
-        true_expr->boolConst = 1;
-
-        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel() + 4, line);
-        emit(jump,NULL,NULL,NULL,nextQuadLabel() + 1 ,line);
-        emit(assign, new_const_bool(1), NULL, term, -1, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel() + 2, line);
-        emit(assign, new_const_bool(0), NULL, term, -1, line);
-    }
-    else
-        fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
+    
+    term = new_expr(boolexpr_e);
+    term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+    expr* true_expr = new_expr(constbool_e);
+    true_expr->boolConst = 1;
+    emit(if_eq, expr1, true_expr, NULL, nextQuadLabel() + 4, line);
+    emit(jump,NULL,NULL,NULL,nextQuadLabel() + 1 ,line);
+    emit(assign, new_const_bool(1), NULL, term, -1, line);
+    emit(jump, NULL, NULL, NULL, nextQuadLabel() + 2, line);
+    emit(assign, new_const_bool(0), NULL, term, -1, line);
 
     return term;
 }
@@ -374,30 +362,29 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
 
     expr1->boolConst = convert_to_bool(expr1);
     expr2->boolConst = convert_to_bool(expr2);
-
-    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
-        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == constbool_e ||expr1->type == boolexpr_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
-        
-        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        incCurrScopeOffset();
-
-        result = new_expr(boolexpr_e);
-        result->sym = tmp_symbol;
-
-        expr* true_expr = new_expr(constbool_e);
-        true_expr->boolConst = 1;
-        
+    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+    result = new_expr(boolexpr_e);
+    result->sym = tmp_symbol;
+    expr* true_expr = new_expr(constbool_e);
+    true_expr->boolConst = 1;
+    
+    if(op == and){
         emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
-        emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
-        emit(assign, new_const_bool(1), NULL, result, -1, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-        emit(assign, new_const_bool(0), NULL, result, -1, line);
-    }
-    else 
-        fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
+    } else 
+    if(op == or){
+        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+4, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+1, line);
+    }  
     
+    emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+    emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
+    emit(assign, new_const_bool(1), NULL, result, -1, line);
+    emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+    emit(assign, new_const_bool(0), NULL, result, -1, line);
+    
+
     return result;
 }
 
@@ -487,7 +474,7 @@ void manage_term_lpar_expr_rpar(int debug, FILE* out) {
 expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"UMINUS expr"CYN" ->"RESET" term \n");
     
-    if(check_arith(u_expr,out_file, line)) return NULL;  //An fas kana seg check edw an kai den nomizw :)
+    if(check_arith(u_expr,out_file, line,"arithmetic")) return NULL;  //An fas kana seg check edw an kai den nomizw :)
 
     expr *result = new_expr(arithexpr_e);
     result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
@@ -522,7 +509,7 @@ expr* manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, e
     if(debug) fprintf(out, MAG "Detected :" RESET"++lvalue"CYN" ->"RESET" term \n");
     
     if(lvalue != NULL) {
-        if(check_arith(lvalue,out_file, line)) 
+        if(check_arith(lvalue,out_file, line,"arithmetic")) 
             return NULL;
     }
 
@@ -547,7 +534,7 @@ expr* manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, e
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue++"CYN" ->"RESET" term \n");
     
     if(lvalue != NULL) {
-        if(check_arith(lvalue,out_file, line)) 
+        if(check_arith(lvalue,out_file, line,"arithmetic")) 
             return NULL;
     }
 
@@ -573,7 +560,7 @@ expr* manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable,
     if(debug) fprintf(out, MAG "Detected :" RESET"--lvalue"CYN" ->"RESET" term \n");
     
     if(lvalue != NULL) {
-        if(check_arith(lvalue,out_file, line)) 
+        if(check_arith(lvalue,out_file, line,"arithmetic")) 
             return NULL;
     }
 
@@ -598,7 +585,7 @@ expr* manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable,
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue--"CYN" ->"RESET" term \n");
     
     if(lvalue != NULL) {
-        if(check_arith(lvalue,out_file, line)) 
+        if(check_arith(lvalue,out_file, line, "arithmetic")) 
             return NULL;
     }
 

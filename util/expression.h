@@ -46,7 +46,7 @@ typedef struct callexpr{
     char* name;
 } callexpr;
 
-int check_arith(expr* e, FILE* error_out, unsigned int line);
+int check_arith(expr* e, FILE* error_out, unsigned int line, char* op);
 
 expr* new_expr(enum expr_t type);
 
