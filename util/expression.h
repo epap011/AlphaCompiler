@@ -40,6 +40,12 @@ typedef struct expr{
 
 } expr;
 
+typedef struct callexpr{
+    unsigned int method;
+    expr* elist;
+    char* name;
+} callexpr;
+
 expr* new_expr(enum expr_t type);
 
 expr* new_lvalue_expr(Symbol* sym);
@@ -48,5 +54,6 @@ expr* new_const_string(char *str);
 expr* new_const_bool(int flag);
 expr* new_const_nil();
 expr* new_member_item(expr* lv, char* name, unsigned int scope, unsigned int line);
+callexpr* new_callexpr(unsigned int method, expr* elist, char* name);
 
 #endif /* EXPR_H */

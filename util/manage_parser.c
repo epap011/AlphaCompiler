@@ -174,19 +174,19 @@ int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsi
     return 0;
 }
 
-void manage_func_call(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line) {
+expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned int line) {
 
-    //check if the function exists
-    if(is_id_built_in_function(id)) return;
-
-    for(int i = 0; i <= scope; i++) {
-        Symbol* tmp_symbol = symbol_table_scope_lookup(symTable, id, i); 
-        if(tmp_symbol != NULL) 
-            return;
+    expr* func = emit_if_tableitem(lvalue,scope,line);
+    while(elist){
+        emit(param,elist,NULL,NULL,-1,line);
+        elist = elist->next;
     }
-
-    fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" doesn't exist (line: "GRN"%d"RESET")\n", id, line);
-    hide_symbol_on_scope(symTable, id, scope);
+    emit(call,func,NULL,NULL,-1,line);
+    expr* result = new_expr(var_e);
+    result->sym = symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
+    emit(getretval,NULL,NULL,result,-1,line);
+    
+    return result;
 }
 
 int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int scope) {
@@ -678,48 +678,64 @@ expr* manage_member_call_lbr_expr_rbr(int debug, FILE* out, expr* call, expr* ex
     return NULL;
 }
 
-expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out) {
+expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out, unsigned int scope, unsigned int line, expr* lvalue, expr* elist) {
     if(debug) fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");
+
+    if(lvalue)
+        return manage_func_call(lvalue, elist, 0, 0);
     return NULL;
 }
 
-expr* manage_call_lvalue_callsuffix(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line) {
+expr* manage_call_lvalue_callsuffix(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line, callexpr* c_expr) {
     if(debug) fprintf(out, MAG "Detected :" RESET"lvalue callsuffix"CYN" ->"RESET" call \n");
 
     if(!(*normalcall_skip)) {
-        if(lvalue != NULL) {
-            manage_func_call(symTable, lvalue->sym->name, scope, line);
+        if(lvalue) {
+            lvalue = emit_if_tableitem(lvalue,scope,line);
+            if(c_expr->method){
+                expr *t = lvalue;
+                lvalue = emit_if_tableitem(new_member_item(t,c_expr->name,scope,line),scope,line);
+                c_expr->elist->next = t;
+            }
+            return manage_func_call(lvalue, c_expr->elist, scope, line);
         }
     }
-
     *normalcall_skip = 0;
     return NULL;
 }
 
-expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out) {
+expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out, unsigned int scope, unsigned int line, Symbol *funcdef, expr* elist) {
     if(debug) fprintf(out, MAG "Detected :" RESET"( funcdef ) ( elist )"CYN" ->"RESET" call \n");
-    return NULL;
+
+    expr* func = new_expr(programfunc_e);
+    func->sym = funcdef;
+    return manage_func_call(func, elist, scope, line);
 }
 
-expr* manage_callsuffix_normcall  (int debug, FILE* out) {
+callexpr* manage_callsuffix_normcall  (int debug, FILE* out, callexpr* c_expr) {
     if(debug) fprintf(out, MAG "Detected :" RESET"normcall"CYN" ->"RESET" callsuffix \n");
-    return NULL;
+    //probably unnecessary
+    return c_expr;
 }
 
-expr* manage_callsuffix_methodcall(int debug, FILE* out) {
+callexpr* manage_callsuffix_methodcall(int debug, FILE* out, callexpr* c_expr) {
     if(debug) fprintf(out, MAG "Detected :" RESET"methodcall"CYN" ->"RESET" callsuffix \n");
-    return NULL;
+    //probably unnecessary
+    return c_expr;
 }
 
-expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");
-    return NULL;
+callexpr* manage_normcall_lpar_elist_rpar(int debug, FILE* out, unsigned int method, expr* elist, char* name) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"( elist )"CYN" ->"RESET" normcall \n");        
+
+    return new_callexpr(0,elist,name);
 }
 
-expr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normallcall_skip) {
+callexpr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normallcall_skip, unsigned int method, expr* elist, char* name) {
     if(debug) fprintf(out, MAG "Detected :" RESET".. IDENT ( elist )"CYN" ->"RESET" methodcall \n");
+
     *normallcall_skip = 1;
-    return NULL;
+    
+    return new_callexpr(1,elist,name);
 }
 
 expr* manage_comexpropt_empty(int debug, FILE* out) {

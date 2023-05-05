@@ -18,7 +18,7 @@ Symbol* manage_funcdef  (SymbolTable* symTable, char* id, unsigned int scope, un
 void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 void manage_lvalue_inc(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 void manage_lvalue_dec(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
-void manage_func_call(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
+expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned int line);
 void manage_assignment(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 void check_if_declared(SymbolTable* symTable, const char* id, unsigned int scope);
 void manage_return(int line, int flag);
@@ -90,16 +90,16 @@ void  manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, exp
 expr* manage_member_call_dot_ident      (int debug, FILE* out, expr* call,  char* id, int* normalcall_skip);
 expr* manage_member_call_lbr_expr_rbr   (int debug, FILE* out, expr* call, expr* expr1);
 
-expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out);
-expr* manage_call_lvalue_callsuffix     (int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line);
-expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out);
+expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out, unsigned int scope, unsigned int line, expr* lvalue, expr* elist);
+expr* manage_call_lvalue_callsuffix     (int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line, callexpr* c_expr);
+expr* manage_call_lpar_funcdef_rpar_lpar_elist_rpar(int debug, FILE* out, unsigned int scope, unsigned int line, Symbol *funcdef, expr* elist);
 
-expr* manage_callsuffix_normcall  (int debug, FILE* out);
-expr* manage_callsuffix_methodcall(int debug, FILE* out);
+callexpr* manage_callsuffix_normcall  (int debug, FILE* out, callexpr* c_expr);
+callexpr* manage_callsuffix_methodcall(int debug, FILE* out, callexpr* c_expr);
 
-expr* manage_normcall_lpar_elist_rpar(int debug, FILE* out);
+callexpr* manage_normcall_lpar_elist_rpar(int debug, FILE* out, unsigned int method, expr* elist, char* name);
 
-expr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normcall_skip);
+callexpr* manage_methodcall_ddot_ident_lpar_elist_rpar(int debug, FILE* out, int* normcall_skip, unsigned int method, expr* elist, char* name);
 
 expr* manage_comexpropt_empty(int debug, FILE* out);
 expr* manage_comexpropt_comma_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt);

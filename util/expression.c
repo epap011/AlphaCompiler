@@ -7,6 +7,7 @@ expr* new_expr(enum expr_t type){
 
     e->next = (expr*)0;
     e->type = type;
+    e->hidden_var = NULL;
 
     return e;
 }
@@ -35,6 +36,8 @@ expr* new_const_num(double n){
     expr* e = new_expr(constnum_e);
     e->numConst = n;
 
+    e->hidden_var = NULL;
+
     return e;
 }
 
@@ -42,6 +45,8 @@ expr* new_const_string(char *str){
     
     expr* e = new_expr(conststring_e);
     e->strConst = strdup(str);
+    
+    e->hidden_var = NULL;
 
     return e;
 }
@@ -50,14 +55,17 @@ expr* new_const_bool(int flag){
     
     expr* e = new_expr(constbool_e);
     e->boolConst = flag;
-
+    
+    e->hidden_var = NULL;
 
     return e;
 }
 
 expr* new_const_nil(){
      
-     expr* e = new_expr(nil_e);
+    expr* e = new_expr(nil_e);
+     
+    e->hidden_var = NULL;
 
     return e;
 }
@@ -67,5 +75,17 @@ expr* new_member_item(expr* lv, char* name, unsigned int scope, unsigned int lin
     expr* ti = new_expr(tableitem_e);
     ti->sym = lv->sym;
     ti->index = new_const_string(name);
+    ti->hidden_var = NULL;
     return ti;
+}
+
+callexpr* new_callexpr(unsigned int method, expr* elist, char* name){
+    callexpr* e = (callexpr*)malloc(sizeof(callexpr));
+    memset(e, 0, sizeof(callexpr));
+    
+    e->method = method;
+    e->elist = elist;
+    e->name = name;
+    
+    return e;
 }

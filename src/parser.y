@@ -45,6 +45,7 @@
     char *stringVal;
     struct Symbol *symbolVal;
     struct expr *exprVal;
+    struct callexpr *callexprVal;
 }
 
 %token <intVal>    INTCONST
@@ -82,12 +83,12 @@
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
 %type<stringVal> id_opt com_id_opt
-%type<intVal>    callsuffix
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr assignexpr term const lvalue member call primary
 %type<exprVal>   objectdef
 %type<exprVal>   elist com_expr_opt
 %type<exprVal>   indexedelem com_indexedelem_opt indexed
+%type<callexprVal>   methodcall normcall callsuffix
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -170,19 +171,19 @@ member      : lvalue "." IDENT      {$$ = manage_memeber_lvalue_dot_ident   (DEB
             | call "[" expr "]"     {     manage_member_call_lbr_expr_rbr   (DEBUG_PRINT, yyout, $1, $3);}
             ;
 
-call        : call "(" elist ")"            {manage_call_call_lpar_elist_rpar(DEBUG_PRINT, yyout);}
-            | lvalue callsuffix             {manage_call_lvalue_callsuffix   (DEBUG_PRINT, yyout, symTable, $1, &normcall_skip, scope, yylineno);}
-            | "(" funcdef ")" "(" elist ")" {manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout);}
+call        : call "(" elist ")"            {$$ = manage_call_call_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $1, $3);}
+            | lvalue callsuffix             {$$ = manage_call_lvalue_callsuffix   (DEBUG_PRINT, yyout, symTable, $1, &normcall_skip, scope, yylineno, $2);}
+            | "(" funcdef ")" "(" elist ")" {$$ = manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $2, $5);}
             ;
 
-callsuffix  : normcall   {manage_callsuffix_normcall  (DEBUG_PRINT, yyout);} 
-            | methodcall {manage_callsuffix_methodcall(DEBUG_PRINT, yyout);} 
+callsuffix  : normcall   {$$ = manage_callsuffix_normcall  (DEBUG_PRINT, yyout, $1);} 
+            | methodcall {$$ = manage_callsuffix_methodcall(DEBUG_PRINT, yyout, $1);} 
             ;
 
-normcall    : "(" elist ")" {manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout);}
+normcall    : "(" elist ")" {$$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout,0,$2,NULL);}
             ;
 
-methodcall  : ".." IDENT "(" elist ")" {manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip);}
+methodcall  : ".." IDENT "(" elist ")" {$$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,$2);}
             ;
 
 com_expr_opt : /* empty */             {$$ = manage_comexpropt_empty                (DEBUG_PRINT, yyout);} //NULL
