@@ -387,8 +387,15 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
         expr* true_expr = new_expr(constbool_e);
         true_expr->boolConst = 1;
         
-        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
+        if(op == and){
+            emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
+            emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
+        } else 
+        if(op == or){
+            emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+4, line);
+            emit(jump, NULL, NULL, NULL, nextQuadLabel()+1, line);
+        }  
+        
         emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
         emit(assign, new_const_bool(1), NULL, result, -1, line);
