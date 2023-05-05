@@ -82,7 +82,7 @@
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
-%type<intVal>    ifprefix elseprefix
+%type<intVal>    ifprefix elseprefix whilestart whilecond
 %type<stringVal> id_opt com_id_opt
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr assignexpr term const lvalue member call primary
@@ -143,10 +143,10 @@ expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
 term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PRINT, yyout); $$ = $2;}
             | "-" expr %prec UMINUS {$$ = manage_term_uminus_expr      (DEBUG_PRINT, yyout, $2,scope,  yylineno);}
             | NOT expr              {manage_term_not_expr              (DEBUG_PRINT, yyout); $$ = $2;}
-            | "++" lvalue           {$$ = manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
-            | lvalue "++"           {$$ = manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
-            | "--" lvalue           {$$ = manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno); $$ = $2;}
-            | lvalue "--"           {$$ = manage_term_lvalue_minusminus(DEBUG_PRINT, yyout, symTable, $1, scope, yylineno); $$ = $1;}
+            | "++" lvalue           {$$ = manage_term_plusplus_lvalue  (DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
+            | lvalue "++"           {$$ = manage_term_lvalue_plusplus  (DEBUG_PRINT, yyout, symTable, $1, scope, yylineno);}
+            | "--" lvalue           {$$ = manage_term_minusminus_lvalue(DEBUG_PRINT, yyout, symTable, $2, scope, yylineno);}
+            | lvalue "--"           {$$ = manage_term_lvalue_minusminus(DEBUG_PRINT, yyout, symTable, $1, scope, yylineno);}
             | primary               {manage_term_primary                (DEBUG_PRINT, yyout);}
             ;   
 
@@ -324,13 +324,25 @@ ifprefix        : IF "(" expr ")" {$$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, 
 elseprefix      : ELSE {$$ = manage_elseprefix(DEBUG_PRINT, yyout, scope, yylineno);}
                 ;
 
-whilestmt       : WHILE "(" expr ")"{   if(!loop_flag_stack) loop_flag_stack = new_stack();
-                                        int* loop_flag_ptr = malloc(sizeof(int));
-                                        *loop_flag_ptr = loop_flag;
-                                        push(loop_flag_stack,loop_flag_ptr);
-                                        loop_flag = 1;
-                                    } 
-                                    stmt {loop_flag = *(int*)pop(loop_flag_stack);} {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");}
+whilestmt       : whilestart whilecond  { if(!loop_flag_stack) loop_flag_stack = new_stack();
+                                          int* loop_flag_ptr = malloc(sizeof(int));
+                                          *loop_flag_ptr = loop_flag;
+                                          push(loop_flag_stack,loop_flag_ptr);
+                                          loop_flag = 1;
+                                        } 
+                                    stmt{   loop_flag = *(int*)pop(loop_flag_stack);} {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");
+                                            emit(jump, NULL, NULL, NULL, $1, yylineno);
+                                            patchLabel($2, nextQuadLabel());
+
+                                        }
+                ;
+
+whilestart      : WHILE {$$ = nextQuadLabel();}
+
+whilecond       : "(" expr ")"  {emit(if_eq, $2, new_const_bool(1), NULL, nextQuadLabel()+2, yylineno);  
+                                 $$ = nextQuadLabel();
+                                 emit(jump, NULL, NULL, NULL, 0, yylineno);
+                                }
                 ;
 
 forstmt         : FOR "(" elist ";" expr ";" elist ")"  {   if(!loop_flag_stack) loop_flag_stack = new_stack();
