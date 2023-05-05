@@ -82,7 +82,7 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
 expr* manage_primary_lvalue(int debug, FILE* out, expr* lvalue, unsigned int scope, unsigned int line);
 void manage_primary_call             (int debug, FILE* out);
 void manage_primary_objectdef        (int debug, FILE* out);
-void manage_primary_lpar_funcdef_rpar(int debug, FILE* out);
+expr* manage_primary_lpar_funcdef_rpar(int debug, FILE* out, Symbol* funcdef_s);
 void manage_primary_const            (int debug, FILE* out);
 
 expr* manage_lvalue_ident       (int debug, FILE* out, SymbolTable* symTable, char* id, enum SymbolType type, unsigned int scope, unsigned int line, ScopeStackList *tail);

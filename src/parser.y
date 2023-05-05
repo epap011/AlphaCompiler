@@ -159,7 +159,7 @@ assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(D
 primary     : lvalue                {if($1 != NULL) $$ = manage_primary_lvalue(DEBUG_PRINT, yyout, $1, scope, yylineno);}
             | call                  {manage_primary_call                      (DEBUG_PRINT, yyout);}
             | objectdef             {manage_primary_objectdef                 (DEBUG_PRINT, yyout);}
-            | "(" funcdef ")"       {manage_primary_lpar_funcdef_rpar         (DEBUG_PRINT, yyout);} //EDw file exeis douleia
+            | "(" funcdef ")"       {$$ = manage_primary_lpar_funcdef_rpar         (DEBUG_PRINT, yyout, $2);} //EDw file exeis douleia
             | const                 {manage_primary_const                     (DEBUG_PRINT, yyout);}
             ;   
 

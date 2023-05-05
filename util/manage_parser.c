@@ -174,6 +174,7 @@ expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned i
     emit(call,func,NULL,NULL,-1,line);
     expr* result = new_expr(var_e);
     result->sym = symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
+    incCurrScopeOffset();
     emit(getretval,NULL,NULL,result,-1,line);
     
     return result;
@@ -665,8 +666,15 @@ void manage_primary_objectdef(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"objectdef"CYN" ->"RESET" primary \n");
 }
 
-void manage_primary_lpar_funcdef_rpar(int debug, FILE* out) {
+expr* manage_primary_lpar_funcdef_rpar(int debug, FILE* out, Symbol* funcdef_s) {
     if(debug) fprintf(out, MAG "Detected :" RESET"( funcdef )"CYN" ->"RESET" primary \n");
+
+    if(funcdef_s){
+        expr* funcdef_e = new_expr(programfunc_e);
+        funcdef_e->sym = funcdef_s;
+        return funcdef_e;
+    }
+    return NULL;
 }
 
 void manage_primary_const(int debug, FILE* out) {
@@ -970,7 +978,7 @@ int manage_ifprefix(int debug, FILE* out, expr* expr1, unsigned int scope, unsig
     true_expr->boolConst = 1;
     
     emit(if_eq, expr1, true_expr, result, nextQuadLabel()+2, line);
-    emit(jump, NULL, NULL, NULL, 0, line);
+    emit(jump, NULL, NULL, NULL, -1, line);
 
     return nextQuadLabel()-1;
 }
@@ -978,7 +986,7 @@ int manage_ifprefix(int debug, FILE* out, expr* expr1, unsigned int scope, unsig
 int manage_elseprefix (int debug, FILE* out, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"elseprefix\n");
     
-    emit(jump, NULL, NULL, NULL, 0, line);
+    emit(jump, NULL, NULL, NULL, -1, line);
     return nextQuadLabel()-1;
 }
 
