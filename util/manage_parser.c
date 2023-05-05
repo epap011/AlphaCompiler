@@ -489,7 +489,20 @@ expr* manage_term_plusplus_lvalue(int debug, FILE* out, SymbolTable* symTable, e
             return NULL;
     }
 
-    return NULL;
+    expr * term;
+    if(lvalue->type == tableitem_e){
+       term = emit_if_tableitem(lvalue, scope, line);
+       emit(add, term, new_const_num(1), term, -1, line);
+       emit(tablesetelem, lvalue->index, term, lvalue, -1, line);
+    }
+    else{
+        emit(add, lvalue, new_const_num(1), lvalue, -1, line);
+        term = new_expr(arithexpr_e);
+        term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        emit(assign, lvalue, NULL, term, -1, line);
+    }
+
+    return term;
 }
 
 expr* manage_term_lvalue_plusplus(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, unsigned int scope, unsigned int line) {
@@ -525,7 +538,20 @@ expr* manage_term_minusminus_lvalue(int debug, FILE* out, SymbolTable* symTable,
             return NULL;
     }
 
-    return NULL;
+    expr * term;
+    if(lvalue->type == tableitem_e){
+       term = emit_if_tableitem(lvalue, scope, line);
+       emit(sub, term, new_const_num(1), term, -1, line);
+       emit(tablesetelem, lvalue->index, term, lvalue, -1, line);
+    }
+    else{
+        emit(sub, lvalue, new_const_num(1), lvalue, -1, line);
+        term = new_expr(arithexpr_e);
+        term->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        emit(assign, lvalue, NULL, term, -1, line);
+    }
+
+    return term;
 }
 
 expr* manage_term_lvalue_minusminus(int debug, FILE* out, SymbolTable* symTable, expr* lvalue, unsigned int scope, unsigned int line) {
