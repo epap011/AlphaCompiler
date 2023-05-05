@@ -6,6 +6,11 @@
 #include "expression.h"
 #include "quad.h"
 
+typedef struct Forprefix{
+    unsigned int test;
+    unsigned int enter;
+} Forprefix;
+
 void        insert_lib_functions(SymbolTable * symTable);
 const char* str_type(enum SymbolType type);
 void        symbol_table_print(SymbolTable* symTable);

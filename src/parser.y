@@ -47,6 +47,7 @@
     struct Symbol *symbolVal;
     struct expr *exprVal;
     struct callexpr *callexprVal;
+    struct Forprefix *forprefixVal;
 }
 
 %token <intVal>    INTCONST
@@ -83,7 +84,7 @@
 
 %token AND OR NOT IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE LOCAL TRUE FALSE NIL
 
-%type<intVal>    ifprefix elseprefix whilestart whilecond
+%type<intVal>    ifprefix elseprefix whilestart whilecond M N1 N2 N3
 %type<stringVal> id_opt com_id_opt
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr expr_opt assignexpr term const lvalue member call primary 
@@ -91,6 +92,7 @@
 %type<exprVal>   elist com_expr_opt stmt
 %type<exprVal>   indexedelem com_indexedelem_opt indexed
 %type<callexprVal>   methodcall normcall callsuffix
+%type<forprefixVal> forprefix
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -341,6 +343,7 @@ whilestmt       : whilestart whilecond  { if(!loop_flag_stack) loop_flag_stack =
                 ;
 
 whilestart      : WHILE {$$ = nextQuadLabel();}
+                ;
 
 whilecond       : "(" expr ")"  {emit(if_eq, $2, new_const_bool(1), NULL, nextQuadLabel()+2, yylineno);  
                                  $$ = nextQuadLabel();
@@ -348,13 +351,45 @@ whilecond       : "(" expr ")"  {emit(if_eq, $2, new_const_bool(1), NULL, nextQu
                                 }
                 ;
 
-forstmt         : FOR "(" elist ";" expr ";" elist ")"  {   if(!loop_flag_stack) loop_flag_stack = new_stack();
-                                                            int* loop_flag_ptr = malloc(sizeof(int));
-                                                            *loop_flag_ptr = loop_flag;
-                                                            push(loop_flag_stack,loop_flag_ptr);
-                                                            loop_flag = 1;
-                                                        } 
-                                                        stmt {loop_flag = *(int*)pop(loop_flag_stack);} {fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");}
+forstmt         : forprefix N1 elist ")" N2 {   if(!loop_flag_stack) loop_flag_stack = new_stack();
+                                                int* loop_flag_ptr = malloc(sizeof(int));
+                                                *loop_flag_ptr = loop_flag;
+                                                push(loop_flag_stack,loop_flag_ptr);
+                                                loop_flag = 1;
+                                        }  
+                                        stmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
+                                                fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
+
+                                                patchLabel($1->enter, $5+1);     //true    jump
+                                                patchLabel($2, nextQuadLabel()); //false   jump
+                                                patchLabel($5, $1->test);        //loop    jump
+                                                patchLabel($8, $2+1);            //closure jump
+                                            }
+                    ; 
+
+forprefix       : FOR "(" elist ";" M expr ";" {
+                                            Forprefix* forprefix = (Forprefix*)malloc(sizeof(Forprefix));
+                                            forprefix->test  = $5;
+                                            forprefix->enter = nextQuadLabel();
+                                            printf("forprefix->enter = %d\n", forprefix->enter);
+                                            printf("forprefix->test = %d\n", forprefix->test);
+                                            emit(if_eq, $6, new_const_bool(1), NULL, 0, yylineno);
+
+                                            $$ = forprefix;
+                                        }
+                ;
+                    
+
+N1              : {$$ = nextQuadLabel(); emit(jump, NULL, NULL, NULL, 0, yylineno);} 
+                ;
+
+N2              : {$$ = nextQuadLabel(); emit(jump, NULL, NULL, NULL, 0, yylineno);} 
+                ;
+
+N3              : {$$ = nextQuadLabel(); emit(jump, NULL, NULL, NULL, 0, yylineno);} 
+                ;      
+
+M               : {$$ = nextQuadLabel();}
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
