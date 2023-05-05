@@ -700,7 +700,7 @@ expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out, unsigned int scop
     if(debug) fprintf(yyout, MAG "Detected :" RESET"call ( elist )"CYN" ->"RESET" call \n");
 
     if(lvalue)
-        return manage_func_call(lvalue, elist, 0, 0);
+        return manage_func_call(lvalue, elist, scope, line);
     return NULL;
 }
 
