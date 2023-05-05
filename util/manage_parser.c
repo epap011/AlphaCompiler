@@ -347,24 +347,17 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
 
     expr* term = NULL;
     expr1->boolConst = convert_to_bool(expr1);
-
-    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e)){
-      
-        term = new_expr(boolexpr_e);
-        term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        incCurrScopeOffset();
-
-        expr* true_expr = new_expr(constbool_e);
-        true_expr->boolConst = 1;
-
-        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel() + 4, line);
-        emit(jump,NULL,NULL,NULL,nextQuadLabel() + 1 ,line);
-        emit(assign, new_const_bool(1), NULL, term, -1, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel() + 2, line);
-        emit(assign, new_const_bool(0), NULL, term, -1, line);
-    }
-    else
-        fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
+    
+    term = new_expr(boolexpr_e);
+    term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+    expr* true_expr = new_expr(constbool_e);
+    true_expr->boolConst = 1;
+    emit(if_eq, expr1, true_expr, NULL, nextQuadLabel() + 4, line);
+    emit(jump,NULL,NULL,NULL,nextQuadLabel() + 1 ,line);
+    emit(assign, new_const_bool(1), NULL, term, -1, line);
+    emit(jump, NULL, NULL, NULL, nextQuadLabel() + 2, line);
+    emit(assign, new_const_bool(0), NULL, term, -1, line);
 
     return term;
 }
@@ -374,37 +367,29 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
 
     expr1->boolConst = convert_to_bool(expr1);
     expr2->boolConst = convert_to_bool(expr2);
-
-    if ((expr1->type == var_e || expr1->type == constnum_e || expr1->type == constbool_e || expr1->type == boolexpr_e || expr1->type == tableitem_e || expr1->type == arithexpr_e) &&
-        (expr2->type == var_e || expr2->type == constnum_e || expr2->type == constbool_e ||expr1->type == boolexpr_e || expr2->type == tableitem_e || expr2->type == arithexpr_e)) {
-        
-        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        incCurrScopeOffset();
-
-        result = new_expr(boolexpr_e);
-        result->sym = tmp_symbol;
-
-        expr* true_expr = new_expr(constbool_e);
-        true_expr->boolConst = 1;
-        
-        if(op == and){
-            emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
-            emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
-        } else 
-        if(op == or){
-            emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+4, line);
-            emit(jump, NULL, NULL, NULL, nextQuadLabel()+1, line);
-        }  
-        
-        emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
-        emit(assign, new_const_bool(1), NULL, result, -1, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-        emit(assign, new_const_bool(0), NULL, result, -1, line);
-    }
-    else 
-        fprintf(out_file, RED"Error:"RESET" Invalid operands for boolean operation (line: "GRN"%d"RESET")\n", line);
+    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+    result = new_expr(boolexpr_e);
+    result->sym = tmp_symbol;
+    expr* true_expr = new_expr(constbool_e);
+    true_expr->boolConst = 1;
     
+    if(op == and){
+        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
+    } else 
+    if(op == or){
+        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+4, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+1, line);
+    }  
+    
+    emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+    emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
+    emit(assign, new_const_bool(1), NULL, result, -1, line);
+    emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+    emit(assign, new_const_bool(0), NULL, result, -1, line);
+    
+
     return result;
 }
 
