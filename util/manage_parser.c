@@ -332,7 +332,7 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
     result = new_expr(boolexpr_e);
     result->sym = tmp_symbol;
     
-    emit(op, expr1, expr2, result, nextQuadLabel()+2, line);
+    emit(op, expr1, expr2, NULL, nextQuadLabel()+2, line);
     emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
     emit(assign, new_const_bool(1), NULL, result, -1, line);
     emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
@@ -967,20 +967,13 @@ expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, uns
 }
 
 int manage_ifprefix(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {
-    expr* result = NULL;
 
     if(debug) fprintf(out, MAG "Detected :" RESET"ifprefix\n");
-
-    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
-
-    result = new_expr(boolexpr_e);
-    result->sym = tmp_symbol;
 
     expr* true_expr = new_expr(constbool_e);
     true_expr->boolConst = 1;
     
-    emit(if_eq, expr1, true_expr, result, nextQuadLabel()+2, line);
+    emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
     emit(jump, NULL, NULL, NULL, -1, line);
 
     return nextQuadLabel()-1;
