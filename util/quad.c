@@ -67,11 +67,13 @@ void printQuads(){
             printf(" RESULT: "RED"NULL           "RESET"\t");   
 
         if(quads[i].arg1 != NULL){
-            if(quads[i].arg1->type == var_e )
-                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
-            else if(quads[i].arg1->type == arithexpr_e)
-                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
-            else if (quads[i].arg1->type == libraryfunc_e || quads[i].arg1->type == programfunc_e)
+            if(quads[i].arg1->type == var_e         ||
+               quads[i].arg1->type == arithexpr_e   ||
+               quads[i].arg1->type == libraryfunc_e || 
+               quads[i].arg1->type == programfunc_e ||
+               quads[i].arg1->type == boolexpr_e    ||
+               quads[i].arg1->type == tableitem_e   ||
+               quads[i].arg1->type == newtable_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else if(quads[i].arg1->type == constnum_e) {
                 if(quads[i].arg1->sym != NULL)
@@ -81,27 +83,28 @@ void printQuads(){
             }
             else if(quads[i].arg1->type == constbool_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->boolConst ? "true" : "false");
-            else if(quads[i].arg1->type == boolexpr_e)
-                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
-            else if(quads[i].arg1->type == conststring_e)
-                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->strConst);
+            else if(quads[i].arg1->type == conststring_e){
+                int spacing = 13 - count_str(quads[i].arg1->strConst);
+                printf(" ARG1: \""YEL"%s"RESET"\"", quads[i].arg1->strConst);
+                for(int i = 0; i < spacing; i++)
+                    printf(" ");
+                printf("\t");
+            }
             else if(quads[i].arg1->type == nil_e)
                 printf(" ARG1: "YEL"nil            "RESET"\t");
-            else if(quads[i].arg1->type == tableitem_e)
-                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
-            else if(quads[i].arg1->type == newtable_e)
-                printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
             else 
-                printf("ARG1: kati paei lathos sta quads");
+                printf("ARG1: Something is wrong");
         }
         else
             printf(" ARG1: "RED"NULL           "RESET"\t");
         if(quads[i].arg2 != NULL){
-            if(quads[i].arg2->type == var_e )
-                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
-            else if(quads[i].arg2->type == arithexpr_e)
-                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
-            else if (quads[i].arg2->type == libraryfunc_e || quads[i].arg2->type == programfunc_e)
+            if(quads[i].arg2->type == var_e         ||
+               quads[i].arg2->type == arithexpr_e   ||
+               quads[i].arg2->type == libraryfunc_e || 
+               quads[i].arg2->type == programfunc_e ||
+               quads[i].arg2->type == boolexpr_e    ||
+               quads[i].arg2->type == tableitem_e   ||
+               quads[i].arg2->type == newtable_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else if(quads[i].arg2->type == constnum_e) {
                 if(quads[i].arg2->sym != NULL)
@@ -111,16 +114,17 @@ void printQuads(){
             }
             else if(quads[i].arg2->type == constbool_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->boolConst ? "true" : "false");
-            else if(quads[i].arg1->type == boolexpr_e)
-                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
-            else if(quads[i].arg2->type == conststring_e)
-                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->strConst);
+            else if(quads[i].arg2->type == conststring_e){
+                int spacing = 13 - count_str(quads[i].arg2->strConst);
+                printf(" ARG2: \""YEL"%s"RESET"\"", quads[i].arg2->strConst);
+                for(int i = 0; i < spacing; i++)
+                    printf(" ");
+                printf("\t");
+            }
             else if(quads[i].arg2->type == nil_e)
                 printf(" ARG2: "YEL"nil            "RESET"\t");
-            else if(quads[i].arg2->type == tableitem_e)
-                printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
             else 
-                printf("ARG2: kati paei lathos sta quads\n");
+                printf("ARG2: Something is wrong");
         }
         else
             printf(" ARG2: "RED"NULL           "RESET"\t");
@@ -153,7 +157,7 @@ const char* iopcode_tostring(enum iopcode op){
         case if_greater: return "if_greater";
         case call: return "call";
         case param: return "param";
-        case ret: return "ret";
+        case ret: return "return";
         case getretval: return "getretval";
         case funcstart: return "funcstart";
         case funcend: return "funcend";
@@ -164,4 +168,17 @@ const char* iopcode_tostring(enum iopcode op){
         default:
             return "unknown";
     }
+}
+
+int count_str(const char* str){
+
+    int i = 0;
+    int count = 0;
+    while(str[i] != '\0'){
+        if(str[i] == '\\' && str[i+1] == 't')
+            count += 7;
+        count++;
+        i++;
+    }
+    return count;
 }
