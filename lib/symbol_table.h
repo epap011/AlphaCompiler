@@ -43,7 +43,7 @@ typedef struct SymbolTable {
 
 SymbolTable* symbol_table_create ();
 void         symbol_table_destroy(SymbolTable* symbol_table);
-void         symbol_table_insert (SymbolTable* symbol_table, Symbol*     symbol);
+Symbol*      symbol_table_insert (SymbolTable* symbol_table, Symbol*     symbol);
 Symbol*      symbol_table_lookup (SymbolTable* symbol_table, const char* symbol);
 void         symbol_table_hide   (SymbolTable* symbol_table, unsigned int scope );
 Symbol*      symbol_table_scope_lookup (SymbolTable* symbol_table, const char* symbol, unsigned int scope);
@@ -51,7 +51,7 @@ Symbol*      symbol_table_scope_lookup (SymbolTable* symbol_table, const char* s
 Symbol* symbol_table_get_first_symbol_of_scope(SymbolTable* symbol_table, unsigned int scope);
 Symbol* symbol_table_get_last_symbol_of_scope(SymbolTable* symbol_table, unsigned int scope);
 
-Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable, enum symbol_t type, enum scopespace_t space, unsigned int offset);
+Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, enum SymbolType symbol_type, int is_variable, enum symbol_t type, enum scopespace_t space, unsigned int offset);
 void update_last_symbol_of_scope(SymbolTable* symbol_table, Symbol* symbol);
 int hash_function(const char* name, unsigned int size);
 

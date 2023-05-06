@@ -45,7 +45,7 @@ int hash_function(const char* key, unsigned int size) {
     return ascii_sum % size;
 }
 
-void symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
+Symbol* symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
     unsigned int index = hash_function(symbol->name, symbol_table->size);
 
     if( symbol_table->buckets[index] == NULL) {
@@ -60,6 +60,8 @@ void symbol_table_insert(SymbolTable* symbol_table, Symbol* symbol) {
         symbol_table->last_symbol_scopes[scope]->next_symbol_of_same_scope = symbol;    
     
     update_last_symbol_of_scope(symbol_table, symbol);
+
+    return symbol;
 }
 
 //This is unused (for now???)
@@ -118,7 +120,7 @@ void symbol_table_hide(SymbolTable* symbol_table, unsigned int scope) {
     }
 }
 
-Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, int symbol_type, int is_variable, enum symbol_t type, enum scopespace_t space, unsigned int offset) {
+Symbol* symbol_create(const char* name, unsigned int scope, unsigned int line, enum SymbolType symbol_type, int is_variable, enum symbol_t type, enum scopespace_t space, unsigned int offset) {
     Symbol* symbol = (Symbol*)malloc(sizeof(Symbol));
     
     symbol->is_active   = 1;
