@@ -15,7 +15,7 @@
 enum iopcode{
 
     assign, add, sub, mul, i_div, mod, uminus,
-    and, or, not,
+    and, or, not, //useless
     if_eq, if_noteq, if_lesseq, if_greatereq, if_less, if_greater,
     call, param, ret, getretval,
     funcstart, funcend,
@@ -39,6 +39,7 @@ void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label,
 expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line);
 const char* iopcode_tostring(enum iopcode);
 void printQuads();
+int count_str(const char* str);
 
 //for functions
 unsigned nextQuadLabel();

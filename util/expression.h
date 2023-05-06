@@ -7,13 +7,13 @@
 enum expr_t{
 
     var_e,            //symbol
-    tableitem_e,      //index
+    tableitem_e,      //lvalue[]
 
     programfunc_e,    //symbol
     libraryfunc_e,    //symbol
 
     arithexpr_e,      //hidden var - arithop
-    boolexpr_e,       //unused
+    boolexpr_e,       
     assignexpr_e,     //unused
 
     newtable_e,      //table create
