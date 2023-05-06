@@ -118,7 +118,7 @@ program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
             | /* empty */
             ;   
 
-stmt        : expr ";"      {manage_stmt_expr      (DEBUG_PRINT, yyout);}
+stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
             | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
             | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
             | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
@@ -393,8 +393,6 @@ forprefix       : FOR "(" elist ";" M expr ";" {
                                             Forprefix* forprefix = (Forprefix*)malloc(sizeof(Forprefix));
                                             forprefix->test  = $5;
                                             forprefix->enter = nextQuadLabel();
-                                            printf("forprefix->enter = %d\n", forprefix->enter);
-                                            printf("forprefix->test = %d\n", forprefix->test);
                                             emit(if_eq, $6, new_const_bool(1), NULL, 0, yylineno);
 
                                             $$ = forprefix;
