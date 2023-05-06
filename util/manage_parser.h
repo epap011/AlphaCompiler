@@ -11,6 +11,16 @@ typedef struct Forprefix{
     unsigned int enter;
 } Forprefix;
 
+typedef struct stmt_t {
+    int break_list;
+    int cont_list;
+} stmt_t;
+
+stmt_t* make_stmt ();
+int     new_list  (int i);
+int     merge_list(int l1, int l2);
+void    patch_list(int list, int label);
+
 void        insert_lib_functions(SymbolTable * symTable);
 const char* str_type(enum SymbolType type);
 void        symbol_table_print(SymbolTable* symTable);
@@ -35,16 +45,16 @@ int convert_to_bool(expr* expr);
 
 void manage_program        (int debug, FILE* out);
 
-void manage_stmt_expr      (int debug, FILE* out);
-void manage_stmt_ifstmt    (int debug, FILE* out);
-void manage_stmt_whilestmt (int debug, FILE* out);
-void manage_stmt_forstmt   (int debug, FILE* out);
-void manage_stmt_returnstmt(int debug, FILE* out);
-void manage_stmt_break     (int debug, FILE* out, int line, int flag);
-void manage_stmt_continue  (int debug, FILE* out, int line, int flag);
-void manage_stmt_block     (int debug, FILE* out);
-void manage_stmt_funcdef   (int debug, FILE* out);
-void manage_stmt_semicolon (int debug, FILE* out);
+stmt_t* manage_stmt_expr      (int debug, FILE* out);
+stmt_t* manage_stmt_ifstmt    (int debug, FILE* out);
+stmt_t* manage_stmt_whilestmt (int debug, FILE* out);
+stmt_t* manage_stmt_forstmt   (int debug, FILE* out);
+stmt_t* manage_stmt_returnstmt(int debug, FILE* out);
+stmt_t* manage_stmt_break     (int debug, FILE* out, int line, int flag);
+stmt_t* manage_stmt_continue  (int debug, FILE* out, int line, int flag);
+stmt_t* manage_stmt_block     (int debug, FILE* out);
+stmt_t* manage_stmt_funcdef   (int debug, FILE* out);
+stmt_t* manage_stmt_semicolon (int debug, FILE* out);
 
 void manage_expr_assignexpr(int debug, FILE* out);
 void manage_expr_term      (int debug, FILE* out);
@@ -122,8 +132,9 @@ expr* manage_indexedele_lcbrace_expr_colon_expr_rcbrace(int debug, FILE* out, ex
 expr* manage_comindexedelemopt_empty(int debug, FILE* out);
 expr* manage_comindexedelemopt_comma_indexedelem_comindexedelemopt(int debug, FILE* out, expr* indexedelem, expr* com_indexedelem_opt);
 
-expr* manage_stmtList_empty(int debug, FILE* out);
+expr* manage_stmtList_stmt(int debug, FILE* out);
 expr* manage_stmtList_stmt_stmtList(int debug, FILE* out);
+expr* manage_stmtList_empty(int debug, FILE* out);
 
 expr* manage_ifstmt     (int debug, FILE* out, int ifprefix, unsigned int scope, unsigned int line);
 expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line);

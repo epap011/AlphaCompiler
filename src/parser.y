@@ -21,6 +21,7 @@
     int loop_flag          = 0;
     int return_flag        = 0;
     int normcall_skip      = 0;       // we want to manage_function_call only when a function is called, not when a method is called
+    int loop_counter       = 0;
 
     int is_function_block  = 0;  // 0: not in function block, 1: in function block
     int is_function_active = 0;  // 0: not in function, > 0 in function
@@ -48,6 +49,7 @@
     struct expr *exprVal;
     struct callexpr *callexprVal;
     struct Forprefix *forprefixVal;
+    struct stmt_t *stmtVal;
 }
 
 %token <intVal>    INTCONST
@@ -89,10 +91,11 @@
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr expr_opt assignexpr term const lvalue member call primary 
 %type<exprVal>   objectdef
-%type<exprVal>   elist com_expr_opt stmt
+%type<exprVal>   elist com_expr_opt
 %type<exprVal>   indexedelem com_indexedelem_opt indexed
 %type<callexprVal>   methodcall normcall callsuffix
 %type<forprefixVal> forprefix
+%type<stmtVal>   stmt stmtList loopstmt break continue block ifstmt whilestmt forstmt returnstmt
 
 %nonassoc LP_ELSE
 %nonassoc ELSE
@@ -112,18 +115,19 @@
 %%  
 
 program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
+            | /*empty*/
             ;   
 
-stmt        : expr ";"      {manage_stmt_expr      (DEBUG_PRINT, yyout);}
-            | ifstmt        {manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
-            | whilestmt     {manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
-            | forstmt       {manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
-            | returnstmt    {manage_stmt_returnstmt(DEBUG_PRINT, yyout);}
-            | BREAK ";"     {manage_stmt_break     (DEBUG_PRINT, yyout, yylineno, loop_flag);}
-            | CONTINUE ";"  {manage_stmt_continue  (DEBUG_PRINT, yyout, yylineno, loop_flag);}
-            | block         {manage_stmt_block     (DEBUG_PRINT, yyout);}
-            | funcdef       {manage_stmt_funcdef   (DEBUG_PRINT, yyout);}
-            | ";"           {manage_stmt_semicolon (DEBUG_PRINT, yyout);}
+stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
+            | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
+            | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
+            | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
+            | returnstmt    {$$ = manage_stmt_returnstmt(DEBUG_PRINT, yyout);}
+            | break         {manage_stmt_break(DEBUG_PRINT, yyout, yylineno, loop_flag);      $$ = $1; }
+            | continue      {manage_stmt_continue  (DEBUG_PRINT, yyout, yylineno, loop_flag); $$ = $1;}
+            | block         {manage_stmt_block     (DEBUG_PRINT, yyout); $$ = $1; }
+            | funcdef       {$$ = manage_stmt_funcdef   (DEBUG_PRINT, yyout);}
+            | ";"           {$$ = manage_stmt_semicolon (DEBUG_PRINT, yyout);}
             ;           
 
 expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
@@ -225,11 +229,35 @@ block           : "{" {increase_scope(&scope);
                                                                 decrease_scope(&scope);
                                                                 in_function_tail = SSL_Pop(in_function_tail);
                                                                 fprintf(yyout, MAG "Detected :" RESET"{ stmtList }"CYN" ->"RESET" block \n");
+                                                                $$ = $3;
                                                              }
+                | "{" {increase_scope(&scope); 
+                    if(is_function_block){          
+                        in_function_tail = SSL_Push(in_function_tail,1);
+                        is_function_block=0;
+                    }
+                    else
+                        in_function_tail = SSL_Push(in_function_tail,0);
+                        }     
+                             "}" {
+                                symbol_table_hide(symTable,scope);
+                                decrease_scope(&scope);
+                                in_function_tail = SSL_Pop(in_function_tail);
+                                fprintf(yyout, MAG "Detected :" RESET"{  }"CYN" ->"RESET" block \n");
+                                $$ = make_stmt();
+                                }
+                                
                 ;
 
-stmtList        : /* empty */   {manage_stmtList_empty        (DEBUG_PRINT, yyout);}
-                | stmt stmtList {manage_stmtList_stmt_stmtList(DEBUG_PRINT, yyout);}
+stmtList        : stmt           {manage_stmtList_stmt        (DEBUG_PRINT, yyout); $$ = $1; }
+                | stmtList stmt  {manage_stmtList_stmt_stmtList(DEBUG_PRINT, yyout);
+                                 $$ = make_stmt();
+                                 if($1 != NULL && $2 != NULL) {
+                                    $$->break_list   = merge_list($1->break_list, $2->break_list); 
+                                    $$->cont_list    = merge_list($1->cont_list , $2->cont_list );
+                                 }
+                                 }
+
                 ;
 
                 /*Please for the shake of our sanity leave that as it is.*/                                                           
@@ -326,7 +354,7 @@ com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"co
                 | "," IDENT com_id_opt {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
                 ;
 
-ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT, yyout, $1, scope, yylineno);}
+ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT, yyout, $1, scope, yylineno);     $$ = $2;}
                 | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
                 ;
 
@@ -341,11 +369,13 @@ whilestmt       : whilestart whilecond  { if(!loop_flag_stack) loop_flag_stack =
                                           push(loop_flag_stack,loop_flag_ptr);
                                           loop_flag = 1;
                                         } 
-                                    stmt{   loop_flag = *(int*)pop(loop_flag_stack);} {fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");
-                                            emit(jump, NULL, NULL, NULL, $1, yylineno);
-                                            patchLabel($2, nextQuadLabel());
-
-                                        }
+                                        loopstmt{   loop_flag = *(int*)pop(loop_flag_stack);
+                                                    emit(jump, NULL, NULL, NULL, $1, yylineno);
+                                                    patchLabel($2, nextQuadLabel());
+                                                    patch_list($4->break_list, nextQuadLabel());
+                                                    patch_list($4->cont_list , $1);
+                                                    fprintf(yyout, MAG "Detected :" RESET"WHILE ( expr ) stmt"CYN"-> "RESET"whilestmt \n");
+                                                }
                 ;
 
 whilestart      : WHILE {$$ = nextQuadLabel();}
@@ -363,13 +393,16 @@ forstmt         : forprefix N1 elist ")" N2 {   if(!loop_flag_stack) loop_flag_s
                                                 push(loop_flag_stack,loop_flag_ptr);
                                                 loop_flag = 1;
                                         }  
-                                        stmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
+                                        loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
                                                 fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
 
                                                 patchLabel($1->enter, $5+1);     //true    jump
                                                 patchLabel($2, nextQuadLabel()); //false   jump
                                                 patchLabel($5, $1->test);        //loop    jump
                                                 patchLabel($8, $2+1);            //closure jump
+
+                                                patch_list($7->break_list, nextQuadLabel());
+                                                patch_list($7->cont_list, $2+1);
                                             }
                     ; 
 
@@ -377,8 +410,6 @@ forprefix       : FOR "(" elist ";" M expr ";" {
                                             Forprefix* forprefix = (Forprefix*)malloc(sizeof(Forprefix));
                                             forprefix->test  = $5;
                                             forprefix->enter = nextQuadLabel();
-                                            printf("forprefix->enter = %d\n", forprefix->enter);
-                                            printf("forprefix->test = %d\n", forprefix->test);
                                             emit(if_eq, $6, new_const_bool(1), NULL, 0, yylineno);
 
                                             $$ = forprefix;
@@ -396,6 +427,26 @@ N3              : {$$ = nextQuadLabel(); emit(jump, NULL, NULL, NULL, 0, yylinen
                 ;      
 
 M               : {$$ = nextQuadLabel();}
+                ;
+
+loopstart       : {++loop_counter;}
+                ;
+
+loopend         : {--loop_counter;}
+                ;
+
+loopstmt        : loopstart stmt loopend {$$ = $2; fprintf(yyout, MAG "Detected :" RESET"stmt"CYN"-> "RESET"loopstmt \n");}
+
+break           : BREAK    ";" {$$ = make_stmt(); 
+                                $$->break_list = new_list(nextQuadLabel()); 
+                                emit(jump, NULL, NULL, NULL, 0, yylineno);
+                               }
+                ;
+
+continue        : CONTINUE ";" {$$ = make_stmt(); 
+                                $$->cont_list  = new_list(nextQuadLabel());
+                                emit(jump, NULL, NULL, NULL, 0, yylineno);
+                               }
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
