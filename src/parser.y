@@ -376,13 +376,16 @@ forstmt         : forprefix N1 elist ")" N2 {   if(!loop_flag_stack) loop_flag_s
                                                 push(loop_flag_stack,loop_flag_ptr);
                                                 loop_flag = 1;
                                         }  
-                                        stmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
+                                        loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
                                                 fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
 
                                                 patchLabel($1->enter, $5+1);     //true    jump
                                                 patchLabel($2, nextQuadLabel()); //false   jump
                                                 patchLabel($5, $1->test);        //loop    jump
                                                 patchLabel($8, $2+1);            //closure jump
+
+                                                patch_list($7->break_list, nextQuadLabel());
+                                                patch_list($7->cont_list, $2+1);
                                             }
                     ; 
 
