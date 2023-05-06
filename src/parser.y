@@ -115,7 +115,7 @@
 %%  
 
 program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
-            | /* empty */
+            | /*empty*/
             ;   
 
 stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
@@ -123,8 +123,8 @@ stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
             | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
             | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
             | returnstmt    {$$ = manage_stmt_returnstmt(DEBUG_PRINT, yyout);}
-            | break         {manage_stmt_break(DEBUG_PRINT, yyout, yylineno, loop_flag); $$ = $1; }
-            | continue      {manage_stmt_continue  (DEBUG_PRINT, yyout, yylineno, loop_flag);}
+            | break         {manage_stmt_break(DEBUG_PRINT, yyout, yylineno, loop_flag);      $$ = $1; }
+            | continue      {manage_stmt_continue  (DEBUG_PRINT, yyout, yylineno, loop_flag); $$ = $1;}
             | block         {manage_stmt_block     (DEBUG_PRINT, yyout); $$ = $1; }
             | funcdef       {$$ = manage_stmt_funcdef   (DEBUG_PRINT, yyout);}
             | ";"           {$$ = manage_stmt_semicolon (DEBUG_PRINT, yyout);}
@@ -231,6 +231,22 @@ block           : "{" {increase_scope(&scope);
                                                                 fprintf(yyout, MAG "Detected :" RESET"{ stmtList }"CYN" ->"RESET" block \n");
                                                                 $$ = $3;
                                                              }
+                | "{" {increase_scope(&scope); 
+                    if(is_function_block){          
+                        in_function_tail = SSL_Push(in_function_tail,1);
+                        is_function_block=0;
+                    }
+                    else
+                        in_function_tail = SSL_Push(in_function_tail,0);
+                        }     
+                             "}" {
+                                symbol_table_hide(symTable,scope);
+                                decrease_scope(&scope);
+                                in_function_tail = SSL_Pop(in_function_tail);
+                                fprintf(yyout, MAG "Detected :" RESET"{  }"CYN" ->"RESET" block \n");
+                                $$ = make_stmt();
+                                }
+                                
                 ;
 
 stmtList        : stmt           {manage_stmtList_stmt        (DEBUG_PRINT, yyout); $$ = $1; }
@@ -241,6 +257,7 @@ stmtList        : stmt           {manage_stmtList_stmt        (DEBUG_PRINT, yyou
                                     $$->cont_list    = merge_list($1->cont_list , $2->cont_list );
                                  }
                                  }
+
                 ;
 
                 /*Please for the shake of our sanity leave that as it is.*/                                                           

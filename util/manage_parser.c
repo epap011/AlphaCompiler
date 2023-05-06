@@ -212,7 +212,7 @@ void manage_program (int debug, FILE* out) {
 
 stmt_t* manage_stmt_expr(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
-    return NULL;
+    return make_stmt();
 }
 
 stmt_t* manage_stmt_ifstmt(int debug, FILE* out) {
