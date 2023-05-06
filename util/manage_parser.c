@@ -191,18 +191,17 @@ int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int sco
     return 0;
 }
 
-void manage_return(int line, int flag, expr* retval, Stack *retstack, unsigned int currQuad){
+void manage_return(int line, int flag, expr* retval, Stack *retstack){
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
     else{
         emit(ret, retval ? retval : NULL, NULL, NULL, -1, line);
         //Because of multiple returns in multiple funcdefs, a stack of stacks is required (funcdefs x returns).
         unsigned int *curr = malloc(sizeof(unsigned int));
-        *curr=currQuad;
         void *ret_s = pop(retstack);
         push(ret_s,curr);
         push(retstack,ret_s);
-
+        *curr=nextQuadLabel();
         emit(jump, NULL, NULL, NULL, -1, line);
     }
 }

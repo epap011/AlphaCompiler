@@ -270,11 +270,7 @@ funcdef         : funcprefix
                                                             void *ret_s, *ret_s_s;
                                                             ret_s = pop(ret_stack);
                                                             while ( (ret_s_s = pop(ret_s) ))
-                                                                    patchLabel(*(unsigned int *)ret_s_s, nextQuadLabel());
-                                                            /*
-                                                            void* ret_s;
-                                                            if( (ret_s = pop(ret_stack)) )
-                                                                patchLabel(*(unsigned int *)ret_s, nextQuadLabel());*/
+                                                                    patchLabel( *(unsigned int *)ret_s_s, (nextQuadLabel()-1) );
                                                          }
                                                                                                              
                                                                                             
@@ -403,7 +399,7 @@ M               : {$$ = nextQuadLabel();}
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
-                                        manage_return(yylineno, return_flag, $2, ret_stack, currQuad);}
+                                        manage_return(yylineno, return_flag, $2, ret_stack);}
                 ;
 
 expr_opt        : /* empty */ {fprintf(yyout, MAG "Detected :" RESET"expr_opt "YEL" (empty)"RESET"\n"); $$ = NULL;}
