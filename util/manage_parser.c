@@ -131,7 +131,7 @@ Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsi
     Symbol* symbol = symbol_create(name, scope, line, USERFUNC, FUNC, programfunc_s, -1, -1);
     
     //phase 3 quad number
-    symbol->iaddress    = nextQuadLabel();
+    symbol->iaddress    = nextQuadLabel() +1; //+1 because a jump quad is created before funcstart quad
 
     symbol_table_insert(symTable, symbol);
     return symbol;
