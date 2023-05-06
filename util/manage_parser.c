@@ -210,48 +210,58 @@ void manage_program (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"program stmtList \n");
 }
 
-void manage_stmt_expr(int debug, FILE* out) {
+stmt_t* manage_stmt_expr(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
+    return NULL;
 }
 
-void manage_stmt_ifstmt(int debug, FILE* out) {
+stmt_t* manage_stmt_ifstmt(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"ifstmt"CYN" ->"RESET" stmt \n");
+    return make_stmt();
 }
 
-void manage_stmt_whilestmt(int debug, FILE* out) {
+stmt_t* manage_stmt_whilestmt(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"whilestmt"CYN" ->"RESET" stmt \n");
+    return make_stmt();
 }
 
-void manage_stmt_forstmt(int debug, FILE* out) {
+stmt_t* manage_stmt_forstmt(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"forstmt"CYN" ->"RESET" stmt \n");
+    return make_stmt();
 }
 
-void manage_stmt_returnstmt(int debug, FILE* out) {
+stmt_t* manage_stmt_returnstmt(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"returnstmt"CYN" ->"RESET" stmt \n");
+    return make_stmt();
 }
 
-void manage_stmt_block     (int debug, FILE* out) {
+stmt_t* manage_stmt_block     (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"block"CYN" ->"RESET" stmt \n");
+    return NULL;
 }
 
-void manage_stmt_break(int debug, FILE* out, int line, int flag){
+stmt_t* manage_stmt_break(int debug, FILE* out, int line, int flag){
     if(debug) fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n");
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"break; "RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+    return NULL;
 }
 
-void manage_stmt_continue(int debug, FILE* out, int line, int flag){
+stmt_t* manage_stmt_continue(int debug, FILE* out, int line, int flag){
     if(debug) fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
     if(!flag)
         fprintf(out_file,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+    return NULL;
 }
 
-void manage_stmt_funcdef   (int debug, FILE* out) {
+stmt_t* manage_stmt_funcdef   (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"funcdef"CYN" ->"RESET" stmt \n");
+    return make_stmt();
 }
 
-void manage_stmt_semicolon (int debug, FILE* out) {
+stmt_t* manage_stmt_semicolon (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET";"CYN""RESET" -> stmt \n");
+    return make_stmt();
 }
 
 void manage_expr_assignexpr(int debug, FILE* out) {
@@ -946,6 +956,11 @@ expr* manage_stmtList_empty(int debug, FILE* out) {
     return NULL;
 }
 
+expr* manage_stmtList_stmt(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"stmt"CYN" ->"RESET" stmtList \n");
+    return NULL;
+}
+
 expr* manage_stmtList_stmt_stmtList(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"stmt stmtList"CYN" ->"RESET" stmtList \n");
     return NULL;
@@ -1006,5 +1021,37 @@ int convert_to_bool(expr* expr) {
             return 1;
         default:
             return -1;
+    }
+}
+
+stmt_t* make_stmt() {
+    stmt_t* stmt = (stmt_t*)malloc(sizeof(stmt_t));
+    stmt->break_list = 0;
+    stmt->cont_list  = 0;
+    return stmt;
+}
+
+int new_list(int i) {
+    get_quads()[i].label = 0;
+    return i;
+}
+
+int merge_list(int l1, int l2) {
+    if(!l1) return l2;
+    else
+    if(!l2) return l1; 
+    else {
+        int i = l1;
+        while(get_quads()[i].label != 0) i = get_quads()[i].label;
+        get_quads()[i].label = l2;
+        return l1;
+    }
+}
+
+void patch_list(int list, int label) {
+    while(list) {
+        int next = get_quads()[list].label;
+        get_quads()[list].label = label;
+        list = next;
     }
 }

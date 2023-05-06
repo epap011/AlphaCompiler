@@ -182,3 +182,7 @@ int count_str(const char* str){
     }
     return count;
 }
+
+quad* get_quads(){
+    return quads;
+}

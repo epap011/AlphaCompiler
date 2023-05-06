@@ -40,6 +40,7 @@ expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line);
 const char* iopcode_tostring(enum iopcode);
 void printQuads();
 int count_str(const char* str);
+quad* get_quads();
 
 //for functions
 unsigned nextQuadLabel();
