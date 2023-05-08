@@ -215,6 +215,9 @@ stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope 
 
 
     if(result->truelist != -1){
+        printf("patcharw to %d\n",nextQuadLabel() +1);
+        patch_list(result->truelist, nextQuadLabel());
+        patch_list(result->falselist, nextQuadLabel()+2);
 
         emit(assign, new_const_bool(1), NULL, result, -1, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
@@ -394,52 +397,48 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
     expr* true_expr = new_expr(constbool_e);
     true_expr->boolConst = 1;
     
+    printf("To M_label einai %d\n", M_label);
     if(expr1->truelist == -1){
     //emits for expr1
         if(op == and){
-            emit(if_eq, expr1, true_expr, NULL, -1, line);
-            emit(jump, NULL, NULL, NULL, -1, line);
+            emit(if_eq, expr1, true_expr, NULL, 0, line); 
+            emit(jump, NULL, NULL, NULL, 0, line);
         } else 
         if(op == or){
-            emit(if_eq, expr1, true_expr, NULL, -1, line);
-            emit(jump, NULL, NULL, NULL, -1, line);
-        }  
-    }
-    //Create truelist and falselist for e1 if not exists
-    if(expr1->truelist == -1){
-        expr1->truelist = new_list(nextQuadLabel()-3);
-        expr1->falselist = new_list(nextQuadLabel()-2);
+            emit(if_eq, expr1, true_expr, NULL, 0, line);
+            emit(jump, NULL, NULL, NULL, 0, line);
+        } 
+        printf("Ftiaxnw listes edw gia to expr1\n");
+        //Create truelist and falselist for e1 if not exists
+        expr1->truelist = new_list(nextQuadLabel()-2);
+        expr1->falselist = new_list(nextQuadLabel()-1);
     }
 
     //emits for expr2
-    emit(if_eq, expr2, true_expr, NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
-    emit(jump, NULL, NULL, NULL, -1, line);
+    emit(if_eq, expr2, true_expr, NULL, 0, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+    emit(jump, NULL, NULL, NULL, 0, line);
    
    //Create truelist and falselist for e2 if not exists
     if(expr2->truelist == -1){
-        expr2->truelist = new_list(nextQuadLabel()-3);
-        expr2->falselist = new_list(nextQuadLabel()-2);
+        printf("Ftiaxnw listes edw gia to expr2\n");
+        expr2->truelist = new_list(nextQuadLabel()-2);
+        expr2->falselist = new_list(nextQuadLabel()-1);
     }
-
+    
     //Merge lists for result (e) 
     if(op == and){
+        printf("patcharw mergarw listes sto and\n");
         patch_list(expr1->truelist, M_label);
         result->truelist = expr2->truelist;
         result->falselist = merge_list(expr1->falselist, expr2->falselist);
     }else
     if(op == or){
+        printf("patcharw mergarw listes sto or\n");
         patch_list(expr1->falselist, M_label);
         result->truelist = merge_list(expr1->truelist, expr2->truelist);
         result->falselist = expr2->falselist;
     }
     
-
-   //auta poulo
-   // emit(assign, new_const_bool(1), NULL, result, -1, line);
-   // emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-   // emit(assign, new_const_bool(0), NULL, result, -1, line);
-    
-
     return result;
 }
 
