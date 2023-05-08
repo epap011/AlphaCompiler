@@ -118,7 +118,7 @@ program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
             | /*empty*/
             ;   
 
-stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
+stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout,$1, scope, yylineno);}
             | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
             | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
             | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
@@ -130,21 +130,21 @@ stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
             | ";"           {$$ = manage_stmt_semicolon (DEBUG_PRINT, yyout);}
             ;           
 
-expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
-            | term          {manage_expr_term      (DEBUG_PRINT, yyout);}
-            | expr "+" expr {$$ = manage_expr_plus_expr (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "*" expr {$$ = manage_expr_mul_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "-" expr {$$ = manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "/" expr {$$ = manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "%" expr {$$ = manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr EQ expr  {$$ = manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr NEQ expr {$$ = manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr GT expr  {$$ = manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr LT expr  {$$ = manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr GTE expr {$$ = manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr LTE expr {$$ = manage_expr_lte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr AND expr {$$ = manage_expr_and_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr OR expr  {$$ = manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+expr        : assignexpr        {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
+            | term              {manage_expr_term      (DEBUG_PRINT, yyout);}
+            | expr "+" expr     {$$ = manage_expr_plus_expr (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "*" expr     {$$ = manage_expr_mul_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "-" expr     {$$ = manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "/" expr     {$$ = manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "%" expr     {$$ = manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr EQ expr      {$$ = manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr NEQ expr     {$$ = manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr GT expr      {$$ = manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr LT expr      {$$ = manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr GTE expr     {$$ = manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr LTE expr     {$$ = manage_expr_lte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr AND M expr   {$$ = manage_expr_and_expr  (DEBUG_PRINT, yyout, $1, $4, $3, scope, yylineno);}
+            | expr OR  M expr   {$$ = manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $4, $3, scope, yylineno);}
             ;                   
 
 term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PRINT, yyout); $$ = $2;}

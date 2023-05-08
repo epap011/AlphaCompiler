@@ -38,6 +38,9 @@ typedef struct expr{
 
     struct expr* hidden_var;
 
+    unsigned int truelist;
+    unsigned int falselist;
+
 } expr;
 
 typedef struct callexpr{

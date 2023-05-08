@@ -210,8 +210,18 @@ void manage_program (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"program stmtList \n");
 }
 
-stmt_t* manage_stmt_expr(int debug, FILE* out) {
+stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope , unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
+
+
+    if(result->truelist != -1){
+
+        emit(assign, new_const_bool(1), NULL, result, -1, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+        emit(assign, new_const_bool(0), NULL, result, -1, line);
+    }
+
+
     return make_stmt();
 }
 
@@ -371,7 +381,7 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
     return term;
 }
 
-expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
+expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
     expr* result = NULL;
 
     expr1->boolConst = convert_to_bool(expr1);
@@ -380,23 +390,54 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
     incCurrScopeOffset();
     result = new_expr(boolexpr_e);
     result->sym = tmp_symbol;
+    
     expr* true_expr = new_expr(constbool_e);
     true_expr->boolConst = 1;
     
+    if(expr1->truelist == -1){
+    //emits for expr1
+        if(op == and){
+            emit(if_eq, expr1, true_expr, NULL, -1, line);
+            emit(jump, NULL, NULL, NULL, -1, line);
+        } else 
+        if(op == or){
+            emit(if_eq, expr1, true_expr, NULL, -1, line);
+            emit(jump, NULL, NULL, NULL, -1, line);
+        }  
+    }
+    //Create truelist and falselist for e1 if not exists
+    if(expr1->truelist == -1){
+        expr1->truelist = new_list(nextQuadLabel()-3);
+        expr1->falselist = new_list(nextQuadLabel()-2);
+    }
+
+    //emits for expr2
+    emit(if_eq, expr2, true_expr, NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+    emit(jump, NULL, NULL, NULL, -1, line);
+   
+   //Create truelist and falselist for e2 if not exists
+    if(expr2->truelist == -1){
+        expr2->truelist = new_list(nextQuadLabel()-3);
+        expr2->falselist = new_list(nextQuadLabel()-2);
+    }
+
+    //Merge lists for result (e) 
     if(op == and){
-        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
-    } else 
+        patch_list(expr1->truelist, M_label);
+        result->truelist = expr2->truelist;
+        result->falselist = merge_list(expr1->falselist, expr2->falselist);
+    }else
     if(op == or){
-        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+4, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+1, line);
-    }  
+        patch_list(expr1->falselist, M_label);
+        result->truelist = merge_list(expr1->truelist, expr2->truelist);
+        result->falselist = expr2->falselist;
+    }
     
-    emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
-    emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
-    emit(assign, new_const_bool(1), NULL, result, -1, line);
-    emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-    emit(assign, new_const_bool(0), NULL, result, -1, line);
+
+   //auta poulo
+   // emit(assign, new_const_bool(1), NULL, result, -1, line);
+   // emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+   // emit(assign, new_const_bool(0), NULL, result, -1, line);
     
 
     return result;
@@ -468,16 +509,16 @@ expr* manage_expr_lte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsig
     return manage_relop_emits(expr1, expr2, scope, line, if_lesseq);
 }
 
-expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");
  
-    return manage_boolop_emits(expr1, expr2, scope, line, and);
+    return manage_boolop_emits(expr1, expr2, scope, line, and, M_label);
 }
 
-expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");
     
-    return manage_boolop_emits(expr1, expr2, scope, line, or); 
+    return manage_boolop_emits(expr1, expr2, scope, line, or, M_label); 
 }
 /**End of Arithmetic / relop**/
 

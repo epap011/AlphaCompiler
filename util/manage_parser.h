@@ -35,7 +35,7 @@ int convert_to_bool(expr* expr);
 
 void manage_program        (int debug, FILE* out);
 
-stmt_t* manage_stmt_expr      (int debug, FILE* out);
+stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope , unsigned int line);
 stmt_t* manage_stmt_ifstmt    (int debug, FILE* out);
 stmt_t* manage_stmt_whilestmt (int debug, FILE* out);
 stmt_t* manage_stmt_forstmt   (int debug, FILE* out);
@@ -52,7 +52,7 @@ void manage_expr_term      (int debug, FILE* out);
 expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_arithop_emits    (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_relop_emits      (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
-expr* manage_boolop_emits     (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
+expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label);
 
 expr* manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
@@ -65,8 +65,8 @@ expr* manage_expr_gt_expr   (int debug, FILE* out, expr* expr1, expr* expr2, uns
 expr* manage_expr_lt_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_gte_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_lte_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
-expr* manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
-expr* manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line);
+expr* manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line);
 
 void manage_term_lpar_expr_rpar   (int debug, FILE* out);
 expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int scope, unsigned int line);
