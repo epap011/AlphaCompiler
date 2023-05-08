@@ -186,3 +186,37 @@ int count_str(const char* str){
 quad* get_quads(){
     return quads;
 }
+
+/*Quad list related functions*/
+
+stmt_t* make_stmt() {
+    stmt_t* stmt = (stmt_t*)malloc(sizeof(stmt_t));
+    stmt->break_list = 0;
+    stmt->cont_list  = 0;
+    return stmt;
+}
+
+int new_list(int i) {
+    get_quads()[i].label = 0;
+    return i;
+}
+
+int merge_list(int l1, int l2) {
+    if(!l1) return l2;
+    else
+    if(!l2) return l1; 
+    else {
+        int i = l1;
+        while(get_quads()[i].label != 0) i = get_quads()[i].label;
+        get_quads()[i].label = l2;
+        return l1;
+    }
+}
+
+void patch_list(int list, int label) {
+    while(list) {
+        int next = get_quads()[list].label;
+        get_quads()[list].label = label;
+        list = next;
+    }
+}

@@ -11,16 +11,6 @@ typedef struct Forprefix{
     unsigned int enter;
 } Forprefix;
 
-typedef struct stmt_t {
-    int break_list;
-    int cont_list;
-} stmt_t;
-
-stmt_t* make_stmt ();
-int     new_list  (int i);
-int     merge_list(int l1, int l2);
-void    patch_list(int list, int label);
-
 void        insert_lib_functions(SymbolTable * symTable);
 const char* str_type(enum SymbolType type);
 void        symbol_table_print(SymbolTable* symTable);
