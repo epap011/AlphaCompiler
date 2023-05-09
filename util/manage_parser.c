@@ -211,9 +211,14 @@ void manage_program (int debug, FILE* out) {
 }
 
 //Gia ta 3 teleutaia emits sta boolops kai to patching twn listwn
-void short_circuit_emits(expr* result, unsigned int line){
+void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
 
     if(result->truelist != -1){
+
+        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
+        result->sym = tmp_symbol;
+
         printf("patcharw to %d\n",nextQuadLabel() +1);
         patch_list(result->truelist, nextQuadLabel());
         patch_list(result->falselist, nextQuadLabel()+2);
@@ -227,7 +232,7 @@ void short_circuit_emits(expr* result, unsigned int line){
 stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope , unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
 
-    short_circuit_emits(result,line);
+    short_circuit_emits(result,line,scope);
 
     return make_stmt();
 }
@@ -368,11 +373,11 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
     incCurrScopeOffset();
     expr* true_expr = new_expr(constbool_e);
     true_expr->boolConst = 1;
-    emit(if_eq, expr1, true_expr, NULL, nextQuadLabel() + 4, line);
-    emit(jump,NULL,NULL,NULL,nextQuadLabel() + 1 ,line);
-    emit(assign, new_const_bool(1), NULL, term, -1, line);
-    emit(jump, NULL, NULL, NULL, nextQuadLabel() + 2, line);
-    emit(assign, new_const_bool(0), NULL, term, -1, line);
+
+    
+    emit(if_eq, expr1, true_expr, NULL, -1, line);
+    emit(jump,NULL,NULL,NULL, -1 ,line);
+
 
     return term;
 }
@@ -383,10 +388,10 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
 
     expr1->boolConst = convert_to_bool(expr1);
     expr2->boolConst = convert_to_bool(expr2);
-    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
+   // Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+  //  incCurrScopeOffset();
     result = new_expr(boolexpr_e);
-    result->sym = tmp_symbol;
+ //   result->sym = tmp_symbol;
     
     expr* true_expr = new_expr(constbool_e);
     true_expr->boolConst = 1;
