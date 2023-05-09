@@ -213,11 +213,11 @@ void manage_program (int debug, FILE* out) {
 //Gia ta 3 teleutaia emits sta boolops kai to patching twn listwn
 void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
 
-    // Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    // incCurrScopeOffset();
-    // result->sym = tmp_symbol;
+    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+    result->sym = tmp_symbol;
+    
     int patch_success=0;
-    printf("patcharw to %d\n",nextQuadLabel() +1);
     //printQuads();
     //printf("final patch -> truelist ");print_panoklist(result->truelist);
     //getchar();
@@ -414,11 +414,7 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
         expr2 = tmp;
     }
     
-    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
-    
     result = new_expr(boolexpr_e);
-    result->sym = tmp_symbol;
 
     if(!(expr1->truelist)){
     //emits for expr1
