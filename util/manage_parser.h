@@ -130,5 +130,6 @@ expr* manage_ifstmt     (int debug, FILE* out, int ifprefix, unsigned int scope,
 expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line);
 int   manage_ifprefix   (int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line);
 int   manage_elseprefix (int debug, FILE* out, unsigned int scope, unsigned int line);
+void short_circuit_emits(expr* result, unsigned int line);
 
 #endif /* MANAGE_PARSER_H */

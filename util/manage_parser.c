@@ -210,9 +210,8 @@ void manage_program (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"program stmtList \n");
 }
 
-stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope , unsigned int line) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
-
+//Gia ta 3 teleutaia emits sta boolops kai to patching twn listwn
+void short_circuit_emits(expr* result, unsigned int line){
 
     if(result->truelist != -1){
         printf("patcharw to %d\n",nextQuadLabel() +1);
@@ -223,7 +222,12 @@ stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope 
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
         emit(assign, new_const_bool(0), NULL, result, -1, line);
     }
+}
 
+stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope , unsigned int line) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
+
+    short_circuit_emits(result,line);
 
     return make_stmt();
 }
@@ -324,7 +328,6 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
 
 expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
     expr* result = NULL;
-    //int constbool_exists = (expr1->type == constbool_e || expr2->type == constbool_e);
     
     expr1->boolConst  = convert_to_bool(expr1);
     expr2->boolConst  = convert_to_bool(expr2);
@@ -339,16 +342,6 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
 
         if(check) return NULL;
     }
-
-
-    // //Isws xreiazetai kapoia skepsi.. p.x sto 1 == true, exetazoume to 1 san true h san 1?An eixame 1 and/or true to 1 tha to kaname true,
-    // //isxuei omws to idio kai gia to == / != ?
-    // if (op == if_eq || op == if_noteq) {
-    //     if(constbool_exists) {
-            
-
-    //     }
-    // }
 
     Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
     incCurrScopeOffset();
@@ -386,6 +379,7 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
 
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
     expr* result = NULL;
+    int clown_flag = 0;
 
     expr1->boolConst = convert_to_bool(expr1);
     expr2->boolConst = convert_to_bool(expr2);
@@ -396,27 +390,36 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
     
     expr* true_expr = new_expr(constbool_e);
     true_expr->boolConst = 1;
-    
-    printf("To M_label einai %d\n", M_label);
+
+
+    printf("To M exei timi %d\n", M_label+1);
     if(expr1->truelist == -1){
     //emits for expr1
         if(op == and){
-            emit(if_eq, expr1, true_expr, NULL, 0, line); 
-            emit(jump, NULL, NULL, NULL, 0, line);
+            emit(if_eq, expr1, true_expr, NULL, -1, line); 
+            emit(jump, NULL, NULL, NULL, -1, line);
         } else 
         if(op == or){
-            emit(if_eq, expr1, true_expr, NULL, 0, line);
-            emit(jump, NULL, NULL, NULL, 0, line);
+            emit(if_eq, expr1, true_expr, NULL, -1, line);
+            emit(jump, NULL, NULL, NULL, -1, line);
         } 
         printf("Ftiaxnw listes edw gia to expr1\n");
         //Create truelist and falselist for e1 if not exists
         expr1->truelist = new_list(nextQuadLabel()-2);
         expr1->falselist = new_list(nextQuadLabel()-1);
+        if(op == and)
+            patchLabel(M_label, M_label +2);
+        else 
+        if (op == or){
+            patchLabel(M_label, M_label +4);
+            patchLabel(M_label + 1, M_label +2);
+        }
+        clown_flag = 1;
     }
 
     //emits for expr2
-    emit(if_eq, expr2, true_expr, NULL, 0, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
-    emit(jump, NULL, NULL, NULL, 0, line);
+    emit(if_eq, expr2, true_expr, NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+    emit(jump, NULL, NULL, NULL, -1, line);
    
    //Create truelist and falselist for e2 if not exists
     if(expr2->truelist == -1){
@@ -424,17 +427,19 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
         expr2->truelist = new_list(nextQuadLabel()-2);
         expr2->falselist = new_list(nextQuadLabel()-1);
     }
-    
+
     //Merge lists for result (e) 
-    if(op == and){
-        printf("patcharw mergarw listes sto and\n");
-        patch_list(expr1->truelist, M_label);
+    if(op == and ){
+        if(!clown_flag)
+            patch_list(expr1->truelist, M_label);
+        printf("patcharw mergarw listes sto and me M_label %d\n", M_label +1);
         result->truelist = expr2->truelist;
         result->falselist = merge_list(expr1->falselist, expr2->falselist);
     }else
     if(op == or){
-        printf("patcharw mergarw listes sto or\n");
-        patch_list(expr1->falselist, M_label);
+        printf("patcharw mergarw listes sto or me M_label %d\n",M_label +1);
+        if(!clown_flag)
+            patch_list(expr1->falselist, M_label);
         result->truelist = merge_list(expr1->truelist, expr2->truelist);
         result->falselist = expr2->falselist;
     }
