@@ -400,6 +400,19 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
 
     expr1->boolConst = convert_to_bool(expr1);
     expr2->boolConst = convert_to_bool(expr2);
+
+    //Must maintain the order of the quads, because of short-circuit evaluation.
+    //Sometimes the grammar evaluates the second expression first, and then the first.
+    //If expr1 has quads chronologically after expr2, then we must swap them, and patch them the other way.
+
+    //first, the condition to figure out if this is happening
+    if ( (expr1->truelist && expr2->truelist && *(int*)(expr1->truelist->head->data) > *(int*)(expr2->truelist->head->data)) || 
+         (!expr1->truelist && expr2->truelist) ){
+        //swap
+        expr* tmp = expr1;
+        expr1 = expr2;
+        expr2 = tmp;
+    }
     
     Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
     incCurrScopeOffset();
