@@ -38,8 +38,8 @@ typedef struct expr{
 
     struct expr* hidden_var;
 
-    unsigned int truelist;
-    unsigned int falselist;
+    linked_list* truelist;
+    linked_list* falselist;
 
 } expr;
 
