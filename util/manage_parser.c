@@ -215,9 +215,9 @@ void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
 
     if(result->truelist != -1){
 
-        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        incCurrScopeOffset();
-        result->sym = tmp_symbol;
+        // Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        // incCurrScopeOffset();
+        // result->sym = tmp_symbol;
 
         printf("patcharw to %d\n",nextQuadLabel() +1);
         patch_list(result->truelist, nextQuadLabel());
@@ -384,67 +384,53 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
 
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
     expr* result = NULL;
-    int clown_flag = 0;
 
     expr1->boolConst = convert_to_bool(expr1);
     expr2->boolConst = convert_to_bool(expr2);
-   // Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-  //  incCurrScopeOffset();
-    result = new_expr(boolexpr_e);
- //   result->sym = tmp_symbol;
     
-    expr* true_expr = new_expr(constbool_e);
-    true_expr->boolConst = 1;
+    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    incCurrScopeOffset();
+    
+    result = new_expr(boolexpr_e);
+    result->sym = tmp_symbol;
 
-
-    printf("To M exei timi %d\n", M_label+1);
     if(expr1->truelist == -1){
     //emits for expr1
         if(op == and){
-            emit(if_eq, expr1, true_expr, NULL, -1, line); 
+            emit(if_eq, expr1, new_const_bool(1), NULL, -1, line); 
             emit(jump, NULL, NULL, NULL, -1, line);
         } else 
         if(op == or){
-            emit(if_eq, expr1, true_expr, NULL, -1, line);
+            emit(if_eq, expr1, new_const_bool(1), NULL, -1, line);
             emit(jump, NULL, NULL, NULL, -1, line);
         } 
-        printf("Ftiaxnw listes edw gia to expr1\n");
+        
         //Create truelist and falselist for e1 if not exists
-        expr1->truelist = new_list(nextQuadLabel()-2);
+        expr1->truelist  = new_list(nextQuadLabel()-2);
         expr1->falselist = new_list(nextQuadLabel()-1);
-        if(op == and)
-            patchLabel(M_label, M_label +2);
-        else 
-        if (op == or){
-            patchLabel(M_label, M_label +4);
-            patchLabel(M_label + 1, M_label +2);
-        }
-        clown_flag = 1;
     }
 
     //emits for expr2
-    emit(if_eq, expr2, true_expr, NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+    emit(if_eq, expr2, new_const_bool(1), NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
     emit(jump, NULL, NULL, NULL, -1, line);
    
    //Create truelist and falselist for e2 if not exists
     if(expr2->truelist == -1){
         printf("Ftiaxnw listes edw gia to expr2\n");
-        expr2->truelist = new_list(nextQuadLabel()-2);
+        expr2->truelist  = new_list(nextQuadLabel()-2);
         expr2->falselist = new_list(nextQuadLabel()-1);
     }
 
     //Merge lists for result (e) 
-    if(op == and ){
-        if(!clown_flag)
-            patch_list(expr1->truelist, M_label);
-        printf("patcharw mergarw listes sto and me M_label %d\n", M_label +1);
+    if(op == and){
+        back_patch(expr1->truelist, M_label);
+        printf("patcharw mergarw listes sto and me M_label %d\n", M_label);
         result->truelist = expr2->truelist;
         result->falselist = merge_list(expr1->falselist, expr2->falselist);
     }else
     if(op == or){
         printf("patcharw mergarw listes sto or me M_label %d\n",M_label +1);
-        if(!clown_flag)
-            patch_list(expr1->falselist, M_label);
+        back_patch(expr1->falselist, M_label);
         result->truelist = merge_list(expr1->truelist, expr2->truelist);
         result->falselist = expr2->falselist;
     }

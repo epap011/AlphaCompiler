@@ -56,5 +56,5 @@ stmt_t* make_stmt ();
 int     new_list  (int i);
 int     merge_list(int l1, int l2);
 void    patch_list(int list, int label);
-
+void    back_patch(int list, int label);
 #endif /* QUAD_H */

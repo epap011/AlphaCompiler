@@ -223,3 +223,12 @@ void patch_list(int list, int label) {
         list = next;
     }
 }
+
+void back_patch(int list, int label) {
+    if(list == 0) get_quads()[list].label = label+2;
+    while(list) {
+        int next = get_quads()[list].label;
+        get_quads()[list].label = label;
+        list = next;
+    }
+}
