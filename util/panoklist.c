@@ -33,14 +33,15 @@ linked_list* merge_panoklist(linked_list *l1, linked_list* l2){
     }
 }
 
-void patch_panoklist(linked_list* list, int label){
-    if ( !list || !(list->head) ) return;
+int patch_panoklist(linked_list* list, int label){
+    if ( !list || !(list->head) ) return 0;
     node* i = list->head;
     while(i){
         int* p_i = (int*) i->data;
         get_quads()[*p_i].label = label;
         i = i->next;
     }
+    return 1;
 }
 
 void print_panoklist(linked_list* list){

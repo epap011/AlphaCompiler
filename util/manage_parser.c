@@ -213,16 +213,15 @@ void manage_program (int debug, FILE* out) {
 //Gia ta 3 teleutaia emits sta boolops kai to patching twn listwn
 void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
 
-    if(result->truelist != -1){
+    // Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+    // incCurrScopeOffset();
+    // result->sym = tmp_symbol;
+    int patch_success=0;
+    printf("patcharw to %d\n",nextQuadLabel() +1);
+    patch_success += patch_panoklist(result->truelist, nextQuadLabel());
+    patch_success += patch_panoklist(result->falselist, nextQuadLabel()+2);
 
-        // Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-        // incCurrScopeOffset();
-        // result->sym = tmp_symbol;
-
-        printf("patcharw to %d\n",nextQuadLabel() +1);
-        back_patch(result->truelist, nextQuadLabel());
-        back_patch(result->falselist, nextQuadLabel()+2);
-
+    if(patch_success){
         emit(assign, new_const_bool(1), NULL, result, -1, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
         emit(assign, new_const_bool(0), NULL, result, -1, line);
@@ -394,8 +393,9 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
     result = new_expr(boolexpr_e);
     result->sym = tmp_symbol;
 
-    if(expr1->truelist == -1){
+    if(!(expr1->truelist)){
     //emits for expr1
+        //Create truelist and falselist for e1 if not exists
         if(op == and){
             emit(if_eq, expr1, new_const_bool(1), NULL, -1, line); 
             emit(jump, NULL, NULL, NULL, -1, line);
@@ -404,10 +404,8 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
             emit(if_eq, expr1, new_const_bool(1), NULL, -1, line);
             emit(jump, NULL, NULL, NULL, -1, line);
         } 
-        
-        //Create truelist and falselist for e1 if not exists
-        expr1->truelist  = new_list(nextQuadLabel()-2);
-        expr1->falselist = new_list(nextQuadLabel()-1);
+        expr1->truelist  = new_panoklist(nextQuadLabel()-2);
+        expr1->falselist = new_panoklist(nextQuadLabel()-1);
     }
 
     //emits for expr2
@@ -415,23 +413,23 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
     emit(jump, NULL, NULL, NULL, -1, line);
    
    //Create truelist and falselist for e2 if not exists
-    if(expr2->truelist == -1){
+    if(!(expr2->truelist)){
         printf("Ftiaxnw listes edw gia to expr2\n");
-        expr2->truelist  = new_list(nextQuadLabel()-2);
-        expr2->falselist = new_list(nextQuadLabel()-1);
+        expr2->truelist  = new_panoklist(nextQuadLabel()-2);
+        expr2->falselist = new_panoklist(nextQuadLabel()-1);
     }
 
     //Merge lists for result (e) 
     if(op == and){
-        back_patch(expr1->truelist, M_label);
+        patch_panoklist(expr1->truelist, M_label);
         printf("patcharw mergarw listes sto and me M_label %d\n", M_label);
         result->truelist = expr2->truelist;
-        result->falselist = merge_list(expr1->falselist, expr2->falselist);
+        result->falselist = merge_panoklist(expr1->falselist, expr2->falselist);
     }else
     if(op == or){
         printf("patcharw mergarw listes sto or me M_label %d\n",M_label +1);
-        back_patch(expr1->falselist, M_label);
-        result->truelist = merge_list(expr1->truelist, expr2->truelist);
+        patch_panoklist(expr1->falselist, M_label);
+        result->truelist = merge_panoklist(expr1->truelist, expr2->truelist);
         result->falselist = expr2->falselist;
     }
     

@@ -41,9 +41,6 @@ expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
         result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, 1, var_s, currScopeSpace(), currScopeOffset()));
         incCurrScopeOffset();
 
-        result->truelist = -1;
-        result->falselist = -1;
-
         emit(tablegetelem, e, e->index, result, -1, yylineno);
         return result;
     }

@@ -5,6 +5,7 @@
 #include "symbol_table.h"
 #include "expression.h"
 #include "quad.h"
+#include "panoklist.h"
 
 typedef struct Forprefix{
     unsigned int test;
