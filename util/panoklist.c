@@ -53,7 +53,7 @@ void print_panoklist(linked_list* list){
         node* i = list->head;
         while(i){
             int* p_i = (int*) i->data;
-            printf("-> %d ", *p_i);
+            printf("-> %d ", *p_i+1);
             i = i->next;
         }
         printf("\n");

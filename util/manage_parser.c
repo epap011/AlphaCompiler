@@ -218,7 +218,13 @@ void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
     // result->sym = tmp_symbol;
     int patch_success=0;
     printf("patcharw to %d\n",nextQuadLabel() +1);
+    //printQuads();
+    //printf("final patch -> truelist ");print_panoklist(result->truelist);
+    //getchar();
     patch_success += patch_panoklist(result->truelist, nextQuadLabel());
+    //printQuads();
+    //printf("final patch -> falselist ");print_panoklist(result->falselist);
+    //getchar();
     patch_success += patch_panoklist(result->falselist, nextQuadLabel()+2);
 
     if(patch_success){
@@ -363,25 +369,30 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
 
 expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");
-
-    expr* term = NULL;
+    //Creation of new expression with hidden var, is unnecessary.
+    linked_list* tmp;
     expr1->boolConst = convert_to_bool(expr1);
     
-    term = new_expr(boolexpr_e);
-    term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
-    expr* true_expr = new_expr(constbool_e);
-    true_expr->boolConst = 1;
+    if(!(expr1->truelist)){
+        //Quads are emitted ONLY if expression doesn't have truelist/falselist.
+        //Lists are also created, and linked in an opposite way (true->false, false->true).
+        expr1->falselist = new_panoklist(nextQuadLabel()); //falselist linked to true
+        expr1->truelist = new_panoklist(nextQuadLabel()+1); //truelist linked to false
+        emit(if_eq, expr1, new_const_bool(1), NULL, -1, line);
+        emit(jump,NULL,NULL,NULL, -1 ,line);
+    }
+    else{
+        //If expression has truelist/falselist, then we just need to swap them.
+        tmp = expr1->truelist;
+        expr1->truelist = expr1->falselist;
+        expr1->falselist = tmp;
+    }
 
-    
-    emit(if_eq, expr1, true_expr, NULL, -1, line);
-    emit(jump,NULL,NULL,NULL, -1 ,line);
-
-
-    return term;
+    return expr1;
 }
 
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
+    unsigned int M_label_final = M_label;
     expr* result = NULL;
 
     expr1->boolConst = convert_to_bool(expr1);
@@ -407,30 +418,36 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
         expr1->truelist  = new_panoklist(nextQuadLabel()-2);
         expr1->falselist = new_panoklist(nextQuadLabel()-1);
     }
-
-    //emits for expr2
-    emit(if_eq, expr2, new_const_bool(1), NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
-    emit(jump, NULL, NULL, NULL, -1, line);
    
-   //Create truelist and falselist for e2 if not exists
+   //Create truelist and falselist for e2 if nonexistent.
+   //Emits for expr2 are ONLY created if truelist/falselist do not exist.
     if(!(expr2->truelist)){
-        printf("Ftiaxnw listes edw gia to expr2\n");
-        expr2->truelist  = new_panoklist(nextQuadLabel()-2);
-        expr2->falselist = new_panoklist(nextQuadLabel()-1);
+        expr2->truelist  = new_panoklist(nextQuadLabel());
+        expr2->falselist = new_panoklist(nextQuadLabel()+1);
+        //M_label == the next emit's label, whenever we create quads.
+        M_label_final = nextQuadLabel();
+        emit(if_eq, expr2, new_const_bool(1), NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+        emit(jump, NULL, NULL, NULL, -1, line);
     }
 
     //Merge lists for result (e) 
     if(op == and){
-        patch_panoklist(expr1->truelist, M_label);
-        printf("patcharw mergarw listes sto and me M_label %d\n", M_label);
+        patch_panoklist(expr1->truelist, M_label_final);
         result->truelist = expr2->truelist;
         result->falselist = merge_panoklist(expr1->falselist, expr2->falselist);
+        //printQuads();
+        //printf("ex and ex -> truelist ");print_panoklist(result->truelist);
+        //printf("ex and ex -> falselist ");print_panoklist(result->falselist);
+        //getchar();
     }else
     if(op == or){
-        printf("patcharw mergarw listes sto or me M_label %d\n",M_label +1);
-        patch_panoklist(expr1->falselist, M_label);
+        patch_panoklist(expr1->falselist, M_label_final);
         result->truelist = merge_panoklist(expr1->truelist, expr2->truelist);
         result->falselist = expr2->falselist;
+        //printQuads();
+        //printf("ex or ex -> truelist -> ");print_panoklist(result->truelist);
+        //printf("ex or ex -> falselist -> ");print_panoklist(result->falselist);
+        //getchar();
     }
     
     return result;
