@@ -220,8 +220,8 @@ void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
         // result->sym = tmp_symbol;
 
         printf("patcharw to %d\n",nextQuadLabel() +1);
-        patch_list(result->truelist, nextQuadLabel());
-        patch_list(result->falselist, nextQuadLabel()+2);
+        back_patch(result->truelist, nextQuadLabel());
+        back_patch(result->falselist, nextQuadLabel()+2);
 
         emit(assign, new_const_bool(1), NULL, result, -1, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
