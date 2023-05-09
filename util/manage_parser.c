@@ -353,16 +353,19 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
         if(check) return NULL;
     }
 
-    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
     result = new_expr(boolexpr_e);
-    result->sym = tmp_symbol;
+
+    //Ta apotelesmata boolean ekfrasewn den pairnoun (pleon) hidden_var san tis arithmitikes,
+    //dioti h ekvash tous katalhgei se truelist/falselist, kai sto telos ginetai short_circuit_emits.
     
+    result->truelist=new_panoklist(nextQuadLabel());
+    result->falselist=new_panoklist(nextQuadLabel()+1);
     emit(op, expr1, expr2, NULL, nextQuadLabel()+2, line);
     emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
-    emit(assign, new_const_bool(1), NULL, result, -1, line);
-    emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-    emit(assign, new_const_bool(0), NULL, result, -1, line);
+
+    //emit(assign, new_const_bool(1), NULL, result, -1, line);
+    //emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+    //emit(assign, new_const_bool(0), NULL, result, -1, line);
 
     return result;
 }
