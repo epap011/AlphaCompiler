@@ -213,6 +213,9 @@ void manage_program (int debug, FILE* out) {
 //Gia ta 3 teleutaia emits sta boolops kai to patching twn listwn
 void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
     
+    if(result == NULL)
+        return;
+
     int patch_success=0;
     //printQuads();
     //printf("final patch -> truelist ");print_panoklist(result->truelist);

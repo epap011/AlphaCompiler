@@ -393,6 +393,7 @@ forstmt         : forprefix N1 elist ")" N2 {   if(!loop_flag_stack) loop_flag_s
                                                 *loop_flag_ptr = loop_flag;
                                                 push(loop_flag_stack,loop_flag_ptr);
                                                 loop_flag = 1;
+                                                short_circuit_emits($3,yylineno,scope);
                                         }  
                                         loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
                                                 fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
@@ -414,6 +415,9 @@ forprefix       : FOR "(" elist ";" M expr ";" {
                                             emit(if_eq, $6, new_const_bool(1), NULL, 0, yylineno);
 
                                             $$ = forprefix;
+
+                                            short_circuit_emits($3,yylineno,scope);
+                                            short_circuit_emits($6,yylineno,scope);
                                         }
                 ;
                     
