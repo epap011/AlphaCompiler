@@ -137,8 +137,8 @@ expr        : assignexpr        {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
             | expr "-" expr     {$$ = manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             | expr "/" expr     {$$ = manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             | expr "%" expr     {$$ = manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr EQ expr      {$$ = manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr NEQ expr     {$$ = manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr EQ expr      {short_circuit_emits($1,yylineno,scope); $$ = manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr NEQ expr     {short_circuit_emits($1,yylineno,scope); $$ = manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             | expr GT expr      {$$ = manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             | expr LT expr      {$$ = manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
             | expr GTE expr     {$$ = manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
@@ -188,14 +188,14 @@ callsuffix  : normcall   {$$ = manage_callsuffix_normcall  (DEBUG_PRINT, yyout, 
             | methodcall {$$ = manage_callsuffix_methodcall(DEBUG_PRINT, yyout, $1);} 
             ;
 
-normcall    : "(" elist ")" {short_circuit_emits($2,yylineno,scope); $$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout,0,$2,NULL);}
+normcall    : "(" elist ")" { $$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout,0,$2,NULL);}
             ;
 
-methodcall  : ".." IDENT "(" elist ")" {short_circuit_emits($4,yylineno,scope); $$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,strdup($2));}
+methodcall  : ".." IDENT "(" elist ")" { $$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,strdup($2));}
             ;
 
 com_expr_opt : /* empty */             {$$ = manage_comexpropt_empty                (DEBUG_PRINT, yyout);} //NULL
-             | COMMA expr com_expr_opt {$$ = manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout, $2, $3);}
+             | COMMA expr com_expr_opt {short_circuit_emits($2,yylineno,scope); $$ = manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout, $2, $3);}
              ;
 
 objectdef   : "[" indexed "]" {$$ = manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRINT, yyout, $2, scope, yylineno);}
@@ -203,7 +203,7 @@ objectdef   : "[" indexed "]" {$$ = manage_objectdef_lbrace_indexed_rbrace(DEBUG
             ;
 
 elist       : /* empty */       {$$ = manage_elist_empty          (DEBUG_PRINT, yyout);} //NULL
-            | expr com_expr_opt {$$ = manage_elist_expr_comexpropt(DEBUG_PRINT, yyout, $1, $2);}
+            | expr com_expr_opt {short_circuit_emits($1,yylineno,scope); $$ = manage_elist_expr_comexpropt(DEBUG_PRINT, yyout, $1, $2);}
             ;
             
 indexed     : indexedelem com_indexedelem_opt {$$ = manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout, $1, $2);}
@@ -388,8 +388,7 @@ whilecond       : "(" expr ")"  {short_circuit_emits($2,yylineno,scope);
                                 }
                 ;
 
-forstmt         : forprefix N1 elist {short_circuit_emits($3,yylineno,scope);} 
-                                    ")" N2 {   if(!loop_flag_stack) loop_flag_stack = new_stack();
+forstmt         : forprefix N1 elist ")" N2 {   if(!loop_flag_stack) loop_flag_stack = new_stack();
                                                 int* loop_flag_ptr = malloc(sizeof(int));
                                                 *loop_flag_ptr = loop_flag;
                                                 push(loop_flag_stack,loop_flag_ptr);
@@ -398,23 +397,23 @@ forstmt         : forprefix N1 elist {short_circuit_emits($3,yylineno,scope);}
                                             loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
                                                     fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
 
-                                                    patchLabel($1->enter, $6+1);     //true    jump
+                                                    patchLabel($1->enter, $5+1);     //true    jump
                                                     patchLabel($2, nextQuadLabel()); //false   jump
-                                                    patchLabel($6, $1->test);        //loop    jump
-                                                    patchLabel($9, $2+1);            //closure jump
+                                                    patchLabel($5, $1->test);        //loop    jump
+                                                    patchLabel($8, $2+1);            //closure jump
 
-                                                    patch_list($8->break_list, nextQuadLabel());
-                                                    patch_list($8->cont_list, $2+1);
+                                                    patch_list($7->break_list, nextQuadLabel());
+                                                    patch_list($7->cont_list, $2+1);
                                                 }
                     ; 
 
-forprefix       : FOR "(" elist {short_circuit_emits($3,yylineno,scope);} ";" M expr ";" {
-                                            short_circuit_emits($7,yylineno,scope);
+forprefix       : FOR "(" elist ";" M expr ";" {
+                                            short_circuit_emits($6,yylineno,scope);
                                             Forprefix* forprefix = (Forprefix*)malloc(sizeof(Forprefix));
-                                            forprefix->test  = $6;
+                                            forprefix->test  = $5;
                                             forprefix->enter = nextQuadLabel();
                                             
-                                            emit(if_eq, $7, new_const_bool(1), NULL, 0, yylineno);
+                                            emit(if_eq, $6, new_const_bool(1), NULL, 0, yylineno);
 
                                             $$ = forprefix;
                                         }

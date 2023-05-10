@@ -8,4 +8,4 @@ g <= h
 and 
 not i == j 
 or 
-not k != l;
+not k < l;
