@@ -157,7 +157,7 @@ term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PR
             | primary               {manage_term_primary                (DEBUG_PRINT, yyout);}
             ;   
 
-assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
+assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno); short_circuit_emits($3,yylineno,scope);}
             ;   
 
 primary     : lvalue                {if($1 != NULL) $$ = manage_primary_lvalue(DEBUG_PRINT, yyout, $1, scope, yylineno);}
@@ -358,7 +358,7 @@ ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT,
                 | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
                 ;
 
-ifprefix        : IF "(" expr ")" {$$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}
+ifprefix        : IF "(" expr ")" {$$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno); short_circuit_emits($3,yylineno,scope);}
 
 elseprefix      : ELSE {$$ = manage_elseprefix(DEBUG_PRINT, yyout, scope, yylineno);}
                 ;
@@ -384,6 +384,7 @@ whilestart      : WHILE {$$ = nextQuadLabel();}
 whilecond       : "(" expr ")"  {emit(if_eq, $2, new_const_bool(1), NULL, nextQuadLabel()+2, yylineno);  
                                  $$ = nextQuadLabel();
                                  emit(jump, NULL, NULL, NULL, 0, yylineno);
+                                 short_circuit_emits($2,yylineno,scope);
                                 }
                 ;
 

@@ -212,10 +212,6 @@ void manage_program (int debug, FILE* out) {
 
 //Gia ta 3 teleutaia emits sta boolops kai to patching twn listwn
 void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
-
-    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
-    result->sym = tmp_symbol;
     
     int patch_success=0;
     //printQuads();
@@ -228,6 +224,10 @@ void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
     patch_success += patch_panoklist(result->falselist, nextQuadLabel()+2);
 
     if(patch_success){
+        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
+        result->sym = tmp_symbol;
+
         emit(assign, new_const_bool(1), NULL, result, -1, line);
         emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
         emit(assign, new_const_bool(0), NULL, result, -1, line);
