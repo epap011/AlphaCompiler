@@ -358,7 +358,7 @@ ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT,
                 | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
                 ;
 
-ifprefix        : IF "(" expr ")" {$$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno); short_circuit_emits($3,yylineno,scope);}
+ifprefix        : IF "(" expr ")" {short_circuit_emits($3,yylineno,scope); $$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}
 
 elseprefix      : ELSE {$$ = manage_elseprefix(DEBUG_PRINT, yyout, scope, yylineno);}
                 ;
@@ -381,42 +381,42 @@ whilestmt       : whilestart whilecond  { if(!loop_flag_stack) loop_flag_stack =
 whilestart      : WHILE {$$ = nextQuadLabel();}
                 ;
 
-whilecond       : "(" expr ")"  {emit(if_eq, $2, new_const_bool(1), NULL, nextQuadLabel()+2, yylineno);  
+whilecond       : "(" expr ")"  {short_circuit_emits($2,yylineno,scope);
+                                 emit(if_eq, $2, new_const_bool(1), NULL, nextQuadLabel()+2, yylineno);  
                                  $$ = nextQuadLabel();
                                  emit(jump, NULL, NULL, NULL, 0, yylineno);
-                                 short_circuit_emits($2,yylineno,scope);
                                 }
                 ;
 
-forstmt         : forprefix N1 elist {short_circuit_emits($3,yylineno,scope);} ")" N2 {   if(!loop_flag_stack) loop_flag_stack = new_stack();
+forstmt         : forprefix N1 elist {short_circuit_emits($3,yylineno,scope);} 
+                                    ")" N2 {   if(!loop_flag_stack) loop_flag_stack = new_stack();
                                                 int* loop_flag_ptr = malloc(sizeof(int));
                                                 *loop_flag_ptr = loop_flag;
                                                 push(loop_flag_stack,loop_flag_ptr);
                                                 loop_flag = 1;
-                                        }  
-                                        loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
-                                                fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
+                                            }  
+                                            loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
+                                                    fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
 
-                                                patchLabel($1->enter, $6+1);     //true    jump
-                                                patchLabel($2, nextQuadLabel()); //false   jump
-                                                patchLabel($6, $1->test);        //loop    jump
-                                                patchLabel($9, $2+1);            //closure jump
+                                                    patchLabel($1->enter, $6+1);     //true    jump
+                                                    patchLabel($2, nextQuadLabel()); //false   jump
+                                                    patchLabel($6, $1->test);        //loop    jump
+                                                    patchLabel($9, $2+1);            //closure jump
 
-                                                patch_list($8->break_list, nextQuadLabel());
-                                                patch_list($8->cont_list, $2+1);
-                                            }
+                                                    patch_list($8->break_list, nextQuadLabel());
+                                                    patch_list($8->cont_list, $2+1);
+                                                }
                     ; 
 
 forprefix       : FOR "(" elist {short_circuit_emits($3,yylineno,scope);} ";" M expr ";" {
+                                            short_circuit_emits($7,yylineno,scope);
                                             Forprefix* forprefix = (Forprefix*)malloc(sizeof(Forprefix));
                                             forprefix->test  = $6;
                                             forprefix->enter = nextQuadLabel();
                                             
-                                            short_circuit_emits($7,yylineno,scope);
                                             emit(if_eq, $7, new_const_bool(1), NULL, 0, yylineno);
 
                                             $$ = forprefix;
-
                                         }
                 ;
                     
