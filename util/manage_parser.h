@@ -36,7 +36,7 @@ int convert_to_bool(expr* expr);
 
 void manage_program        (int debug, FILE* out);
 
-stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope , unsigned int line);
+stmt_t* manage_stmt_expr(int debug, FILE* out);
 stmt_t* manage_stmt_ifstmt    (int debug, FILE* out);
 stmt_t* manage_stmt_whilestmt (int debug, FILE* out);
 stmt_t* manage_stmt_forstmt   (int debug, FILE* out);

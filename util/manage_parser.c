@@ -237,10 +237,8 @@ void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
     }
 }
 
-stmt_t* manage_stmt_expr(int debug, FILE* out, expr* result, unsigned int scope , unsigned int line) {
+stmt_t* manage_stmt_expr(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
-
-    short_circuit_emits(result,line,scope);
 
     return make_stmt();
 }

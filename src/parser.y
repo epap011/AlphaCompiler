@@ -118,7 +118,7 @@ program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
             | /*empty*/
             ;   
 
-stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout,$1, scope, yylineno);}
+stmt        : expr ";"      {short_circuit_emits($1,yylineno,scope); $$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
             | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
             | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
             | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
@@ -157,7 +157,7 @@ term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PR
             | primary               {manage_term_primary                (DEBUG_PRINT, yyout);}
             ;   
 
-assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno); short_circuit_emits($3,yylineno,scope);}
+assignexpr  : lvalue "=" expr       {short_circuit_emits($3,yylineno,scope); $$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
             ;   
 
 primary     : lvalue                {if($1 != NULL) $$ = manage_primary_lvalue(DEBUG_PRINT, yyout, $1, scope, yylineno);}
