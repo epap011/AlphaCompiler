@@ -375,23 +375,26 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
     //Creation of new expression with hidden var, is unnecessary.
     linked_list* tmp;
     expr1->boolConst = convert_to_bool(expr1);
+
+    expr* temp;
     
     if(!(expr1->truelist)){
+        temp=new_expr(boolexpr_e);
         //Quads are emitted ONLY if expression doesn't have truelist/falselist.
         //Lists are also created, and linked in an opposite way (true->false, false->true).
-        expr1->falselist = new_panoklist(nextQuadLabel()); //falselist linked to true
-        expr1->truelist = new_panoklist(nextQuadLabel()+1); //truelist linked to false
+        temp->falselist = new_panoklist(nextQuadLabel()); //falselist linked to true
+        temp->truelist = new_panoklist(nextQuadLabel()+1); //truelist linked to false
         emit(if_eq, expr1, new_const_bool(1), NULL, -1, line);
         emit(jump,NULL,NULL,NULL, -1 ,line);
+        return temp;
     }
     else{
         //If expression has truelist/falselist, then we just need to swap them.
         tmp = expr1->truelist;
         expr1->truelist = expr1->falselist;
         expr1->falselist = tmp;
+        return expr1;
     }
-
-    return expr1;
 }
 
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
