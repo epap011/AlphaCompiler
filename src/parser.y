@@ -181,17 +181,17 @@ member      : lvalue "." IDENT      {$$ = manage_memeber_lvalue_dot_ident   (DEB
 
 call        : call "(" elist ")"            {$$ = manage_call_call_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $1, $3);}
             | lvalue callsuffix             {$$ = manage_call_lvalue_callsuffix   (DEBUG_PRINT, yyout, symTable, $1, &normcall_skip, scope, yylineno, $2);}
-            | "(" funcdef ")" "(" elist ")" {$$ = manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $2, $5);}
+            | "(" funcdef ")" "(" elist ")" {short_circuit_emits($5,yylineno,scope); $$ = manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $2, $5);}
             ;
 
 callsuffix  : normcall   {$$ = manage_callsuffix_normcall  (DEBUG_PRINT, yyout, $1);} 
             | methodcall {$$ = manage_callsuffix_methodcall(DEBUG_PRINT, yyout, $1);} 
             ;
 
-normcall    : "(" elist ")" {$$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout,0,$2,NULL);}
+normcall    : "(" elist ")" {short_circuit_emits($2,yylineno,scope); $$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout,0,$2,NULL);}
             ;
 
-methodcall  : ".." IDENT "(" elist ")" {$$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,strdup($2));}
+methodcall  : ".." IDENT "(" elist ")" {short_circuit_emits($4,yylineno,scope); $$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,strdup($2));}
             ;
 
 com_expr_opt : /* empty */             {$$ = manage_comexpropt_empty                (DEBUG_PRINT, yyout);} //NULL
