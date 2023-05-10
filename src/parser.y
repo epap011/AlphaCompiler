@@ -388,36 +388,35 @@ whilecond       : "(" expr ")"  {emit(if_eq, $2, new_const_bool(1), NULL, nextQu
                                 }
                 ;
 
-forstmt         : forprefix N1 elist ")" N2 {   if(!loop_flag_stack) loop_flag_stack = new_stack();
+forstmt         : forprefix N1 elist {short_circuit_emits($3,yylineno,scope);} ")" N2 {   if(!loop_flag_stack) loop_flag_stack = new_stack();
                                                 int* loop_flag_ptr = malloc(sizeof(int));
                                                 *loop_flag_ptr = loop_flag;
                                                 push(loop_flag_stack,loop_flag_ptr);
                                                 loop_flag = 1;
-                                                short_circuit_emits($3,yylineno,scope);
                                         }  
                                         loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
                                                 fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
 
-                                                patchLabel($1->enter, $5+1);     //true    jump
+                                                patchLabel($1->enter, $6+1);     //true    jump
                                                 patchLabel($2, nextQuadLabel()); //false   jump
-                                                patchLabel($5, $1->test);        //loop    jump
-                                                patchLabel($8, $2+1);            //closure jump
+                                                patchLabel($6, $1->test);        //loop    jump
+                                                patchLabel($9, $2+1);            //closure jump
 
-                                                patch_list($7->break_list, nextQuadLabel());
-                                                patch_list($7->cont_list, $2+1);
+                                                patch_list($8->break_list, nextQuadLabel());
+                                                patch_list($8->cont_list, $2+1);
                                             }
                     ; 
 
-forprefix       : FOR "(" elist ";" M expr ";" {
+forprefix       : FOR "(" elist {short_circuit_emits($3,yylineno,scope);} ";" M expr ";" {
                                             Forprefix* forprefix = (Forprefix*)malloc(sizeof(Forprefix));
-                                            forprefix->test  = $5;
+                                            forprefix->test  = $6;
                                             forprefix->enter = nextQuadLabel();
-                                            emit(if_eq, $6, new_const_bool(1), NULL, 0, yylineno);
+                                            
+                                            short_circuit_emits($7,yylineno,scope);
+                                            emit(if_eq, $7, new_const_bool(1), NULL, 0, yylineno);
 
                                             $$ = forprefix;
 
-                                            short_circuit_emits($3,yylineno,scope);
-                                            short_circuit_emits($6,yylineno,scope);
                                         }
                 ;
                     
