@@ -217,13 +217,7 @@ void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
         return;
 
     int patch_success=0;
-    //printQuads();
-    //printf("final patch -> truelist ");print_panoklist(result->truelist);
-    //getchar();
     patch_success += patch_panoklist(result->truelist, nextQuadLabel());
-    //printQuads();
-    //printf("final patch -> falselist ");print_panoklist(result->falselist);
-    //getchar();
     patch_success += patch_panoklist(result->falselist, nextQuadLabel()+2);
 
     if(patch_success){
@@ -350,8 +344,7 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
         int check = 0; //xrisimopoioume metavliti apla gia na petaei kai gia ta 2 expr ta error an uparxei auto to case
         check += check_arith(expr1, out_file,line,"relational");
         check += check_arith(expr2, out_file,line,"relational");
-
-        if(check) return NULL;
+        if(check){printf("Tha fas seg an tuposeis ta quads!!!!\n"); return NULL;}
     }
 
     result = new_expr(boolexpr_e);
@@ -364,15 +357,14 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
     emit(op, expr1, expr2, NULL, nextQuadLabel()+2, line);
     emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
 
-    //emit(assign, new_const_bool(1), NULL, result, -1, line);
-    //emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-    //emit(assign, new_const_bool(0), NULL, result, -1, line);
-
     return result;
 }
 
 expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");
+
+    if(expr1 == NULL) return NULL;
+
     //Creation of new expression with hidden var, is unnecessary.
     linked_list* tmp;
     expr1->boolConst = convert_to_bool(expr1);
@@ -399,6 +391,8 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
 }
 
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
+    if(expr1 == NULL || expr2 == NULL) return NULL;
+    
     unsigned int M_label_final = M_label;
     expr* result = NULL;
 
@@ -451,19 +445,11 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
         patch_panoklist(expr1->truelist, M_label_final);
         result->truelist = expr2->truelist;
         result->falselist = merge_panoklist(expr1->falselist, expr2->falselist);
-        //printQuads();
-        //printf("ex and ex -> truelist ");print_panoklist(result->truelist);
-        //printf("ex and ex -> falselist ");print_panoklist(result->falselist);
-        //getchar();
     }else
     if(op == or){
         patch_panoklist(expr1->falselist, M_label_final);
         result->truelist = merge_panoklist(expr1->truelist, expr2->truelist);
         result->falselist = expr2->falselist;
-        //printQuads();
-        //printf("ex or ex -> truelist -> ");print_panoklist(result->truelist);
-        //printf("ex or ex -> falselist -> ");print_panoklist(result->falselist);
-        //getchar();
     }
     
     return result;
