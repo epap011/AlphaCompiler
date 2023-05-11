@@ -450,6 +450,7 @@ continue        : CONTINUE ";" {$$ = make_stmt();
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
+                                        short_circuit_emits($2,yylineno,scope);
                                         manage_return(yylineno, return_flag, $2, ret_stack);}
                 ;
 
