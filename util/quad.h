@@ -41,9 +41,11 @@ typedef struct stmt_t {
 
 void expand();
 void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label, unsigned line);
+void emit_target(enum iopcode op, expr *arg1, expr *arg2, expr *result, int target, unsigned label, unsigned line);
 expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line);
 const char* iopcode_tostring(enum iopcode);
 void printQuads();
+void shiftQuads(int number, int offset);
 int count_str(const char* str);
 quad* get_quads();
 

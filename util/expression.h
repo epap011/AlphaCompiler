@@ -41,6 +41,8 @@ typedef struct expr{
     linked_list* truelist;
     linked_list* falselist;
 
+    unsigned int firstQuad;
+
 } expr;
 
 typedef struct callexpr{

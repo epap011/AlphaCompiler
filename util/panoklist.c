@@ -44,6 +44,17 @@ int patch_panoklist(linked_list* list, int label){
     return 1;
 }
 
+void shift_panoklist(linked_list* list, int shift, int max){   //Shift truelist/falselist by 'shift', if label >= max
+    if ( !list || !(list->head) ) return;
+    node* i = list->head;
+    while(i){
+        int* p_i = (int*) i->data;
+        if(*p_i >= max)
+            *p_i += shift;
+        i = i->next;
+    }
+}
+
 void print_panoklist(linked_list* list){
     if ( !list )
         printf("-> nonexistent\n");

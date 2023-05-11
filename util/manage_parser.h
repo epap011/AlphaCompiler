@@ -54,6 +54,7 @@ expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, uns
 expr* manage_arithop_emits    (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_relop_emits      (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label);
+expr* manage_boolop_bypass(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 
 expr* manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);

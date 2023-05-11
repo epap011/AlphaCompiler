@@ -31,6 +31,19 @@ void emit(enum iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label,
     p->line = line;
 }
 
+void emit_target(enum iopcode op, expr *arg1, expr *arg2, expr *result, int target, unsigned label, unsigned line){
+    if(currQuad == total)
+        expand();
+
+    quad *p = quads + target;
+    p->op = op;
+    p->arg1 = arg1;
+    p->arg2 = arg2;
+    p->result = result;
+    p->label = label;
+    p->line = line;
+}
+
 expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
     if(e->type != tableitem_e)
         return e;
@@ -136,6 +149,18 @@ void printQuads(){
     }
 }
 
+void shiftQuads(int number, int offset){
+    //shift all quads with number >= number by offset
+    int i;
+    for(i = currQuad - 1; i >= number; i--){
+        if( (currQuad + offset) >= total)
+            expand();
+        quads[i + offset] = quads[i];
+        if(quads[i].label != -1 && quads[i].label >= number)
+            quads[i + offset].label += offset;
+    }
+    currQuad += offset;
+}
 const char* iopcode_tostring(enum iopcode op){
     switch (op)
     {

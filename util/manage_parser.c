@@ -217,6 +217,7 @@ void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
         return;
 
     int patch_success=0;
+    
     patch_success += patch_panoklist(result->truelist, nextQuadLabel());
     patch_success += patch_panoklist(result->falselist, nextQuadLabel()+2);
 
@@ -352,6 +353,7 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
     //Ta apotelesmata boolean ekfrasewn den pairnoun (pleon) hidden_var san tis arithmitikes,
     //dioti h ekvash tous katalhgei se truelist/falselist, kai sto telos ginetai short_circuit_emits.
     
+    result->firstQuad = nextQuadLabel();
     result->truelist=new_panoklist(nextQuadLabel());
     result->falselist=new_panoklist(nextQuadLabel()+1);
     emit(op, expr1, expr2, NULL, nextQuadLabel()+2, line);
@@ -390,6 +392,48 @@ expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope
     }
 }
 
+expr* manage_boolop_bypass(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
+    expr* result = new_expr(boolexpr_e);
+    if(!(expr1->truelist)){
+        //emits for expr1
+            //Create truelist and falselist for e1 if not exists
+            //Also shift quads of expr2, so that they are placed after expr1's quads.
+            if(op == and){
+                expr1->firstQuad = expr2->firstQuad;    //expr1 takes expr2's place in the quad array
+                shiftQuads(expr2->firstQuad, 2);        //shift expr2's quads by 2, to make space for expr1's quads
+                expr2->firstQuad += 2;
+                emit_target(if_eq, expr1, new_const_bool(1), NULL, expr1->firstQuad, -1, line); 
+                emit_target(jump, NULL, NULL, NULL, (expr1->firstQuad+1), -1, line);
+            } else 
+            if(op == or){
+                expr1->firstQuad = expr2->firstQuad;
+                shiftQuads(expr2->firstQuad, 2);
+                expr2->firstQuad += 2;
+                emit_target(if_eq, expr1, new_const_bool(1), NULL, expr1->firstQuad, -1, line);
+                emit_target(jump, NULL, NULL, NULL, (expr1->firstQuad+1), -1, line);
+            } 
+            expr1->truelist  = new_panoklist(expr1->firstQuad);
+            expr1->falselist = new_panoklist(expr1->firstQuad+1);
+            shift_panoklist(expr2->truelist, 2, expr1->firstQuad);  //shift truelist/falselist, if labels are less than expr2's previous firstQuad
+            shift_panoklist(expr2->falselist, 2, expr1->firstQuad);
+        }
+        //else if expr1 exists (has truelist/falselist) (?)
+
+            //Merge lists for result (e) 
+    if(op == and){
+        patch_panoklist(expr1->truelist, expr2->firstQuad);
+        result->truelist = expr2->truelist;
+        result->falselist = merge_panoklist(expr1->falselist, expr2->falselist);
+    }else
+    if(op == or){
+        patch_panoklist(expr1->falselist, expr2->firstQuad);
+        result->truelist = merge_panoklist(expr1->truelist, expr2->truelist);
+        result->falselist = expr2->falselist;
+    }
+    
+    return result;
+}
+
 expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
     if(expr1 == NULL || expr2 == NULL) return NULL;
     
@@ -402,14 +446,17 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
     //Must maintain the order of the quads, because of short-circuit evaluation.
     //Sometimes the grammar evaluates the second expression first, and then the first.
     //If expr1 has quads chronologically after expr2, then we must swap them, and patch them the other way.
+    //Also, we should shift the 2nd expression's quads, so that they are after the 1st expression's quads.
 
     //first, the condition to figure out if this is happening
-    if ( (expr1->truelist && expr2->truelist && *(int*)(expr1->truelist->head->data) > *(int*)(expr2->truelist->head->data)) || 
-         (!expr1->truelist && expr2->truelist) ){
-        //swap
-        expr* tmp = expr1;
+    if(!expr1->truelist && expr2->truelist){
+          return manage_boolop_bypass(expr1, expr2, scope, line, op);
+    }
+    else if (expr1->truelist && expr2->truelist && *(int*)(expr1->truelist->head->data) > *(int*)(expr2->truelist->head->data)){
+        //swap expr
+        expr* temp = expr1;
         expr1 = expr2;
-        expr2 = tmp;
+        expr2 = temp;
     }
     
     result = new_expr(boolexpr_e);
@@ -418,10 +465,12 @@ expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned
     //emits for expr1
         //Create truelist and falselist for e1 if not exists
         if(op == and){
+            result->firstQuad = nextQuadLabel();
             emit(if_eq, expr1, new_const_bool(1), NULL, -1, line); 
             emit(jump, NULL, NULL, NULL, -1, line);
         } else 
         if(op == or){
+            result->firstQuad = nextQuadLabel();
             emit(if_eq, expr1, new_const_bool(1), NULL, -1, line);
             emit(jump, NULL, NULL, NULL, -1, line);
         } 
