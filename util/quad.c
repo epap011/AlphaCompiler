@@ -91,8 +91,12 @@ void printQuads(){
             else if(quads[i].arg1->type == constnum_e) {
                 if(quads[i].arg1->sym != NULL)
                     printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->sym->name);
-                else
-                    printf(" ARG1: "YEL"%-15.2f"RESET"\t", quads[i].arg1->numConst);
+                else{
+                    if(is_int(quads[i].arg1->numConst))
+                        printf(" ARG1: "YEL"%-15d"RESET"\t", (int) quads[i].arg1->numConst);
+                    else
+                        printf(" ARG1: "YEL"%-15.5f"RESET"\t", quads[i].arg1->numConst);
+                }
             }
             else if(quads[i].arg1->type == constbool_e)
                 printf(" ARG1: "YEL"%-15s"RESET"\t", quads[i].arg1->boolConst ? "true" : "false");
@@ -122,8 +126,12 @@ void printQuads(){
             else if(quads[i].arg2->type == constnum_e) {
                 if(quads[i].arg2->sym != NULL)
                     printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->sym->name);
-                else
-                    printf(" ARG2: "YEL"%-15.2f"RESET"\t", quads[i].arg2->numConst);
+                else{
+                    if(is_int(quads[i].arg2->numConst))
+                        printf(" ARG2: "YEL"%-15d"RESET"\t", (int) quads[i].arg2->numConst);
+                    else
+                        printf(" ARG2: "YEL"%-15.5f"RESET"\t", quads[i].arg2->numConst);
+                }
             }
             else if(quads[i].arg2->type == constbool_e)
                 printf(" ARG2: "YEL"%-15s"RESET"\t", quads[i].arg2->boolConst ? "true" : "false");
@@ -263,4 +271,9 @@ void back_patch(int list, int label) {
         get_quads()[list].label = label;
         list = next;
     }
+}
+
+int is_int(double num)
+{
+    return (int)num == num;
 }

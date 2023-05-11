@@ -60,4 +60,5 @@ int     merge_list(int l1, int l2);
 void    patch_list(int list, int label);
 void    back_patch(int list, int label);
 void patch_jump_to_jump_labels();
+int is_int(double num);
 #endif /* QUAD_H */
