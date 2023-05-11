@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
     
     //debug
     printf("\n----------- Quads -----------\n");
+    patch_jump_to_jump_labels();
     printQuads();
 
     symbol_table_print(symTable);

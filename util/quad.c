@@ -149,6 +149,16 @@ void printQuads(){
     }
 }
 
+void patch_jump_to_jump_labels(){
+
+    int i;
+    for(i = currQuad - 1; i >= 0; i--){
+        if(quads[i].op == jump && quads[quads[i].label].op == jump)
+           patchLabel(i, quads[quads[i].label].label);
+    }
+}
+
+
 void shiftQuads(int number, int offset){
     //shift all quads with number >= number by offset
     int i;
