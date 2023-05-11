@@ -61,4 +61,5 @@ void    patch_list(int list, int label);
 void    back_patch(int list, int label);
 void patch_jump_to_jump_labels();
 int is_int(double num);
+void quads_to_external_file();
 #endif /* QUAD_H */

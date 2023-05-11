@@ -42,11 +42,13 @@ int main(int argc, char** argv) {
     symTable = symbol_table_create();
     insert_lib_functions(symTable);
     yyparse();
-    
+    patch_jump_to_jump_labels();
+
     //debug
     printf("\n----------- Quads -----------\n");
-    patch_jump_to_jump_labels();
+    
     printQuads();
+    quads_to_external_file();
 
     symbol_table_print(symTable);
     fseek(out_file, 0, SEEK_SET);

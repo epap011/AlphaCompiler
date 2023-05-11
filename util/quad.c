@@ -68,6 +68,7 @@ void patchLabel(unsigned quadNo, unsigned label){
     quads[quadNo].label = label;
 }
 
+//Prints quads to stdout with nice colors and stuff
 void printQuads(){
     int i;
     for(i = 0; i < currQuad; i++){
@@ -154,6 +155,98 @@ void printQuads(){
         else
             printf(" LABEL: %d  \t", quads[i].label+1);
         printf("LINE: "GRN"%d"RESET"\n", quads[i].line);
+    }
+}
+
+//No colors just alignment as it is shown in FAQ
+void quads_to_external_file(){
+    FILE* quadFile = fopen("quads.txt", "w");
+
+    fprintf(quadFile, "Quad #\t opcode \t\t result \t\t arg1 \t\t\t arg2 \t\t\t label \t\tline\n");
+    fprintf(quadFile, "------------------------------------------------------------------------------------------\n");
+    int i;
+    for(i = 0; i < currQuad; i++){
+        fprintf(quadFile,"%-3d: \t %-16s", i + 1, iopcode_tostring(quads[i].op));
+        if(quads[i].result != NULL) {
+            if(quads[i].result->sym != NULL)
+                fprintf(quadFile,"%-16s", quads[i].result->sym->name);
+        }
+        else
+            fprintf(quadFile," \t\t\t\t ");   
+    
+        if(quads[i].arg1 != NULL){
+            if(quads[i].arg1->type == var_e         ||
+               quads[i].arg1->type == arithexpr_e   ||
+               quads[i].arg1->type == libraryfunc_e || 
+               quads[i].arg1->type == programfunc_e ||
+               quads[i].arg1->type == boolexpr_e    ||
+               quads[i].arg1->type == tableitem_e   ||
+               quads[i].arg1->type == newtable_e)
+                fprintf(quadFile,"%-16s", quads[i].arg1->sym->name);
+            else if(quads[i].arg1->type == constnum_e) {
+                if(quads[i].arg1->sym != NULL)
+                    fprintf(quadFile,"%-16s", quads[i].arg1->sym->name);
+                else{
+                    if(is_int(quads[i].arg1->numConst))
+                        fprintf(quadFile,"%-16d", (int) quads[i].arg1->numConst);
+                    else
+                        fprintf(quadFile,"%-16.5f", quads[i].arg1->numConst);
+                }
+            }
+            else if(quads[i].arg1->type == constbool_e)
+                fprintf(quadFile,"%-16s", quads[i].arg1->boolConst ? "true" : "false");
+            else if(quads[i].arg1->type == conststring_e){
+                int spacing = 14 - count_str(quads[i].arg1->strConst);
+                fprintf(quadFile," \"%s\"", quads[i].arg1->strConst);
+                for(int i = 0; i < spacing; i++)
+                    fprintf(quadFile," ");
+            }
+            else if(quads[i].arg1->type == nil_e)
+                fprintf(quadFile,"nil     \t");
+            else 
+                fprintf(quadFile,"Something is wrong");
+        }
+        else
+            fprintf(quadFile," \t\t\t\t ");
+        if(quads[i].arg2 != NULL){
+            if(quads[i].arg2->type == var_e         ||
+               quads[i].arg2->type == arithexpr_e   ||
+               quads[i].arg2->type == libraryfunc_e || 
+               quads[i].arg2->type == programfunc_e ||
+               quads[i].arg2->type == boolexpr_e    ||
+               quads[i].arg2->type == tableitem_e   ||
+               quads[i].arg2->type == newtable_e)
+                fprintf(quadFile,"%-16s", quads[i].arg2->sym->name);
+            else if(quads[i].arg2->type == constnum_e) {
+                if(quads[i].arg2->sym != NULL)
+                    fprintf(quadFile,"%-16s", quads[i].arg2->sym->name);
+                else{
+                    if(is_int(quads[i].arg2->numConst))
+                        fprintf(quadFile,"%-16d", (int) quads[i].arg2->numConst);
+                    else
+                        fprintf(quadFile,"%-16.5f", quads[i].arg2->numConst);
+                }
+            }
+            else if(quads[i].arg2->type == constbool_e)
+                fprintf(quadFile,"%-16s", quads[i].arg2->boolConst ? "true" : "false");
+            else if(quads[i].arg2->type == conststring_e){
+                int spacing = 14 - count_str(quads[i].arg2->strConst);
+                fprintf(quadFile,"\"%s\"", quads[i].arg2->strConst);
+                for(int i = 0; i < spacing; i++)
+                    fprintf(quadFile," ");
+            }
+            else if(quads[i].arg2->type == nil_e)
+                fprintf(quadFile,"nil     \t");
+            else 
+                fprintf(quadFile,"Something is wrong");
+        }
+        else
+            fprintf(quadFile," \t\t\t\t ");
+        if (quads[i].label == -1)
+            fprintf(quadFile,"\t\t\t");
+        else
+            fprintf(quadFile,"%-3d\t\t", quads[i].label+1);
+        fprintf(quadFile,"%d\n", quads[i].line);
     }
 }
 
