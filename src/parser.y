@@ -91,7 +91,7 @@
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr expr_opt assignexpr term const lvalue member call primary 
 %type<exprVal>   objectdef
-%type<exprVal>   elist com_expr_opt
+%type<exprVal>   elist
 %type<exprVal>   indexedelem com_indexedelem_opt indexed
 %type<callexprVal>   methodcall normcall callsuffix
 %type<forprefixVal> forprefix
@@ -194,16 +194,13 @@ normcall    : "(" elist ")" { $$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, 
 methodcall  : ".." IDENT "(" elist ")" { $$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,strdup($2));}
             ;
 
-com_expr_opt : /* empty */             {$$ = manage_comexpropt_empty                (DEBUG_PRINT, yyout);} //NULL
-             | COMMA expr com_expr_opt {short_circuit_emits($2,yylineno,scope); $$ = manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout, $2, $3);}
-             ;
-
 objectdef   : "[" indexed "]" {$$ = manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRINT, yyout, $2, scope, yylineno);}
             | "[" elist   "]" {$$ = manage_objectdef_lbrace_elist_rbrace(DEBUG_PRINT, yyout,$2, scope, yylineno);}
             ;
 
-elist       : /* empty */       {$$ = manage_elist_empty          (DEBUG_PRINT, yyout);} //NULL
-            | expr com_expr_opt {short_circuit_emits($1,yylineno,scope); $$ = manage_elist_expr_comexpropt(DEBUG_PRINT, yyout, $1, $2);}
+elist       : /* empty */      {$$ = manage_elist_empty(DEBUG_PRINT, yyout);} //NULL
+            | expr             {short_circuit_emits($1,yylineno,scope); manage_elist_expr(DEBUG_PRINT, yyout); $$ = $1;}
+            | elist COMMA expr {short_circuit_emits($3,yylineno,scope); $$ = manage_elist_elist_comma_exp(DEBUG_PRINT, yyout, $1, $3);}
             ;
             
 indexed     : indexedelem com_indexedelem_opt {$$ = manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout, $1, $2);}
@@ -453,6 +450,7 @@ continue        : CONTINUE ";" {$$ = make_stmt();
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
+                                        short_circuit_emits($2,yylineno,scope);
                                         manage_return(yylineno, return_flag, $2, ret_stack);}
                 ;
 
