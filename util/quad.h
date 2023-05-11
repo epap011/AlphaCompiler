@@ -34,11 +34,18 @@ typedef struct quad{
 
 } quad;
 
+typedef struct stmt_t {
+    int break_list;
+    int cont_list;
+} stmt_t;
+
 void expand();
 void emit(enum iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label, unsigned line);
+void emit_target(enum iopcode op, expr *arg1, expr *arg2, expr *result, int target, unsigned label, unsigned line);
 expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line);
 const char* iopcode_tostring(enum iopcode);
 void printQuads();
+void shiftQuads(int number, int offset);
 int count_str(const char* str);
 quad* get_quads();
 
@@ -47,4 +54,9 @@ unsigned nextQuadLabel();
 void patchLabel(unsigned quadNo, unsigned label);
 
 
+stmt_t* make_stmt ();
+int     new_list  (int i);
+int     merge_list(int l1, int l2);
+void    patch_list(int list, int label);
+void    back_patch(int list, int label);
 #endif /* QUAD_H */

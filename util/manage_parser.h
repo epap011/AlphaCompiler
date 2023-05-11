@@ -5,21 +5,12 @@
 #include "symbol_table.h"
 #include "expression.h"
 #include "quad.h"
+#include "panoklist.h"
 
 typedef struct Forprefix{
     unsigned int test;
     unsigned int enter;
 } Forprefix;
-
-typedef struct stmt_t {
-    int break_list;
-    int cont_list;
-} stmt_t;
-
-stmt_t* make_stmt ();
-int     new_list  (int i);
-int     merge_list(int l1, int l2);
-void    patch_list(int list, int label);
 
 void        insert_lib_functions(SymbolTable * symTable);
 const char* str_type(enum SymbolType type);
@@ -45,7 +36,7 @@ int convert_to_bool(expr* expr);
 
 void manage_program        (int debug, FILE* out);
 
-stmt_t* manage_stmt_expr      (int debug, FILE* out);
+stmt_t* manage_stmt_expr(int debug, FILE* out);
 stmt_t* manage_stmt_ifstmt    (int debug, FILE* out);
 stmt_t* manage_stmt_whilestmt (int debug, FILE* out);
 stmt_t* manage_stmt_forstmt   (int debug, FILE* out);
@@ -62,7 +53,8 @@ void manage_expr_term      (int debug, FILE* out);
 expr* manage_arith_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_arithop_emits    (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 expr* manage_relop_emits      (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
-expr* manage_boolop_emits     (expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
+expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label);
+expr* manage_boolop_bypass(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op);
 
 expr* manage_expr_plus_expr (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_mul_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
@@ -75,8 +67,8 @@ expr* manage_expr_gt_expr   (int debug, FILE* out, expr* expr1, expr* expr2, uns
 expr* manage_expr_lt_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_gte_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
 expr* manage_expr_lte_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
-expr* manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
-expr* manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line);
+expr* manage_expr_and_expr  (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line);
+expr* manage_expr_or_expr   (int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line);
 
 void manage_term_lpar_expr_rpar   (int debug, FILE* out);
 expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int scope, unsigned int line);
@@ -123,7 +115,8 @@ expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out, expr* indexed
 expr* manage_objectdef_lbrace_elist_rbrace(int debug, FILE* out, expr* elist, unsigned int scope, unsigned int line);
 
 expr* manage_elist_empty          (int debug, FILE* out);
-expr* manage_elist_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt);
+expr* manage_elist_expr           (int debug, FILE* out);
+expr* manage_elist_elist_comma_exp(int debug, FILE* out, expr* expr1, expr* com_expr_opt);
 
 expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out, expr* indexedelem, expr* com_indexedelem_opt);
 
@@ -140,5 +133,6 @@ expr* manage_ifstmt     (int debug, FILE* out, int ifprefix, unsigned int scope,
 expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line);
 int   manage_ifprefix   (int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line);
 int   manage_elseprefix (int debug, FILE* out, unsigned int scope, unsigned int line);
+void short_circuit_emits(expr* result, unsigned int line, unsigned int scope);
 
 #endif /* MANAGE_PARSER_H */

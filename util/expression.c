@@ -40,6 +40,9 @@ expr* new_expr(enum expr_t type){
     e->type = type;
     e->hidden_var = NULL;
 
+    e->truelist = NULL;   //null
+    e->falselist = NULL;
+
     return e;
 }
 
@@ -59,6 +62,10 @@ expr* new_lvalue_expr(Symbol* sym){
     }
     e->hidden_var = NULL;
 
+    e->truelist = NULL;   //null
+    e->falselist = NULL;
+
+
     return e;   
 }
 
@@ -68,6 +75,10 @@ expr* new_const_num(double n){
     e->numConst = n;
 
     e->hidden_var = NULL;
+
+    e->truelist = NULL;   //null
+    e->falselist = NULL;
+
 
     return e;
 }
@@ -79,6 +90,9 @@ expr* new_const_string(char *str){
     
     e->hidden_var = NULL;
 
+    e->truelist = NULL;   //null
+    e->falselist = NULL;
+
     return e;
 }
 
@@ -89,6 +103,9 @@ expr* new_const_bool(int flag){
     
     e->hidden_var = NULL;
 
+    e->truelist = NULL;   //null
+    e->falselist = NULL;
+
     return e;
 }
 
@@ -97,6 +114,9 @@ expr* new_const_nil(){
     expr* e = new_expr(nil_e);
 
     e->hidden_var = NULL;
+
+    e->truelist = NULL;   //null
+    e->falselist = NULL;
 
     return e;
 }
@@ -107,6 +127,10 @@ expr* new_member_item(expr* lv, char* name, unsigned int scope, unsigned int lin
     ti->sym = lv->sym;
     ti->index = new_const_string(name);
     ti->hidden_var = NULL;
+
+    ti->truelist = NULL;   //null
+    ti->falselist = NULL;
+
     return ti;
 }
 

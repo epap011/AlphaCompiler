@@ -38,6 +38,11 @@ typedef struct expr{
 
     struct expr* hidden_var;
 
+    linked_list* truelist;
+    linked_list* falselist;
+
+    unsigned int firstQuad;
+
 } expr;
 
 typedef struct callexpr{

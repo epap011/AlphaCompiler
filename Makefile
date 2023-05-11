@@ -25,10 +25,11 @@ MANAGE 	    = manage_parser
 QUAD		= quad
 EXPRESSION	= expression
 SCOPE_SPACE = scope_space
+PANOKLIST	= panoklist
 
 #---< Final Targets >---#
 # exe target is the final product of the phase 2
-scarser: $(PARSER).o $(MANAGE).o $(MAIN).o $(LLIST).o $(SYMTABLE).o $(SCANNER).o $(STACK).o $(YACC_UTIL).o $(QUAD).o $(EXPRESSION).o $(SCOPE_SPACE).o | $(BIN_DIR) 
+scarser: $(PARSER).o $(MANAGE).o $(MAIN).o $(LLIST).o $(SYMTABLE).o $(SCANNER).o $(STACK).o $(YACC_UTIL).o $(QUAD).o $(EXPRESSION).o $(SCOPE_SPACE).o $(PANOKLIST).o | $(BIN_DIR) 
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o
 
 #---< Object Targets >---#
@@ -66,6 +67,9 @@ $(QUAD).o: $(UTIL_DIR)/$(QUAD).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
 $(EXPRESSION).o: $(UTIL_DIR)/$(EXPRESSION).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
+	
+$(PANOKLIST).o: $(UTIL_DIR)/$(PANOKLIST).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
 $(SCOPE_SPACE).o: $(LIB_DIR)/$(SCOPE_SPACE).c | $(OBJ_DIR)

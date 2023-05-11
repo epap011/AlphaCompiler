@@ -31,6 +31,19 @@ void emit(enum iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label,
     p->line = line;
 }
 
+void emit_target(enum iopcode op, expr *arg1, expr *arg2, expr *result, int target, unsigned label, unsigned line){
+    if(currQuad == total)
+        expand();
+
+    quad *p = quads + target;
+    p->op = op;
+    p->arg1 = arg1;
+    p->arg2 = arg2;
+    p->result = result;
+    p->label = label;
+    p->line = line;
+}
+
 expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
     if(e->type != tableitem_e)
         return e;
@@ -41,7 +54,7 @@ expr* emit_if_tableitem(expr* e, unsigned int scope, unsigned int line){
         result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, 1, var_s, currScopeSpace(), currScopeOffset()));
         incCurrScopeOffset();
 
-        emit(tablegetelem, e, e->index, result, nextQuadLabel(), yylineno);
+        emit(tablegetelem, e, e->index, result, -1, yylineno);
         return result;
     }
 }
@@ -136,6 +149,18 @@ void printQuads(){
     }
 }
 
+void shiftQuads(int number, int offset){
+    //shift all quads with number >= number by offset
+    int i;
+    for(i = currQuad - 1; i >= number; i--){
+        if( (currQuad + offset) >= total)
+            expand();
+        quads[i + offset] = quads[i];
+        if(quads[i].label != -1 && quads[i].label >= number)
+            quads[i + offset].label += offset;
+    }
+    currQuad += offset;
+}
 const char* iopcode_tostring(enum iopcode op){
     switch (op)
     {
@@ -185,4 +210,47 @@ int count_str(const char* str){
 
 quad* get_quads(){
     return quads;
+}
+
+/*Quad list related functions*/
+
+stmt_t* make_stmt() {
+    stmt_t* stmt = (stmt_t*)malloc(sizeof(stmt_t));
+    stmt->break_list = 0;
+    stmt->cont_list  = 0;
+    return stmt;
+}
+
+int new_list(int i) {
+    get_quads()[i].label = 0;
+    return i;
+}
+
+int merge_list(int l1, int l2) {
+    if(!l1) return l2;
+    else
+    if(!l2) return l1; 
+    else {
+        int i = l1;
+        while(get_quads()[i].label != 0) i = get_quads()[i].label;
+        get_quads()[i].label = l2;
+        return l1;
+    }
+}
+
+void patch_list(int list, int label) {
+    while(list) {
+        int next = get_quads()[list].label;
+        get_quads()[list].label = label;
+        list = next;
+    }
+}
+
+void back_patch(int list, int label) {
+    if(list == 0) get_quads()[list].label = label+2;
+    while(list) {
+        int next = get_quads()[list].label;
+        get_quads()[list].label = label;
+        list = next;
+    }
 }

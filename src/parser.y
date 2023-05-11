@@ -91,7 +91,7 @@
 %type<symbolVal> funcprefix funcdef
 %type<exprVal>   expr expr_opt assignexpr term const lvalue member call primary 
 %type<exprVal>   objectdef
-%type<exprVal>   elist com_expr_opt
+%type<exprVal>   elist
 %type<exprVal>   indexedelem com_indexedelem_opt indexed
 %type<callexprVal>   methodcall normcall callsuffix
 %type<forprefixVal> forprefix
@@ -118,7 +118,7 @@ program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
             | /*empty*/
             ;   
 
-stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
+stmt        : expr ";"      {short_circuit_emits($1,yylineno,scope); $$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
             | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
             | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
             | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
@@ -130,21 +130,21 @@ stmt        : expr ";"      {$$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
             | ";"           {$$ = manage_stmt_semicolon (DEBUG_PRINT, yyout);}
             ;           
 
-expr        : assignexpr    {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
-            | term          {manage_expr_term      (DEBUG_PRINT, yyout);}
-            | expr "+" expr {$$ = manage_expr_plus_expr (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "*" expr {$$ = manage_expr_mul_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "-" expr {$$ = manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "/" expr {$$ = manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr "%" expr {$$ = manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr EQ expr  {$$ = manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr NEQ expr {$$ = manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr GT expr  {$$ = manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr LT expr  {$$ = manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr GTE expr {$$ = manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr LTE expr {$$ = manage_expr_lte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr AND expr {$$ = manage_expr_and_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
-            | expr OR expr  {$$ = manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+expr        : assignexpr        {manage_expr_assignexpr(DEBUG_PRINT, yyout);}
+            | term              {manage_expr_term      (DEBUG_PRINT, yyout);}
+            | expr "+" expr     {$$ = manage_expr_plus_expr (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "*" expr     {$$ = manage_expr_mul_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "-" expr     {$$ = manage_expr_minus_expr(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "/" expr     {$$ = manage_expr_div_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr "%" expr     {$$ = manage_expr_mod_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr EQ expr      {short_circuit_emits($1,yylineno,scope); $$ = manage_expr_eq_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr NEQ expr     {short_circuit_emits($1,yylineno,scope); $$ = manage_expr_neq_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr GT expr      {$$ = manage_expr_gt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr LT expr      {$$ = manage_expr_lt_expr   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr GTE expr     {$$ = manage_expr_gte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr LTE expr     {$$ = manage_expr_lte_expr  (DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+            | expr AND M expr   {$$ = manage_expr_and_expr  (DEBUG_PRINT, yyout, $1, $4, $3, scope, yylineno);}
+            | expr OR  M expr   {$$ = manage_expr_or_expr   (DEBUG_PRINT, yyout, $1, $4, $3, scope, yylineno);}
             ;                   
 
 term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PRINT, yyout); $$ = $2;}
@@ -157,7 +157,7 @@ term        : "(" expr ")"          {manage_term_lpar_expr_rpar        (DEBUG_PR
             | primary               {manage_term_primary                (DEBUG_PRINT, yyout);}
             ;   
 
-assignexpr  : lvalue "=" expr       {$$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
+assignexpr  : lvalue "=" expr       {short_circuit_emits($3,yylineno,scope); $$ = manage_assignexpr_lvalue_assign_expr(DEBUG_PRINT, yyout, symTable, $1, $3, scope, yylineno);}
             ;   
 
 primary     : lvalue                {if($1 != NULL) $$ = manage_primary_lvalue(DEBUG_PRINT, yyout, $1, scope, yylineno);}
@@ -181,29 +181,26 @@ member      : lvalue "." IDENT      {$$ = manage_memeber_lvalue_dot_ident   (DEB
 
 call        : call "(" elist ")"            {$$ = manage_call_call_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $1, $3);}
             | lvalue callsuffix             {$$ = manage_call_lvalue_callsuffix   (DEBUG_PRINT, yyout, symTable, $1, &normcall_skip, scope, yylineno, $2);}
-            | "(" funcdef ")" "(" elist ")" {$$ = manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $2, $5);}
+            | "(" funcdef ")" "(" elist ")" {short_circuit_emits($5,yylineno,scope); $$ = manage_call_lpar_funcdef_rpar_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $2, $5);}
             ;
 
 callsuffix  : normcall   {$$ = manage_callsuffix_normcall  (DEBUG_PRINT, yyout, $1);} 
             | methodcall {$$ = manage_callsuffix_methodcall(DEBUG_PRINT, yyout, $1);} 
             ;
 
-normcall    : "(" elist ")" {$$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout,0,$2,NULL);}
+normcall    : "(" elist ")" { $$ = manage_normcall_lpar_elist_rpar(DEBUG_PRINT, yyout,0,$2,NULL);}
             ;
 
-methodcall  : ".." IDENT "(" elist ")" {$$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,strdup($2));}
+methodcall  : ".." IDENT "(" elist ")" { $$ = manage_methodcall_ddot_ident_lpar_elist_rpar(DEBUG_PRINT, yyout, &normcall_skip,1,$4,strdup($2));}
             ;
-
-com_expr_opt : /* empty */             {$$ = manage_comexpropt_empty                (DEBUG_PRINT, yyout);} //NULL
-             | COMMA expr com_expr_opt {$$ = manage_comexpropt_comma_expr_comexpropt(DEBUG_PRINT, yyout, $2, $3);}
-             ;
 
 objectdef   : "[" indexed "]" {$$ = manage_objectdef_lbrace_indexed_rbrace(DEBUG_PRINT, yyout, $2, scope, yylineno);}
             | "[" elist   "]" {$$ = manage_objectdef_lbrace_elist_rbrace(DEBUG_PRINT, yyout,$2, scope, yylineno);}
             ;
 
-elist       : /* empty */       {$$ = manage_elist_empty          (DEBUG_PRINT, yyout);} //NULL
-            | expr com_expr_opt {$$ = manage_elist_expr_comexpropt(DEBUG_PRINT, yyout, $1, $2);}
+elist       : /* empty */      {$$ = manage_elist_empty(DEBUG_PRINT, yyout);} //NULL
+            | expr             {short_circuit_emits($1,yylineno,scope); manage_elist_expr(DEBUG_PRINT, yyout); $$ = $1;}
+            | elist COMMA expr {short_circuit_emits($3,yylineno,scope); $$ = manage_elist_elist_comma_exp(DEBUG_PRINT, yyout, $1, $3);}
             ;
             
 indexed     : indexedelem com_indexedelem_opt {$$ = manage_indexed_indexedelem_comindexedelemopt(DEBUG_PRINT, yyout, $1, $2);}
@@ -358,7 +355,7 @@ ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT,
                 | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
                 ;
 
-ifprefix        : IF "(" expr ")" {$$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}
+ifprefix        : IF "(" expr ")" {short_circuit_emits($3,yylineno,scope); $$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}
 
 elseprefix      : ELSE {$$ = manage_elseprefix(DEBUG_PRINT, yyout, scope, yylineno);}
                 ;
@@ -381,7 +378,8 @@ whilestmt       : whilestart whilecond  { if(!loop_flag_stack) loop_flag_stack =
 whilestart      : WHILE {$$ = nextQuadLabel();}
                 ;
 
-whilecond       : "(" expr ")"  {emit(if_eq, $2, new_const_bool(1), NULL, nextQuadLabel()+2, yylineno);  
+whilecond       : "(" expr ")"  {short_circuit_emits($2,yylineno,scope);
+                                 emit(if_eq, $2, new_const_bool(1), NULL, nextQuadLabel()+2, yylineno);  
                                  $$ = nextQuadLabel();
                                  emit(jump, NULL, NULL, NULL, 0, yylineno);
                                 }
@@ -392,24 +390,26 @@ forstmt         : forprefix N1 elist ")" N2 {   if(!loop_flag_stack) loop_flag_s
                                                 *loop_flag_ptr = loop_flag;
                                                 push(loop_flag_stack,loop_flag_ptr);
                                                 loop_flag = 1;
-                                        }  
-                                        loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
-                                                fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
+                                            }  
+                                            loopstmt N3 {  loop_flag = *(int*)pop(loop_flag_stack);
+                                                    fprintf(yyout, MAG "Detected :" RESET"FOR ( elist ; expr ; elist ) stmt"CYN"-> "RESET"forstmt \n");
 
-                                                patchLabel($1->enter, $5+1);     //true    jump
-                                                patchLabel($2, nextQuadLabel()); //false   jump
-                                                patchLabel($5, $1->test);        //loop    jump
-                                                patchLabel($8, $2+1);            //closure jump
+                                                    patchLabel($1->enter, $5+1);     //true    jump
+                                                    patchLabel($2, nextQuadLabel()); //false   jump
+                                                    patchLabel($5, $1->test);        //loop    jump
+                                                    patchLabel($8, $2+1);            //closure jump
 
-                                                patch_list($7->break_list, nextQuadLabel());
-                                                patch_list($7->cont_list, $2+1);
-                                            }
+                                                    patch_list($7->break_list, nextQuadLabel());
+                                                    patch_list($7->cont_list, $2+1);
+                                                }
                     ; 
 
 forprefix       : FOR "(" elist ";" M expr ";" {
+                                            short_circuit_emits($6,yylineno,scope);
                                             Forprefix* forprefix = (Forprefix*)malloc(sizeof(Forprefix));
                                             forprefix->test  = $5;
                                             forprefix->enter = nextQuadLabel();
+                                            
                                             emit(if_eq, $6, new_const_bool(1), NULL, 0, yylineno);
 
                                             $$ = forprefix;
@@ -450,6 +450,7 @@ continue        : CONTINUE ";" {$$ = make_stmt();
                 ;
 
 returnstmt      : RETURN expr_opt ";" {fprintf(yyout, MAG "Detected :" RESET"RETURN expr_opt ;"CYN"-> "RESET"returnstmt \n");
+                                        short_circuit_emits($2,yylineno,scope);
                                         manage_return(yylineno, return_flag, $2, ret_stack);}
                 ;
 

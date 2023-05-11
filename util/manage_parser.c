@@ -210,8 +210,31 @@ void manage_program (int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"program stmtList \n");
 }
 
+//Gia ta 3 teleutaia emits sta boolops kai to patching twn listwn
+void short_circuit_emits(expr* result, unsigned int line, unsigned int scope){
+    
+    if(result == NULL)
+        return;
+
+    int patch_success=0;
+    
+    patch_success += patch_panoklist(result->truelist, nextQuadLabel());
+    patch_success += patch_panoklist(result->falselist, nextQuadLabel()+2);
+
+    if(patch_success){
+        Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
+        incCurrScopeOffset();
+        result->sym = tmp_symbol;
+
+        emit(assign, new_const_bool(1), NULL, result, -1, line);
+        emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
+        emit(assign, new_const_bool(0), NULL, result, -1, line);
+    }
+}
+
 stmt_t* manage_stmt_expr(int debug, FILE* out) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr;"CYN" ->"RESET" stmt \n");
+
     return make_stmt();
 }
 
@@ -311,7 +334,6 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
 
 expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
     expr* result = NULL;
-    //int constbool_exists = (expr1->type == constbool_e || expr2->type == constbool_e);
     
     expr1->boolConst  = convert_to_bool(expr1);
     expr2->boolConst  = convert_to_bool(expr2);
@@ -323,30 +345,19 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
         int check = 0; //xrisimopoioume metavliti apla gia na petaei kai gia ta 2 expr ta error an uparxei auto to case
         check += check_arith(expr1, out_file,line,"relational");
         check += check_arith(expr2, out_file,line,"relational");
-
-        if(check) return NULL;
+        if(check){printf("Tha fas seg an tuposeis ta quads!!!!\n"); return NULL;}
     }
 
-
-    // //Isws xreiazetai kapoia skepsi.. p.x sto 1 == true, exetazoume to 1 san true h san 1?An eixame 1 and/or true to 1 tha to kaname true,
-    // //isxuei omws to idio kai gia to == / != ?
-    // if (op == if_eq || op == if_noteq) {
-    //     if(constbool_exists) {
-            
-
-    //     }
-    // }
-
-    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
     result = new_expr(boolexpr_e);
-    result->sym = tmp_symbol;
+
+    //Ta apotelesmata boolean ekfrasewn den pairnoun (pleon) hidden_var san tis arithmitikes,
+    //dioti h ekvash tous katalhgei se truelist/falselist, kai sto telos ginetai short_circuit_emits.
     
+    result->firstQuad = nextQuadLabel();
+    result->truelist=new_panoklist(nextQuadLabel());
+    result->falselist=new_panoklist(nextQuadLabel()+1);
     emit(op, expr1, expr2, NULL, nextQuadLabel()+2, line);
     emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
-    emit(assign, new_const_bool(1), NULL, result, -1, line);
-    emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-    emit(assign, new_const_bool(0), NULL, result, -1, line);
 
     return result;
 }
@@ -354,51 +365,142 @@ expr* manage_relop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned 
 expr* manage_term_not_expr(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"NOT expr"CYN" ->"RESET" term \n");
 
-    expr* term = NULL;
-    expr1->boolConst = convert_to_bool(expr1);
-    
-    term = new_expr(boolexpr_e);
-    term->sym  = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
-    expr* true_expr = new_expr(constbool_e);
-    true_expr->boolConst = 1;
-    emit(if_eq, expr1, true_expr, NULL, nextQuadLabel() + 4, line);
-    emit(jump,NULL,NULL,NULL,nextQuadLabel() + 1 ,line);
-    emit(assign, new_const_bool(1), NULL, term, -1, line);
-    emit(jump, NULL, NULL, NULL, nextQuadLabel() + 2, line);
-    emit(assign, new_const_bool(0), NULL, term, -1, line);
+    if(expr1 == NULL) return NULL;
 
-    return term;
+    //Creation of new expression with hidden var, is unnecessary.
+    linked_list* tmp;
+    expr1->boolConst = convert_to_bool(expr1);
+
+    expr* temp;
+    
+    if(!(expr1->truelist)){
+        temp=new_expr(boolexpr_e);
+        //Quads are emitted ONLY if expression doesn't have truelist/falselist.
+        //Lists are also created, and linked in an opposite way (true->false, false->true).
+        temp->falselist = new_panoklist(nextQuadLabel()); //falselist linked to true
+        temp->truelist = new_panoklist(nextQuadLabel()+1); //truelist linked to false
+        emit(if_eq, expr1, new_const_bool(1), NULL, -1, line);
+        emit(jump,NULL,NULL,NULL, -1 ,line);
+        return temp;
+    }
+    else{
+        //If expression has truelist/falselist, then we just need to swap them.
+        tmp = expr1->truelist;
+        expr1->truelist = expr1->falselist;
+        expr1->falselist = tmp;
+        return expr1;
+    }
 }
 
-expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
+expr* manage_boolop_bypass(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op) {
+    expr* result = new_expr(boolexpr_e);
+    if(!(expr1->truelist)){
+        //emits for expr1
+            //Create truelist and falselist for e1 if not exists
+            //Also shift quads of expr2, so that they are placed after expr1's quads.
+            if(op == and){
+                expr1->firstQuad = expr2->firstQuad;    //expr1 takes expr2's place in the quad array
+                shiftQuads(expr2->firstQuad, 2);        //shift expr2's quads by 2, to make space for expr1's quads
+                expr2->firstQuad += 2;
+                emit_target(if_eq, expr1, new_const_bool(1), NULL, expr1->firstQuad, -1, line); 
+                emit_target(jump, NULL, NULL, NULL, (expr1->firstQuad+1), -1, line);
+            } else 
+            if(op == or){
+                expr1->firstQuad = expr2->firstQuad;
+                shiftQuads(expr2->firstQuad, 2);
+                expr2->firstQuad += 2;
+                emit_target(if_eq, expr1, new_const_bool(1), NULL, expr1->firstQuad, -1, line);
+                emit_target(jump, NULL, NULL, NULL, (expr1->firstQuad+1), -1, line);
+            } 
+            expr1->truelist  = new_panoklist(expr1->firstQuad);
+            expr1->falselist = new_panoklist(expr1->firstQuad+1);
+            shift_panoklist(expr2->truelist, 2, expr1->firstQuad);  //shift truelist/falselist, if labels are less than expr2's previous firstQuad
+            shift_panoklist(expr2->falselist, 2, expr1->firstQuad);
+        }
+        //else if expr1 exists (has truelist/falselist) (?)
+
+            //Merge lists for result (e) 
+    if(op == and){
+        patch_panoklist(expr1->truelist, expr2->firstQuad);
+        result->truelist = expr2->truelist;
+        result->falselist = merge_panoklist(expr1->falselist, expr2->falselist);
+    }else
+    if(op == or){
+        patch_panoklist(expr1->falselist, expr2->firstQuad);
+        result->truelist = merge_panoklist(expr1->truelist, expr2->truelist);
+        result->falselist = expr2->falselist;
+    }
+    
+    return result;
+}
+
+expr* manage_boolop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigned int line, enum iopcode op, unsigned int M_label) {
+    if(expr1 == NULL || expr2 == NULL) return NULL;
+    
+    unsigned int M_label_final = M_label;
     expr* result = NULL;
 
     expr1->boolConst = convert_to_bool(expr1);
     expr2->boolConst = convert_to_bool(expr2);
-    Symbol* tmp_symbol = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
-    incCurrScopeOffset();
-    result = new_expr(boolexpr_e);
-    result->sym = tmp_symbol;
-    expr* true_expr = new_expr(constbool_e);
-    true_expr->boolConst = 1;
-    
-    if(op == and){
-        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+2, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+5, line);
-    } else 
-    if(op == or){
-        emit(if_eq, expr1, true_expr, NULL, nextQuadLabel()+4, line);
-        emit(jump, NULL, NULL, NULL, nextQuadLabel()+1, line);
-    }  
-    
-    emit(if_eq, expr2, true_expr, NULL, nextQuadLabel()+2, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
-    emit(jump, NULL, NULL, NULL, nextQuadLabel()+3, line);
-    emit(assign, new_const_bool(1), NULL, result, -1, line);
-    emit(jump, NULL, NULL, NULL, nextQuadLabel()+2, line);
-    emit(assign, new_const_bool(0), NULL, result, -1, line);
-    
 
+    //Must maintain the order of the quads, because of short-circuit evaluation.
+    //Sometimes the grammar evaluates the second expression first, and then the first.
+    //If expr1 has quads chronologically after expr2, then we must swap them, and patch them the other way.
+    //Also, we should shift the 2nd expression's quads, so that they are after the 1st expression's quads.
+
+    //first, the condition to figure out if this is happening
+    if(!expr1->truelist && expr2->truelist){
+          return manage_boolop_bypass(expr1, expr2, scope, line, op);
+    }
+    else if (expr1->truelist && expr2->truelist && *(int*)(expr1->truelist->head->data) > *(int*)(expr2->truelist->head->data)){
+        //swap expr
+        expr* temp = expr1;
+        expr1 = expr2;
+        expr2 = temp;
+    }
+    
+    result = new_expr(boolexpr_e);
+
+    if(!(expr1->truelist)){
+    //emits for expr1
+        //Create truelist and falselist for e1 if not exists
+        if(op == and){
+            result->firstQuad = nextQuadLabel();
+            emit(if_eq, expr1, new_const_bool(1), NULL, -1, line); 
+            emit(jump, NULL, NULL, NULL, -1, line);
+        } else 
+        if(op == or){
+            result->firstQuad = nextQuadLabel();
+            emit(if_eq, expr1, new_const_bool(1), NULL, -1, line);
+            emit(jump, NULL, NULL, NULL, -1, line);
+        } 
+        expr1->truelist  = new_panoklist(nextQuadLabel()-2);
+        expr1->falselist = new_panoklist(nextQuadLabel()-1);
+    }
+   
+   //Create truelist and falselist for e2 if nonexistent.
+   //Emits for expr2 are ONLY created if truelist/falselist do not exist.
+    if(!(expr2->truelist)){
+        expr2->truelist  = new_panoklist(nextQuadLabel());
+        expr2->falselist = new_panoklist(nextQuadLabel()+1);
+        //M_label == the next emit's label, whenever we create quads.
+        M_label_final = nextQuadLabel();
+        emit(if_eq, expr2, new_const_bool(1), NULL, -1, line); //se auto to emit prepei na lifthei ipopsi to const bool kai tws 2 expr
+        emit(jump, NULL, NULL, NULL, -1, line);
+    }
+
+    //Merge lists for result (e) 
+    if(op == and){
+        patch_panoklist(expr1->truelist, M_label_final);
+        result->truelist = expr2->truelist;
+        result->falselist = merge_panoklist(expr1->falselist, expr2->falselist);
+    }else
+    if(op == or){
+        patch_panoklist(expr1->falselist, M_label_final);
+        result->truelist = merge_panoklist(expr1->truelist, expr2->truelist);
+        result->falselist = expr2->falselist;
+    }
+    
     return result;
 }
 
@@ -468,16 +570,16 @@ expr* manage_expr_lte_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsig
     return manage_relop_emits(expr1, expr2, scope, line, if_lesseq);
 }
 
-expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+expr* manage_expr_and_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr AND expr"CYN" ->"RESET" expr \n");
  
-    return manage_boolop_emits(expr1, expr2, scope, line, and);
+    return manage_boolop_emits(expr1, expr2, scope, line, and, M_label);
 }
 
-expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int scope, unsigned int line) {
+expr* manage_expr_or_expr(int debug, FILE* out, expr* expr1, expr* expr2, unsigned int M_label, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"expr OR expr"CYN" ->"RESET" expr \n");
     
-    return manage_boolop_emits(expr1, expr2, scope, line, or); 
+    return manage_boolop_emits(expr1, expr2, scope, line, or, M_label); 
 }
 /**End of Arithmetic / relop**/
 
@@ -917,11 +1019,23 @@ expr* manage_elist_empty(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_elist_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");
+expr* manage_elist_expr(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr"CYN" ->"RESET" elist \n");
+
+    return NULL;
+}
+
+expr* manage_elist_elist_comma_exp(int debug, FILE* out, expr* expr1, expr* com_expr_opt) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"elist , expr"CYN" ->"RESET" elist \n");
+    
+    expr* list_head = expr1;
+    
+    while(expr1->next != NULL)
+        expr1 = expr1->next;
     
     expr1->next = com_expr_opt;
-    return expr1;
+    
+    return list_head;
 }
 
 expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out, expr* indexedelem, expr* com_indexedelem_opt) {
@@ -1021,37 +1135,5 @@ int convert_to_bool(expr* expr) {
             return 1;
         default:
             return -1;
-    }
-}
-
-stmt_t* make_stmt() {
-    stmt_t* stmt = (stmt_t*)malloc(sizeof(stmt_t));
-    stmt->break_list = 0;
-    stmt->cont_list  = 0;
-    return stmt;
-}
-
-int new_list(int i) {
-    get_quads()[i].label = 0;
-    return i;
-}
-
-int merge_list(int l1, int l2) {
-    if(!l1) return l2;
-    else
-    if(!l2) return l1; 
-    else {
-        int i = l1;
-        while(get_quads()[i].label != 0) i = get_quads()[i].label;
-        get_quads()[i].label = l2;
-        return l1;
-    }
-}
-
-void patch_list(int list, int label) {
-    while(list) {
-        int next = get_quads()[list].label;
-        get_quads()[list].label = label;
-        list = next;
     }
 }
