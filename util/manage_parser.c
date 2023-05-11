@@ -970,11 +970,23 @@ expr* manage_elist_empty(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_elist_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt) {
-    if(debug) fprintf(out, MAG "Detected :" RESET"expr com_expr_opt"CYN" ->"RESET" elist \n");
+expr* manage_elist_expr(int debug, FILE* out) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"expr"CYN" ->"RESET" elist \n");
+
+    return NULL;
+}
+
+expr* manage_elist_elist_comma_exp(int debug, FILE* out, expr* expr1, expr* com_expr_opt) {
+    if(debug) fprintf(out, MAG "Detected :" RESET"elist , expr"CYN" ->"RESET" elist \n");
+    
+    expr* list_head = expr1;
+    
+    while(expr1->next != NULL)
+        expr1 = expr1->next;
     
     expr1->next = com_expr_opt;
-    return expr1;
+    
+    return list_head;
 }
 
 expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out, expr* indexedelem, expr* com_indexedelem_opt) {

@@ -114,7 +114,8 @@ expr* manage_objectdef_lbrace_indexed_rbrace(int debug, FILE* out, expr* indexed
 expr* manage_objectdef_lbrace_elist_rbrace(int debug, FILE* out, expr* elist, unsigned int scope, unsigned int line);
 
 expr* manage_elist_empty          (int debug, FILE* out);
-expr* manage_elist_expr_comexpropt(int debug, FILE* out, expr* expr1, expr* com_expr_opt);
+expr* manage_elist_expr           (int debug, FILE* out);
+expr* manage_elist_elist_comma_exp(int debug, FILE* out, expr* expr1, expr* com_expr_opt);
 
 expr* manage_indexed_indexedelem_comindexedelemopt(int debug, FILE* out, expr* indexedelem, expr* com_indexedelem_opt);
 
