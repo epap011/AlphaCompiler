@@ -263,9 +263,9 @@ void patch_jump_to_jump_labels(){
 void shiftQuads(int number, int offset){
     //shift all quads with number >= number by offset
     int i;
+    while( (currQuad + offset) >= total)
+        expand();
     for(i = currQuad - 1; i >= number; i--){
-        if( (currQuad + offset) >= total)
-            expand();
         quads[i + offset] = quads[i];
         if(quads[i].label != -1 && quads[i].label >= number)
             quads[i + offset].label += offset;
