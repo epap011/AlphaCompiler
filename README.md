@@ -1,4 +1,4 @@
-# Alpha Compiler - Phase 2
+# Alpha Compiler - Phase 3
 
 ## Authors  
 
@@ -8,13 +8,15 @@
 
 Ευθύμης Παπαγεωργίου csd4340
 
+## Description
+
++ Everything works as expected.  
++ Short Circuit Evaluation is supported.
+
 # How to build
 > make
 
-# How to run (without file)
-> ./bin/scarser
-
-# How to run (with file)
+# How to run
 > ./bin/scarser /path/to/test
 
 # How to clean
