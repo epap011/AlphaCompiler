@@ -16,9 +16,13 @@
 extern int   yylineno;
 extern char* yytext;
 extern int formal_flag;
+extern int anonym_func_cnt;
+extern int anonym_var_cnt;
 
 int yylex(void);
 int yyerror(char* yaccProvideMessage);
+
+char* str_int_merge(const char* str, int num);
 
 extern int yylineno;
 extern char * yytext;
