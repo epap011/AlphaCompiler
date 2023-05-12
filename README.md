@@ -12,6 +12,7 @@
 
 + Everything works as expected.  
 + Short Circuit Evaluation is supported.
++ A list of created quads is exported in quads.txt as requested, but the list is also printed in stdout with nicer alignments and colors :3
 
 # How to build
 > make
