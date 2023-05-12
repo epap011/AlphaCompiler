@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "manage_symtable.h": "c",
-        "expression.h": "c",
-        "symbol_table.h": "c",
-        "yacc_util.h": "c"
-    }
-}
