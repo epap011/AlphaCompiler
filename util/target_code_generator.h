@@ -67,5 +67,7 @@ extern void generate_GETRETVAL   (quad* quad);
 extern void generate_FUNCSTART   (quad* quad);
 extern void generate_RETURN      (quad* quad);
 extern void generate_FUNCEND     (quad* quad);
+extern void generate_UMINUS      (quad* quad);
+extern void generate_AND         (quad* quad);
 
 #endif /* INSTRUCTION_H */
