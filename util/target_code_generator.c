@@ -33,69 +33,68 @@ generator_func_t generators[] = {
     generate_NOP
 };
 
-#include "target_code_generator.h"
-
 void make_operand(expr* e, vmarg* arg){
+    switch (e->type) {
+        case var_e:
+            break;
+        case tableitem_e:
+            break;
+        case arithexpr_e:
+            break;
+        case boolexpr_e:
+            break;
+        case newtable_e:
+            assert(e->sym);
+            arg->val = e->sym->offset;
+            switch (e->sym->space) {
+                case programvar: 
+                    arg->type = global_a; 
+                    break;
+                case functionlocal: 
+                    arg->type = local_a; 
+                    break;
+                case formalarg: 
+                    arg->type = formal_a; 
+                    break;
+                default: assert(0);
+            }
+            break;
 
-    switch (e->type)
-    {
-    
-    case var_e:
-    case tableitem_e:
-    case arithexpr_e:
-    case boolexpr_e:
-    case newtable_e: {
-        assert(e->sym);
-        arg->val = e->sym->offset;
-        switch (e->sym->space)
-        {
-            case programvar: arg->type = global_a; break;
-            case functionlocal: arg->type = local_a; break;
-            case formalarg: arg->type = formal_a; break;
-            default: assert(0);
-        }
-    } 
-        break;
+        case constbool_e:
+            arg->val = e->boolConst;
+            arg->type = bool_a;
+            break;
 
-    case constbool_e: {
-        arg->val = e->boolConst;
-        arg->type = bool_a;
-    }
-        break;
-    
-    case conststring_e: {
-        arg->val = consts_newstring(e->strConst); // make this function
-        arg->type = string_a;
-    }
-        break;
-    
-    case constnum_e: {
-        arg->val = consts_newnumber(e->numConst); // make this function
-        arg->type = number_a;
-    }
-        break;
+        case conststring_e:
+            arg->val = conts_newstring(e->strConst); // make this function
+            arg->type = string_a;
+            break;
+        
+        case constnum_e:
+            arg->val = conts_newnumber(e->numConst); // make this function
+            arg->type = number_a;
+            break;
 
-    case nil_e: 
-        arg->type = nil_a; break;
+        case nil_e: 
+            arg->type = nil_a; 
+            break;
 
-    case programfunc_e: {
-        arg->type = userfunc_a;
-        arg->val = userfuncs_newfunc(e->sym); // make this function
-    }
-        break;
+        case programfunc_e:
+            arg->type = userfunc_a;
+            arg->val = userfuncs_newfunc(e->sym); // make this function
+            break;
 
-    case libraryfunc_e: {
-        arg->type = libfunc_a;
-        arg->val = libfuncs_newused(e->sym->name); // make this function
-    }
-        break;
-    
-    default: assert(0);
+        case libraryfunc_e:
+            arg->type = libfunc_a;
+            arg->val = libfuncs_newused(e->sym->name); // make this function
+            break;
+        
+        default: assert(0);
     }
 }
 
 void make_numberoperand(vmarg* arg, double val){
-    arg->val = consts_newnumber(val);
+    arg->val = conts_newnumber(val);
     arg->type = number_a;
 }   
 
@@ -104,27 +103,13 @@ void make_booloperand(vmarg* arg, unsigned val){
     arg->type = bool_a;
 }
 
-void make_retvaloperand(vmarg* arg){
-    arg->type = retval_a;
-}
+void make_retvaloperand(vmarg* arg){ arg->type = retval_a; }
 
+unsigned conts_newstring  (char* s)    {return 0;}
+unsigned conts_newnumber  (double n)   {return 0;}
+unsigned libfuncs_newused (char* s)    {return 0;}
+unsigned userfuncs_newfunc(Symbol* sym){return 0;}
 
-unsigned conts_newstring(char* s){
-
-    return 0;
-}
-unsigned conts_newnumber(double n){
-    
-    return 0;
-}
-unsigned libfuncs_newused(char* s){
-
-    return 0;
-}
-unsigned userfuncs_newfunc(Symbol* sym){
-
-    return 0;
-}
 void generate(void) {
     int total_quads = nextQuadLabel();
     quad *quads = get_quads();
@@ -132,3 +117,31 @@ void generate(void) {
         (*generators[quads[i].op])(quads+i);
     }
 }
+
+void generate_ASSIGN(quad* q) {}
+void generate_ADD   (quad* q) {}
+void generate_SUB   (quad* q) {}
+void generate_MUL   (quad* q) {}
+void generate_DIV   (quad* q) {}
+void generate_MOD   (quad* q) {}
+void generate_UMINUS(quad* q) {}
+void generate_AND   (quad* q) {}
+void generate_OR    (quad* q) {}
+void generate_NOT   (quad* q) {}
+void generate_IF_EQ (quad* q) {}
+void generate_IF_NOTEQ(quad* q) {}
+void generate_IF_LESSEQ(quad* q) {}
+void generate_IF_GREATEREQ(quad* q) {}
+void generate_IF_LESS(quad* q) {}
+void generate_IF_GREATER(quad* q) {}
+void generate_CALL(quad* q) {}
+void generate_PARAM(quad* q) {}
+void generate_RETURN(quad* q) {}
+void generate_GETRETVAL(quad* q) {}
+void generate_FUNCSTART(quad* q) {}
+void generate_FUNCEND(quad* q) {}
+void generate_NEWTABLE(quad* q) {}
+void generate_TABLEGETELEM(quad* q) {}
+void generate_TABLESETELEM(quad* q) {}
+void generate_JUMP(quad* q) {}
+void generate_NOP(quad* q) {}
