@@ -1,3 +1,35 @@
+#include "target_code_generator.h"
+#include "quad.h"
+
+typedef void (*generator_func_t)(quad*);
+
+generator_func_t generators[] = {
+    generate_ADD,         
+    generate_SUB,         
+    generate_MUL,         
+    generate_DIV,         
+    generate_MOD,         
+    generate_NEWTABLE,    
+    generate_TABLEGETELEM,
+    generate_TABLESETELEM,
+    generate_ASSIGN,      
+    generate_NOP,         
+    generate_JUMP,        
+    generate_IF_EQ,       
+    generate_IF_NOTEQ,    
+    generate_IF_GREATER,  
+    generate_IF_GREATEREQ,
+    generate_IF_LESS,     
+    generate_IF_LESSEQ,   
+    generate_NOT,         
+    generate_OR,          
+    generate_PARAM,       
+    generate_CALL,        
+    generate_GETRETVAL,   
+    generate_FUNCSTART,   
+    generate_RETURN,      
+    generate_FUNCEND,     
+};
 
 #include "target_code_generator.h"
 
@@ -90,4 +122,11 @@ unsigned libfuncs_newused(char* s){
 unsigned userfuncs_newfunc(Symbol* sym){
 
     return 0;
+}
+void generate(void) {
+    int total_quads = nextQuadLabel();
+    quad *quads = get_quads();
+    for (unsigned i = 0; i < total_quads; ++i) {
+        (*generators[quads[i].op])(quads+i);
+    }
 }
