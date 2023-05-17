@@ -1,3 +1,6 @@
+#ifndef INSTRUCTION_H
+#define INSTRUCTION_H
+
 typedef struct vmarg {
     vmarg_t type;
     unsigned val;
@@ -10,3 +13,6 @@ typedef struct instuction {
     vmarg_t arg2;
     unsigned int srcLine;
 } instruction_t;
+
+
+#endif /* INSTRUCTION_H */
