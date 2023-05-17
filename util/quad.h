@@ -15,7 +15,7 @@
 enum iopcode{
 
     assign, add, sub, mul, i_div, mod, uminus,
-    and, or, not, //useless
+    and, or, not, 
     if_eq, if_noteq, if_lesseq, if_greatereq, if_less, if_greater,
     call, param, ret, getretval,
     funcstart, funcend,
