@@ -14,7 +14,6 @@ enum vmopcode{
 };
 
 enum vmarg_t{
-
     global_a,
     local_a,
     formal_a,
@@ -34,9 +33,9 @@ typedef struct vmarg {
 
 typedef struct instuction {
     enum vmopcode opcode;
-    vmarg result;
-    vmarg arg1;
-    vmarg arg2;
+    vmarg* result;
+    vmarg* arg1;
+    vmarg* arg2;
     unsigned int srcLine;
 } instruction;
 
@@ -50,32 +49,34 @@ unsigned conts_newnumber  (double n);
 unsigned libfuncs_newused (char* s);
 unsigned userfuncs_newfunc(Symbol* sym);
 
-extern void generate_ADD         (quad* quad);
-extern void generate_SUB         (quad* quad);
-extern void generate_MUL         (quad* quad);
-extern void generate_DIV         (quad* quad);
-extern void generate_MOD         (quad* quad);
-extern void generate_NEWTABLE    (quad* quad);
-extern void generate_TABLEGETELEM(quad* quad);
-extern void generate_TABLESETELEM(quad* quad);
-extern void generate_ASSIGN      (quad* quad);
-extern void generate_NOP         (quad* quad);
-extern void generate_JUMP        (quad* quad);
-extern void generate_IF_EQ       (quad* quad);
-extern void generate_IF_NOTEQ    (quad* quad);
-extern void generate_IF_GREATER  (quad* quad);
-extern void generate_IF_GREATEREQ(quad* quad);
-extern void generate_IF_LESS     (quad* quad);
-extern void generate_IF_LESSEQ   (quad* quad);
-extern void generate_NOT         (quad* quad);
-extern void generate_OR          (quad* quad);
-extern void generate_PARAM       (quad* quad);
-extern void generate_CALL        (quad* quad);
-extern void generate_GETRETVAL   (quad* quad);
-extern void generate_FUNCSTART   (quad* quad);
-extern void generate_RETURN      (quad* quad);
-extern void generate_FUNCEND     (quad* quad);
-extern void generate_UMINUS      (quad* quad);
-extern void generate_AND         (quad* quad);
+void generate_ADD         (quad* quad);
+void generate_SUB         (quad* quad);
+void generate_MUL         (quad* quad);
+void generate_DIV         (quad* quad);
+void generate_MOD         (quad* quad);
+void generate_NEWTABLE    (quad* quad);
+void generate_TABLEGETELEM(quad* quad);
+void generate_TABLESETELEM(quad* quad);
+void generate_ASSIGN      (quad* quad);
+void generate_NOP         (quad* quad);
+void generate_JUMP        (quad* quad);
+void generate_IF_EQ       (quad* quad);
+void generate_IF_NOTEQ    (quad* quad);
+void generate_IF_GREATER  (quad* quad);
+void generate_IF_GREATEREQ(quad* quad);
+void generate_IF_LESS     (quad* quad);
+void generate_IF_LESSEQ   (quad* quad);
+void generate_NOT         (quad* quad);
+void generate_OR          (quad* quad);
+void generate_PARAM       (quad* quad);
+void generate_CALL        (quad* quad);
+void generate_GETRETVAL   (quad* quad);
+void generate_FUNCSTART   (quad* quad);
+void generate_RETURN      (quad* quad);
+void generate_FUNCEND     (quad* quad);
+void generate_UMINUS      (quad* quad);
+void generate_AND         (quad* quad);
+
+void emit_instruction(instruction* t);
 
 #endif /* INSTRUCTION_H */
