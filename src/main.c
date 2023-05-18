@@ -7,6 +7,7 @@
     
 extern FILE* yyout;
 extern FILE* yyin;
+extern int error_flag;
 FILE* out_file;
 SymbolTable* symTable;
 
@@ -46,11 +47,11 @@ int main(int argc, char** argv) {
 
     //debug
     printf("\n----------- Quads -----------\n");
-    
-    //Stin periptwsi compile time error den theloume na kleithoun autes oi 3!!!
-    patch_jump_to_jump_labels();
-    printQuads();
-    quads_to_external_file();
+    if(!error_flag){
+        patch_jump_to_jump_labels();
+        printQuads();
+        quads_to_external_file();
+    }
 
     symbol_table_print(symTable);
     fseek(out_file, 0, SEEK_SET);

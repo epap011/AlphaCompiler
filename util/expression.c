@@ -1,31 +1,39 @@
 #include "expression.h"
 #include "quad.h"
 
+extern int error_flag;
+
 //Returns 1 if operation is illegal, 0 otherwise
 int check_arith(expr* e, FILE* out, unsigned int line, char* op){
 
     if(e->type == constbool_e || e->type == boolexpr_e){
         fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"Boolean"RESET"\" for %s operation (line: " GRN "%d" RESET ")\n",op, line);
+        error_flag = 1;
         return 1;
     }
     else if(  e->type == conststring_e){
         fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"String"RESET"\" for %s operation (line: " GRN "%d" RESET ")\n",op, line);
+        error_flag = 1;
         return 1;
     }
     else if(e->type == nil_e){
         fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"NIL"RESET"\" for %s operation (line: " GRN "%d" RESET ")\n",op, line);
+        error_flag = 1;
         return 1;
     }
     else if ( e->type == newtable_e){
         fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"table definition"RESET"\" for %s operation (line: " GRN "%d" RESET ")\n",op, line);
+        error_flag = 1;
         return 1;
     }
     else if (e->type == programfunc_e){
         fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"function"RESET"\" for %s operation (line: " GRN "%d" RESET ")\n",op, line);
+        error_flag = 1;
         return 1;
     }
     else if(e->type == libraryfunc_e){
         fprintf(out, ""RED"Error:"RESET" Illegal expression type \""YEL"Library function"RESET"\" for %s operation (line: " GRN "%d" RESET ")\n",op, line);
+        error_flag = 1;
         return 1;
     }
 
