@@ -264,7 +264,22 @@ void generate_PARAM(quad* q) {
     make_operand(q->result, i->arg1);
     emit_instruction(i);
 }
-void generate_RETURN(quad* q) {}
+void generate_RETURN(quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode      = assign_vm;
+    i->result      = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1        = NULL;
+    i->arg2        = NULL;
+
+    make_retvaloperand(i->result);
+    if(q->result != NULL){
+
+        i->arg1 = (vmarg*) malloc(sizeof(vmarg));
+        make_operand(q->arg1, i->arg1);
+    }
+
+    emit_instruction(i);
+}
 void generate_GETRETVAL(quad* q) {
     //q->arg1->sym->taddress = nextinstructionlabel();
     instruction* i = (instruction*) malloc(sizeof(instruction));
@@ -278,8 +293,29 @@ void generate_GETRETVAL(quad* q) {
     
     emit_instruction(i);
 }
-void generate_FUNCSTART(quad* q) {}
-void generate_FUNCEND(quad* q) {}
+void generate_FUNCSTART(quad* q) {
+    //q->arg1->sym->taddress = nextinstructionlabel();
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode      = funcenter_vm;
+    i->result      = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1        = NULL;
+    i->arg2        = NULL;
+
+    make_operand(q->result, i->result);
+
+    emit_instruction(i);
+}
+void generate_FUNCEND(quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode      = funcexit_vm;
+    i->result      = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1        = NULL;
+    i->arg2        = NULL;
+
+    make_operand(q->result, i->result);
+
+    emit_instruction(i);
+}
 
 void generate_NEWTABLE(quad* q) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
