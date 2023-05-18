@@ -386,6 +386,9 @@ void print_instructions() {
             if(i->result->type == userfunc_a)
                 printf("%s,%d:", vmarg_t_to_string(i->result->type), result_index);
             else
+            if(i->result->type == global_a || i->result->type == local_a || i->result->type == formal_a)
+                printf("%s,%d:", vmarg_t_to_string(i->result->type), result_index);
+            else
                 printf("NULL, ");
         }
         else printf("NULL, ");
@@ -401,6 +404,9 @@ void print_instructions() {
             if(i->arg1->type == bool_a)
                 printf("%s,%d:%d", vmarg_t_to_string(i->arg1->type), arg1_index, i->arg1->val);
             else
+            if(i->arg1->type == global_a || i->arg1->type == local_a || i->arg1->type == formal_a)
+                printf("%s,%d:", vmarg_t_to_string(i->arg1->type), arg1_index);
+            else
                 printf("NULL, ");
         }
         else printf("NULL, ");
@@ -415,6 +421,8 @@ void print_instructions() {
             else
             if(i->arg2->type == bool_a)
                 printf("%s,%d:%d", vmarg_t_to_string(i->arg2->type), arg2_index, i->arg2->val);
+            if(i->arg2->type == global_a || i->arg2->type == local_a || i->arg2->type == formal_a)
+                printf("%s,%d:", vmarg_t_to_string(i->arg2->type), arg2_index);
             else
                 printf("NULL, ");
         }
@@ -429,29 +437,29 @@ void print_instructions() {
 
 char* vmopcode_to_string(enum vmopcode op) {
     switch(op) {
-        case assign_vm:       return "assign";
-        case add_vm:          return "add";
-        case sub_vm:          return "sub";
-        case mul_vm:          return "mul";
-        case div_vm:          return "div";
-        case mod_vm:          return "mod";
-        case not_vm:          return "not";
-        case jmp_vm:          return "jump";
-        case jeq_vm:          return "jeq";
-        case jne_vm:          return "jne";
-        case jle_vm:          return "jle";
-        case jge_vm:          return "jge";
-        case jlt_vm:          return "jlt";
-        case jgt_vm:          return "jgt";
-        case call_vm:         return "call";
-        case pusharg_vm:      return "pusharg";
-        case funcenter_vm:    return "funcenter";
-        case funcexit_vm:     return "funcexit";
-        case newtable_vm:     return "newtable";
-        case tablegetelem_vm: return "tablegetelem";
-        case tablesetelem_vm: return "tablesetelem";
-        case nop_vm:          return "nop";
-        default:              return "unknown";
+        case assign_vm:       return "assign_vm";
+        case add_vm:          return "add_vm";
+        case sub_vm:          return "sub_vm";
+        case mul_vm:          return "mul_vm";
+        case div_vm:          return "div_vm";
+        case mod_vm:          return "mod_vm";
+        case not_vm:          return "not_vm";
+        case jmp_vm:          return "jmp_vm";
+        case jeq_vm:          return "jeq_vm";
+        case jne_vm:          return "jne_vm";
+        case jle_vm:          return "jle_vm";
+        case jge_vm:          return "jge_vm";
+        case jlt_vm:          return "jlt_vm";
+        case jgt_vm:          return "jgt_vm";
+        case call_vm:         return "call_vm";
+        case pusharg_vm:      return "pusharg_vm";
+        case funcenter_vm:    return "funcenter_vm";
+        case funcexit_vm:     return "funcexit_vm";
+        case newtable_vm:     return "newtable_vm";
+        case tablegetelem_vm: return "tablegetelem_vm";
+        case tablesetelem_vm: return "tablesetelem_vm";
+        case nop_vm:          return "nop_vm";
+        default:              return "unknown_vm";
     }
 }
 
