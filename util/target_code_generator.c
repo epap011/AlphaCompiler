@@ -144,11 +144,8 @@ void generate(void) {
     }
 }
 
-void emit_instruction(instruction* t){
+void emit_instruction(instruction* t){}
 
-
-}
-//Also used for table get/set elem since it has the same format
 void generate_ARITHM(quad* q, enum vmopcode op) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode  = op;
@@ -164,19 +161,6 @@ void generate_ARITHM(quad* q, enum vmopcode op) {
     emit_instruction(i);
 }
 
-void generate_ASSIGN(quad* q) {
-    instruction* i = (instruction*) malloc(sizeof(instruction));
-    i->opcode  = assign_vm;
-    i->result  = (vmarg*) malloc(sizeof(vmarg));
-    i->arg1    = (vmarg*) malloc(sizeof(vmarg));
-    i->arg2    = NULL;
-    i->srcLine = q->line;
-
-    make_operand(q->result, i->result);
-    make_operand(q->arg1  , i->arg1);
-
-    emit_instruction(i);
-}
 void generate_RELATIONAL(quad* q, enum vmopcode op) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode  = op;
@@ -190,6 +174,20 @@ void generate_RELATIONAL(quad* q, enum vmopcode op) {
 
     i->result->type = label_a;
     i->result->val  = q->label;
+
+    emit_instruction(i);
+}
+
+void generate_ASSIGN(quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = assign_vm;
+    i->result  = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1    = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2    = NULL;
+    i->srcLine = q->line;
+
+    make_operand(q->result, i->result);
+    make_operand(q->arg1  , i->arg1);
 
     emit_instruction(i);
 }
@@ -213,10 +211,8 @@ void generate_UMINUS(quad* q) {
     make_numberoperand(i->arg2, -1);
 
     emit_instruction(i);
-
 }
 
-/*Dummy functions*/
 void generate_AND   (quad* q) {}
 void generate_OR    (quad* q) {}
 void generate_NOT   (quad* q) {}
@@ -227,6 +223,7 @@ void generate_IF_LESSEQ   (quad* q) {generate_RELATIONAL(q, jle_vm);}
 void generate_IF_GREATEREQ(quad* q) {generate_RELATIONAL(q, jge_vm);}
 void generate_IF_LESS     (quad* q) {generate_RELATIONAL(q, jlt_vm);}
 void generate_IF_GREATER  (quad* q) {generate_RELATIONAL(q, jgt_vm);}
+void generate_JUMP        (quad* q) {generate_RELATIONAL(q, jmp_vm);}
 
 void generate_CALL(quad* q) {}
 void generate_PARAM(quad* q) {}
@@ -247,17 +244,8 @@ void generate_NEWTABLE(quad* q) {
 
     emit_instruction(i);
 }
-void generate_TABLEGETELEM(quad* q) {
-    
-    generate_ARITHM(q,tablegetelem_vm);
-}
-void generate_TABLESETELEM(quad* q) {
-    
-    generate_ARITHM(q,tablesetelem_vm);
-
-}
-
-void generate_JUMP(quad* q) {}
+void generate_TABLEGETELEM(quad* q) {generate_ARITHM(q,tablegetelem_vm);}
+void generate_TABLESETELEM(quad* q) {generate_ARITHM(q,tablesetelem_vm);}
 
 void generate_NOP(quad* q) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
