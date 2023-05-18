@@ -4,6 +4,7 @@
 #include "manage_parser.h"
 #include "parser.h"
 #include "quad.h"
+#include "target_code_generator.h"
     
 extern FILE* yyout;
 extern FILE* yyin;
@@ -61,4 +62,6 @@ int main(int argc, char** argv) {
     }
 
     fclose(out_file);
+
+    generate();
 }

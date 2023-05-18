@@ -49,6 +49,7 @@ unsigned consts_newstring  (char* s);
 unsigned consts_newnumber  (double n);
 unsigned libfuncs_newused  (const char* s);
 
+void generate             ();
 void generate_ADD         (quad* quad);
 void generate_SUB         (quad* quad);
 void generate_MUL         (quad* quad);
