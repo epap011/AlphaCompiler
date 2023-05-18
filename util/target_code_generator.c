@@ -5,6 +5,9 @@
 typedef void (*generator_func_t)(quad*);
 
 linked_list* num_const_list;
+linked_list* str_const_list;
+linked_list* lib_func_list;
+linked_list* user_func_list;
 
 generator_func_t generators[] = {
     generate_ASSIGN,     
@@ -69,7 +72,7 @@ void make_operand(expr* e, vmarg* arg){
             break;
 
         case conststring_e:
-            arg->val = consts_newstring(e->strConst); // make this function
+            arg->val = consts_newstring(e->strConst); 
             arg->type = string_a;
             break;
         
@@ -84,18 +87,19 @@ void make_operand(expr* e, vmarg* arg){
 
         case programfunc_e:
             arg->type = userfunc_a;
-            arg->val = userfuncs_newfunc(e->sym); // make this function
+            arg->val = e->sym->taddress; //we might need to change this
             break;
 
         case libraryfunc_e:
             arg->type = libfunc_a;
-            arg->val = libfuncs_newused(e->sym->name); // make this function
+            arg->val = libfuncs_newused(e->sym->name); 
             break;
         
         default: assert(0);
     }
 }
 
+/**Helper functions for const values*/
 void make_numberoperand(vmarg* arg, double val){
     arg->val = consts_newnumber(val);
     arg->type = number_a;
@@ -108,7 +112,14 @@ void make_booloperand(vmarg* arg, unsigned val){
 
 void make_retvaloperand(vmarg* arg){ arg->type = retval_a; }
 
-unsigned consts_newstring(char* s) {return 0;}
+/**End of helpers*/
+
+unsigned consts_newstring(char* s) {
+    if(str_const_list == NULL) str_const_list = create_linked_list();
+    char *str = strdup(s);
+    insert_at_the_end_to_linked_list(str_const_list, str);
+    return str_const_list->size - 1;
+}
  
 unsigned consts_newnumber(double n) {
     if(num_const_list == NULL) num_const_list = create_linked_list();
@@ -118,8 +129,12 @@ unsigned consts_newnumber(double n) {
     return num_const_list->size - 1;
 }
 
-unsigned libfuncs_newused (char* s)    {return 0;}
-unsigned userfuncs_newfunc(Symbol* sym){return 0;}
+unsigned libfuncs_newused (char* s)    {
+    if(lib_func_list == NULL) lib_func_list = create_linked_list();
+    char *str = strdup(s);
+    insert_at_the_end_to_linked_list(lib_func_list, str);
+    return lib_func_list->size - 1;
+}
 
 void generate(void) {
     int total_quads = nextQuadLabel();

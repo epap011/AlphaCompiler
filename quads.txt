@@ -1,0 +1,17 @@
+Quad #	 opcode 		 result 		 arg1 			 arg2 			 label 		line
+------------------------------------------------------------------------------------------
+1  : 	 jump             				  				  				 16 		5
+2  : 	 funcstart       _anonymous_f0    				  				 			5
+3  : 	 jump             				  				  				 12 		10
+4  : 	 funcstart       _anonymous_f1    				  				 			10
+5  : 	 jump             				  				  				 11 		15
+6  : 	 funcstart       _anonymous_f2    				  				 			15
+7  : 	 funcend         _anonymous_f2    				  				 			15
+8  : 	 jump             				  				  				 11 		20
+9  : 	 funcstart       _anonymous_f3    				  				 			20
+10 : 	 funcend         _anonymous_f3    				  				 			20
+11 : 	 funcend         _anonymous_f1    				  				 			21
+12 : 	 funcend         _anonymous_f0    				  				 			22
+13 : 	 jump             				  				  				 16 		28
+14 : 	 funcstart       _anonymous_f4    				  				 			28
+15 : 	 funcend         _anonymous_f4    				  				 			28
