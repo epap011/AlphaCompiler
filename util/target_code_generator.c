@@ -161,6 +161,20 @@ void generate_ARITHM(quad* q, enum vmopcode op) {
     emit_instruction(i);
 }
 
+void generate_RELATIONAL(quad* q, enum vmopcode op) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = op;
+    i->result  = NULL;
+    i->arg1    = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2    = (vmarg*) malloc(sizeof(vmarg));
+    i->srcLine = q->line;
+
+    make_operand(q->arg1, i->arg1);
+    make_operand(q->arg2, i->arg2);
+
+    emit_instruction(i);
+}
+
 void generate_ASSIGN(quad* q) {}
 
 void generate_ADD   (quad* q) {generate_ARITHM(q, add_vm); }
@@ -193,12 +207,14 @@ void generate_UMINUS(quad* q) {
 void generate_AND   (quad* q) {}
 void generate_OR    (quad* q) {}
 void generate_NOT   (quad* q) {}
-void generate_IF_EQ (quad* q) {}
-void generate_IF_NOTEQ(quad* q) {}
-void generate_IF_LESSEQ(quad* q) {}
-void generate_IF_GREATEREQ(quad* q) {}
-void generate_IF_LESS(quad* q) {}
-void generate_IF_GREATER(quad* q) {}
+
+void generate_IF_EQ       (quad* q) {generate_RELATIONAL(q, jeq_vm);}
+void generate_IF_NOTEQ    (quad* q) {generate_RELATIONAL(q, jne_vm);}
+void generate_IF_LESSEQ   (quad* q) {generate_RELATIONAL(q, jle_vm);}
+void generate_IF_GREATEREQ(quad* q) {generate_RELATIONAL(q, jge_vm);}
+void generate_IF_LESS     (quad* q) {generate_RELATIONAL(q, jlt_vm);}
+void generate_IF_GREATER  (quad* q) {generate_RELATIONAL(q, jgt_vm);}
+
 void generate_CALL(quad* q) {}
 void generate_PARAM(quad* q) {}
 void generate_RETURN(quad* q) {}
