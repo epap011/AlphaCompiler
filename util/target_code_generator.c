@@ -225,7 +225,18 @@ void generate_IF_LESS     (quad* q) {generate_RELATIONAL(q, jlt_vm);}
 void generate_IF_GREATER  (quad* q) {generate_RELATIONAL(q, jgt_vm);}
 void generate_JUMP        (quad* q) {generate_RELATIONAL(q, jmp_vm);}
 
-void generate_CALL(quad* q) {}
+void generate_CALL(quad* q) {
+    q->arg1->sym->taddress = nextinstructionlabel();
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode      = call_vm;
+    i->result      = NULL;
+    i->arg1        = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2        = NULL;
+
+    make_operand(q->result, i->arg1);
+    emit_instruction(i);
+}
+
 void generate_PARAM(quad* q) {}
 void generate_RETURN(quad* q) {}
 void generate_GETRETVAL(quad* q) {}
