@@ -248,10 +248,14 @@ void generate_CALL(quad* q) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode      = call_vm;
     i->result      = NULL;
-    i->arg1        = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1        = NULL;
     i->arg2        = NULL;
 
-    make_operand(q->result, i->arg1);
+    if(q->result) {
+        i->result = (vmarg*) malloc(sizeof(vmarg));
+        make_operand(q->result, i->result);
+    }
+
     emit_instruction(i);
 }
 
@@ -260,10 +264,14 @@ void generate_PARAM(quad* q) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode      = pusharg_vm;
     i->result      = NULL;
-    i->arg1        = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1        = NULL;
     i->arg2        = NULL;
 
-    make_operand(q->result, i->arg1);
+    if(q->result) {
+        i->result = (vmarg*) malloc(sizeof(vmarg));
+        make_operand(q->result, i->result);
+    }
+
     emit_instruction(i);
 }
 void generate_RETURN(quad* q) {
@@ -275,7 +283,6 @@ void generate_RETURN(quad* q) {
 
     make_retvaloperand(i->result);
     if(q->result != NULL){
-
         i->arg1 = (vmarg*) malloc(sizeof(vmarg));
         make_operand(q->arg1, i->arg1);
     }
@@ -286,13 +293,16 @@ void generate_GETRETVAL(quad* q) {
     //q->arg1->sym->taddress = nextinstructionlabel();
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode      = assign_vm;
-    i->result      = (vmarg*) malloc(sizeof(vmarg));
+    i->result      = NULL;
     i->arg1        = (vmarg*) malloc(sizeof(vmarg));
     i->arg2        = NULL;
-    
-    make_operand(q->result, i->result);
+
+    if(q->result) {
+        i->result = (vmarg*) malloc(sizeof(vmarg));
+        make_operand(q->result, i->result);
+    }
+
     make_retvaloperand(i->arg1);
-    
     emit_instruction(i);
 }
 void generate_FUNCSTART(quad* q) {
@@ -371,10 +381,10 @@ void print_instructions() {
 
             else
             if(i->result->type == libfunc_a)
-                printf("%s,%d:%s", vmarg_t_to_string(i->result->type), result_index, (char*)get_from_linked_list(lib_func_list, result_index));
+                printf("%s,%d:", vmarg_t_to_string(i->result->type), result_index);
             else
             if(i->result->type == userfunc_a)
-                printf("%s,%d:%d", vmarg_t_to_string(i->result->type), result_index, *(int*)get_from_linked_list(user_func_list, result_index));
+                printf("%s,%d:", vmarg_t_to_string(i->result->type), result_index);
             else
                 printf("NULL, ");
         }
@@ -391,12 +401,6 @@ void print_instructions() {
             if(i->arg1->type == bool_a)
                 printf("%s,%d:%d", vmarg_t_to_string(i->arg1->type), arg1_index, i->arg1->val);
             else
-            if(i->arg1->type == libfunc_a)
-                printf("%s,%d:%s", vmarg_t_to_string(i->arg1->type), arg1_index, (char*)get_from_linked_list(lib_func_list, arg1_index));
-            else
-            if(i->arg1->type == userfunc_a)
-                printf("%s,%d:%d", vmarg_t_to_string(i->arg1->type), arg1_index, *(int*)get_from_linked_list(user_func_list, arg1_index));
-            else
                 printf("NULL, ");
         }
         else printf("NULL, ");
@@ -411,12 +415,6 @@ void print_instructions() {
             else
             if(i->arg2->type == bool_a)
                 printf("%s,%d:%d", vmarg_t_to_string(i->arg2->type), arg2_index, i->arg2->val);
-            else
-            if(i->arg2->type == libfunc_a)
-                printf("%s,%d:%s", vmarg_t_to_string(i->arg2->type), arg2_index, (char*)get_from_linked_list(lib_func_list, arg2_index));
-            else
-            if(i->arg2->type == userfunc_a)
-                printf("%s,%d:%d", vmarg_t_to_string(i->arg2->type), arg2_index, *(int*)get_from_linked_list(user_func_list, arg2_index));
             else
                 printf("NULL, ");
         }
