@@ -238,7 +238,7 @@ void generate_JUMP        (quad* q) {
 }
 
 void generate_CALL(quad* q) {
-    q->arg1->sym->taddress = nextinstructionlabel();
+    //q->arg1->sym->taddress = nextinstructionlabel();
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode      = call_vm;
     i->result      = NULL;
@@ -249,9 +249,31 @@ void generate_CALL(quad* q) {
     emit_instruction(i);
 }
 
-void generate_PARAM(quad* q) {}
+void generate_PARAM(quad* q) {
+    //q->arg1->sym->taddress = nextinstructionlabel();
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode      = pusharg_vm;
+    i->result      = NULL;
+    i->arg1        = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2        = NULL;
+
+    make_operand(q->result, i->arg1);
+    emit_instruction(i);
+}
 void generate_RETURN(quad* q) {}
-void generate_GETRETVAL(quad* q) {}
+void generate_GETRETVAL(quad* q) {
+    //q->arg1->sym->taddress = nextinstructionlabel();
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode      = assign_vm;
+    i->result      = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1        = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2        = NULL;
+    
+    make_operand(q->result, i->result);
+    make_retvaloperand(i->arg1);
+    
+    emit_instruction(i);
+}
 void generate_FUNCSTART(quad* q) {}
 void generate_FUNCEND(quad* q) {}
 
