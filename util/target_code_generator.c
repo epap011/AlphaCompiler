@@ -8,6 +8,7 @@ linked_list* num_const_list;
 linked_list* str_const_list;
 linked_list* lib_func_list;
 linked_list* user_func_list;
+linked_list* instructions_list;
 
 generator_func_t generators[] = {
     generate_ASSIGN,     
@@ -144,7 +145,10 @@ void generate(void) {
     }
 }
 
-void emit_instruction(instruction* t){}
+void emit_instruction(instruction* i){
+    if(instructions_list == NULL) instructions_list = create_linked_list();
+    insert_at_the_end_to_linked_list(instructions_list, i);
+}
 
 void generate_ARITHM(quad* q, enum vmopcode op) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
