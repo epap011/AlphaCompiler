@@ -129,7 +129,7 @@ unsigned consts_newnumber(double n) {
     return num_const_list->size - 1;
 }
 
-unsigned libfuncs_newused (char* s)    {
+unsigned libfuncs_newused (const char* s)    {
     if(lib_func_list == NULL) lib_func_list = create_linked_list();
     char *str = strdup(s);
     insert_at_the_end_to_linked_list(lib_func_list, str);
@@ -173,7 +173,23 @@ void generate_DIV   (quad* q) {generate_ARITHM(q, div_vm);}
 
 void generate_MOD   (quad* q) {generate_ARITHM(q, mod_vm);}
 
-void generate_UMINUS(quad* q) {}
+void generate_UMINUS(quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = mul_vm;
+    i->result  = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1    = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2    = (vmarg*) malloc(sizeof(vmarg));
+    i->srcLine = q->line;
+
+    make_operand(q->result, i->result);
+    make_operand(q->arg1  , i->arg1);
+    make_numberoperand(i->arg2, -1);
+
+    emit_instruction(i);
+
+}
+
+
 void generate_AND   (quad* q) {}
 void generate_OR    (quad* q) {}
 void generate_NOT   (quad* q) {}

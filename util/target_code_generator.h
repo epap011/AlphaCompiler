@@ -46,8 +46,7 @@ void make_retvaloperand(vmarg* arg);              //helper for return values
 
 unsigned consts_newstring  (char* s);
 unsigned consts_newnumber  (double n);
-unsigned libfuncs_newused  (char* s);
-unsigned userfuncs_newfunc (Symbol* sym);
+unsigned libfuncs_newused  (const char* s);
 
 void generate_ADD         (quad* quad);
 void generate_SUB         (quad* quad);

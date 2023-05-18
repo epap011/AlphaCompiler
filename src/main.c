@@ -42,11 +42,13 @@ int main(int argc, char** argv) {
     symTable = symbol_table_create();
     insert_lib_functions(symTable);
     yyparse();
-    patch_jump_to_jump_labels();
+    
 
     //debug
     printf("\n----------- Quads -----------\n");
     
+    //Stin periptwsi compile time error den theloume na kleithoun autes oi 3!!!
+    patch_jump_to_jump_labels();
     printQuads();
     quads_to_external_file();
 
