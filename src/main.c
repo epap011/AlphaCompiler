@@ -52,6 +52,8 @@ int main(int argc, char** argv) {
         patch_jump_to_jump_labels();
         printQuads();
         quads_to_external_file();
+        generate();
+        print_instructions();
     }
 
     symbol_table_print(symTable);
@@ -63,6 +65,4 @@ int main(int argc, char** argv) {
     }
 
     fclose(out_file);
-
-    generate();
 }

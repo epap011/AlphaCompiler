@@ -345,12 +345,131 @@ void generate_NOP(quad* q) {
 
 void print_instructions() {
 
-    printf("----------- Instructions -----------\n");
+    printf("\n-------- Instructions --------\n");
     node* curr = instructions_list->head;
     while(curr != NULL) {
         instruction* i = (instruction*) curr->data;
-        printf("%d\n", i->srcLine);
+        enum vmopcode op = i->opcode;
+        unsigned result_index = i->result != NULL ? i->result->val : -1;
+        unsigned arg1_index   = i->arg1   != NULL ? i->arg1->val   : -1;
+        unsigned arg2_index   = i->arg2   != NULL ? i->arg2->val   : -1;
+        
+        printf("%d : OP: %s", i->srcLine, vmopcode_to_string(op));
+        
+        printf("\t\t RESULT: ");
+        if(i->result != NULL) {
+            if(i->result->type == number_a)
+                printf("%s,%d:%lf", vmarg_t_to_string(i->result->type), result_index, *(double*)get_from_linked_list(num_const_list, result_index));
+            else
+            if(i->result->type == string_a)
+                printf("%s,%d:%s", vmarg_t_to_string(i->result->type), result_index, (char*)get_from_linked_list(str_const_list, result_index));
+            else
+            if(i->result->type == bool_a)
+                printf("%s,%d:%d", vmarg_t_to_string(i->result->type), result_index, i->result->val);
+
+            else
+            if(i->result->type == libfunc_a)
+                printf("%s,%d:%s", vmarg_t_to_string(i->result->type), result_index, (char*)get_from_linked_list(lib_func_list, result_index));
+            else
+            if(i->result->type == userfunc_a)
+                printf("%s,%d:%d", vmarg_t_to_string(i->result->type), result_index, *(int*)get_from_linked_list(user_func_list, result_index));
+            else
+                printf("NULL, ");
+        }
+        else printf("NULL, ");
+        
+        printf("\t\t ARG1: ");
+        if(i->arg1 != NULL) {
+            if(i->arg1->type == number_a)
+                printf("%s,%d:%lf", vmarg_t_to_string(i->arg1->type), arg1_index, *(double*)get_from_linked_list(num_const_list, arg1_index));
+            else
+            if(i->arg1->type == string_a)
+                printf("%s,%d:%s", vmarg_t_to_string(i->arg1->type), arg1_index, (char*)get_from_linked_list(str_const_list, arg1_index));
+            else
+            if(i->arg1->type == bool_a)
+                printf("%s,%d:%d", vmarg_t_to_string(i->arg1->type), arg1_index, i->arg1->val);
+            else
+            if(i->arg1->type == libfunc_a)
+                printf("%s,%d:%s", vmarg_t_to_string(i->arg1->type), arg1_index, (char*)get_from_linked_list(lib_func_list, arg1_index));
+            else
+            if(i->arg1->type == userfunc_a)
+                printf("%s,%d:%d", vmarg_t_to_string(i->arg1->type), arg1_index, *(int*)get_from_linked_list(user_func_list, arg1_index));
+            else
+                printf("NULL, ");
+        }
+        else printf("NULL, ");
+
+        printf("\t\t ARG2: ");
+        if(i->arg2 != NULL) {
+            if(i->arg2->type == number_a)
+                printf("%s,%d:%lf", vmarg_t_to_string(i->arg2->type), arg2_index, *(double*)get_from_linked_list(num_const_list, arg2_index));
+            else
+            if(i->arg2->type == string_a)
+                printf("%s,%d:%s", vmarg_t_to_string(i->arg2->type), arg2_index, (char*)get_from_linked_list(str_const_list, arg2_index));
+            else
+            if(i->arg2->type == bool_a)
+                printf("%s,%d:%d", vmarg_t_to_string(i->arg2->type), arg2_index, i->arg2->val);
+            else
+            if(i->arg2->type == libfunc_a)
+                printf("%s,%d:%s", vmarg_t_to_string(i->arg2->type), arg2_index, (char*)get_from_linked_list(lib_func_list, arg2_index));
+            else
+            if(i->arg2->type == userfunc_a)
+                printf("%s,%d:%d", vmarg_t_to_string(i->arg2->type), arg2_index, *(int*)get_from_linked_list(user_func_list, arg2_index));
+            else
+                printf("NULL, ");
+        }
+        else printf("NULL, ");
+        
+
+        printf("\n");
         curr = curr->next;
     }
-    printf("------------------------------------\n");
+    printf("------------------------------\n");
 }
+
+char* vmopcode_to_string(enum vmopcode op) {
+    switch(op) {
+        case assign_vm:       return "assign";
+        case add_vm:          return "add";
+        case sub_vm:          return "sub";
+        case mul_vm:          return "mul";
+        case div_vm:          return "div";
+        case mod_vm:          return "mod";
+        case not_vm:          return "not";
+        case jmp_vm:          return "jump";
+        case jeq_vm:          return "jeq";
+        case jne_vm:          return "jne";
+        case jle_vm:          return "jle";
+        case jge_vm:          return "jge";
+        case jlt_vm:          return "jlt";
+        case jgt_vm:          return "jgt";
+        case call_vm:         return "call";
+        case pusharg_vm:      return "pusharg";
+        case funcenter_vm:    return "funcenter";
+        case funcexit_vm:     return "funcexit";
+        case newtable_vm:     return "newtable";
+        case tablegetelem_vm: return "tablegetelem";
+        case tablesetelem_vm: return "tablesetelem";
+        case nop_vm:          return "nop";
+        default:              return "unknown";
+    }
+}
+
+char* vmarg_t_to_string(enum vmarg_t arg) {
+    switch(arg) {
+        case label_a:     return "label";
+        case global_a:    return "global";
+        case formal_a:    return "formal";
+        case local_a:     return "local";
+        case number_a:    return "number";
+        case string_a:    return "string";
+        case bool_a:      return "bool";
+        case nil_a:       return "nil";
+        case userfunc_a:  return "userfunc";
+        case libfunc_a:   return "libfunc";
+        case retval_a:    return "retval";
+        default:          return "unknown";
+    }
+}
+
+

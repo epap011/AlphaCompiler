@@ -49,6 +49,9 @@ unsigned consts_newstring  (char* s);
 unsigned consts_newnumber  (double n);
 unsigned libfuncs_newused  (const char* s);
 
+char* vmopcode_to_string(enum vmopcode op);
+char* vmarg_t_to_string (enum vmarg_t arg);
+
 void generate             ();
 void generate_ADD         (quad* quad);
 void generate_SUB         (quad* quad);
@@ -78,6 +81,7 @@ void generate_FUNCEND     (quad* quad);
 void generate_UMINUS      (quad* quad);
 void generate_AND         (quad* quad);
 
-void emit_instruction(instruction* t);
+void emit_instruction  (instruction* t);
+void print_instructions();
 
 #endif /* INSTRUCTION_H */
