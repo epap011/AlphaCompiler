@@ -44,10 +44,10 @@ void make_numberoperand(vmarg* arg, double val);  //helper for const
 void make_booloperand  (vmarg* arg, unsigned val);//helper for const
 void make_retvaloperand(vmarg* arg);              //helper for return values
 
-unsigned conts_newstring  (char* s);
-unsigned conts_newnumber  (double n);
-unsigned libfuncs_newused (char* s);
-unsigned userfuncs_newfunc(Symbol* sym);
+unsigned consts_newstring  (char* s);
+unsigned consts_newnumber  (double n);
+unsigned libfuncs_newused  (char* s);
+unsigned userfuncs_newfunc (Symbol* sym);
 
 void generate_ADD         (quad* quad);
 void generate_SUB         (quad* quad);

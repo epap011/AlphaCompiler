@@ -1,7 +1,10 @@
 #include "target_code_generator.h"
 #include "quad.h"
+#include "linked_list.h"
 
 typedef void (*generator_func_t)(quad*);
+
+linked_list* num_const_list;
 
 generator_func_t generators[] = {
     generate_ASSIGN,     
@@ -66,12 +69,12 @@ void make_operand(expr* e, vmarg* arg){
             break;
 
         case conststring_e:
-            arg->val = conts_newstring(e->strConst); // make this function
+            arg->val = consts_newstring(e->strConst); // make this function
             arg->type = string_a;
             break;
         
         case constnum_e:
-            arg->val = conts_newnumber(e->numConst); // make this function
+            arg->val = consts_newnumber(e->numConst);
             arg->type = number_a;
             break;
 
@@ -94,7 +97,7 @@ void make_operand(expr* e, vmarg* arg){
 }
 
 void make_numberoperand(vmarg* arg, double val){
-    arg->val = conts_newnumber(val);
+    arg->val = consts_newnumber(val);
     arg->type = number_a;
 }   
 
@@ -105,8 +108,16 @@ void make_booloperand(vmarg* arg, unsigned val){
 
 void make_retvaloperand(vmarg* arg){ arg->type = retval_a; }
 
-unsigned conts_newstring  (char* s)    {return 0;}
-unsigned conts_newnumber  (double n)   {return 0;}
+unsigned consts_newstring(char* s) {return 0;}
+ 
+unsigned consts_newnumber(double n) {
+    if(num_const_list == NULL) num_const_list = create_linked_list();
+    double *num = (double*) malloc(sizeof(double));
+    *num = n;
+    insert_at_the_end_to_linked_list(num_const_list, num);
+    return num_const_list->size - 1;
+}
+
 unsigned libfuncs_newused (char* s)    {return 0;}
 unsigned userfuncs_newfunc(Symbol* sym){return 0;}
 
