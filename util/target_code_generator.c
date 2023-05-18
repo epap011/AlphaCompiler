@@ -41,6 +41,8 @@ generator_func_t generators[] = {
 };
 
 void make_operand(expr* e, vmarg* arg){
+    assert(e != NULL);
+    assert(arg != NULL);
     switch (e->type) {
         case var_e:
             break;
