@@ -23,7 +23,8 @@ enum vmarg_t{
     nil_a,
     userfunc_a,
     libfunc_a,
-    retval_a
+    retval_a,
+    label_a
 };
 
 typedef struct vmarg {

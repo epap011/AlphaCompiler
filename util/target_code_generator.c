@@ -164,7 +164,7 @@ void generate_ARITHM(quad* q, enum vmopcode op) {
 void generate_RELATIONAL(quad* q, enum vmopcode op) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode  = op;
-    i->result  = NULL;
+    i->result  = (vmarg*) malloc(sizeof(vmarg));
     i->arg1    = (vmarg*) malloc(sizeof(vmarg));
     i->arg2    = (vmarg*) malloc(sizeof(vmarg));
     i->srcLine = q->line;
@@ -172,19 +172,18 @@ void generate_RELATIONAL(quad* q, enum vmopcode op) {
     make_operand(q->arg1, i->arg1);
     make_operand(q->arg2, i->arg2);
 
+    i->result->type = label_a;
+    i->result->val  = q->label;
+
     emit_instruction(i);
 }
 
 void generate_ASSIGN(quad* q) {}
 
-void generate_ADD   (quad* q) {generate_ARITHM(q, add_vm); }
-
+void generate_ADD   (quad* q) {generate_ARITHM(q, add_vm);}
 void generate_SUB   (quad* q) {generate_ARITHM(q, sub_vm);}
-
 void generate_MUL   (quad* q) {generate_ARITHM(q, mul_vm);}
-
 void generate_DIV   (quad* q) {generate_ARITHM(q, div_vm);}
-
 void generate_MOD   (quad* q) {generate_ARITHM(q, mod_vm);}
 
 void generate_UMINUS(quad* q) {
