@@ -342,3 +342,15 @@ void generate_NOP(quad* q) {
 
     emit_instruction(i);
 }
+
+void print_instructions() {
+
+    printf("----------- Instructions -----------\n");
+    node* curr = instructions_list->head;
+    while(curr != NULL) {
+        instruction* i = (instruction*) curr->data;
+        printf("%d\n", i->srcLine);
+        curr = curr->next;
+    }
+    printf("------------------------------------\n");
+}
