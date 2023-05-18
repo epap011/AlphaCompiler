@@ -223,7 +223,19 @@ void generate_IF_LESSEQ   (quad* q) {generate_RELATIONAL(q, jle_vm);}
 void generate_IF_GREATEREQ(quad* q) {generate_RELATIONAL(q, jge_vm);}
 void generate_IF_LESS     (quad* q) {generate_RELATIONAL(q, jlt_vm);}
 void generate_IF_GREATER  (quad* q) {generate_RELATIONAL(q, jgt_vm);}
-void generate_JUMP        (quad* q) {generate_RELATIONAL(q, jmp_vm);}
+void generate_JUMP        (quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = jmp_vm;
+    i->result = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1    = NULL;
+    i->arg2    = NULL;
+    i->srcLine = q->line;
+
+    i->result->type = label_a;
+    i->result->val  = q->label;
+
+    emit_instruction(i);
+}
 
 void generate_CALL(quad* q) {}
 void generate_PARAM(quad* q) {}
