@@ -181,7 +181,22 @@ void generate_DIV   (quad* q) {
 
     emit_instruction(i);    
 }
-void generate_MOD   (quad* q) {}
+
+void generate_MOD   (quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = mod_vm;
+    i->result  = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1    = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2    = (vmarg*) malloc(sizeof(vmarg));
+    i->srcLine = q->line;
+
+    make_operand(q->result, i->result);
+    make_operand(q->arg1  , i->arg1);
+    make_operand(q->arg2  , i->arg2); 
+
+    emit_instruction(i);    
+}
+
 void generate_UMINUS(quad* q) {}
 void generate_AND   (quad* q) {}
 void generate_OR    (quad* q) {}
