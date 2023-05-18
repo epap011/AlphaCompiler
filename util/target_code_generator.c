@@ -144,8 +144,11 @@ void generate(void) {
     }
 }
 
-void emit_instruction(instruction* t){}
+void emit_instruction(instruction* t){
 
+
+}
+//Also used for table get/set elem since it has the same format
 void generate_ARITHM(quad* q, enum vmopcode op) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode  = op;
@@ -161,7 +164,19 @@ void generate_ARITHM(quad* q, enum vmopcode op) {
     emit_instruction(i);
 }
 
-void generate_ASSIGN(quad* q) {}
+void generate_ASSIGN(quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = assign_vm;
+    i->result  = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1    = (vmarg*) malloc(sizeof(vmarg));
+    i->arg2    = NULL;
+    i->srcLine = q->line;
+
+    make_operand(q->result, i->result);
+    make_operand(q->arg1  , i->arg1);
+
+    emit_instruction(i);
+}
 
 void generate_ADD   (quad* q) {generate_ARITHM(q, add_vm); }
 
@@ -189,10 +204,11 @@ void generate_UMINUS(quad* q) {
 
 }
 
+/*Dummy functions*/
+void generate_AND   (quad* q) { return; }
+void generate_OR    (quad* q) { return; }
+void generate_NOT   (quad* q) { return; }
 
-void generate_AND   (quad* q) {}
-void generate_OR    (quad* q) {}
-void generate_NOT   (quad* q) {}
 void generate_IF_EQ (quad* q) {}
 void generate_IF_NOTEQ(quad* q) {}
 void generate_IF_LESSEQ(quad* q) {}
@@ -205,8 +221,38 @@ void generate_RETURN(quad* q) {}
 void generate_GETRETVAL(quad* q) {}
 void generate_FUNCSTART(quad* q) {}
 void generate_FUNCEND(quad* q) {}
-void generate_NEWTABLE(quad* q) {}
-void generate_TABLEGETELEM(quad* q) {}
-void generate_TABLESETELEM(quad* q) {}
+
+void generate_NEWTABLE(quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = newtable_vm;
+    i->result  = (vmarg*) malloc(sizeof(vmarg));
+    i->arg1    = NULL;
+    i->arg2    = NULL;
+    i->srcLine = q->line;
+
+    make_operand(q->result, i->result);
+
+    emit_instruction(i);
+}
+void generate_TABLEGETELEM(quad* q) {
+    
+    generate_ARITHM(q,tablegetelem_vm);
+}
+void generate_TABLESETELEM(quad* q) {
+    
+    generate_ARITHM(q,tablesetelem_vm);
+
+}
+
 void generate_JUMP(quad* q) {}
-void generate_NOP(quad* q) {}
+
+void generate_NOP(quad* q) {
+    instruction* i = (instruction*) malloc(sizeof(instruction));
+    i->opcode  = nop_vm;
+    i->result  = NULL;
+    i->arg1    = NULL;
+    i->arg2    = NULL;
+    i->srcLine = q->line;
+
+    emit_instruction(i);
+}
