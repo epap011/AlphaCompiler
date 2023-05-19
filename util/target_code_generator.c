@@ -136,7 +136,7 @@ unsigned userfuncs_newfunc (Symbol* sym){
     tmp->total_locals = sym->totalLocals;
     tmp->name = sym->name;
 
-    insert_at_the_end_to_linked_list(user_func_list, sym);
+    insert_at_the_end_to_linked_list(user_func_list, tmp);
 
     return user_func_list->size - 1;
 }
@@ -369,11 +369,12 @@ void generate_NOP(quad* q) {
     emit_instruction(i);
 }
 
+//This function is just for debugging purposes only. VM takes a binary file as input
 void print_instructions() {
 
     printf("\n-------- Instructions --------\n");
     node* curr = instructions_list->head;
-    int i = 1;
+    int i = 0;
     while(curr != NULL) {
         printf("%-2d: ", i++);
         instruction* i = (instruction*) curr->data;
@@ -395,6 +396,71 @@ void print_instructions() {
 
         printf("srcLine: %-2d\n",i->srcLine);
 
+        curr = curr->next;
+    }
+    print_constnums();
+    print_conststrings();
+    print_libfuncs();
+    print_userfuncs();
+}
+
+void print_constnums() {
+    printf("\n-------- Constnums table --------\n");
+    if(num_const_list == NULL) 
+        return;
+
+    node* curr = num_const_list->head;
+    int i = 0;
+    while(curr != NULL) {
+        printf("index: %-2d ", i++);
+        double num = *(double *)(curr->data);
+        if(num == (int)num)
+            printf("value: %-3d\n", (int)num);
+        else
+            printf("value: %-3.5f\n", num);
+        curr = curr->next;
+    }
+}
+
+void print_conststrings() {
+    printf("\n-------- Strings table --------\n");
+    if(str_const_list == NULL) 
+        return;
+
+    node* curr = str_const_list->head;
+    int i = 0;
+    while(curr != NULL) {
+        printf("index: %-2d ", i++);
+        printf("value: %-10s\n", (char *)(curr->data));
+        curr = curr->next;
+    }
+}
+
+void print_libfuncs() {
+    printf("\n-------- Libfuncs table --------\n");
+    if(lib_func_list == NULL) 
+        return;
+
+    node* curr = lib_func_list->head;
+    int i = 0;
+    while(curr != NULL) {
+        printf("index: %-2d: ", i++);
+        printf("value: %-10s\n", (char *)(curr->data));
+        curr = curr->next;
+    }
+}
+
+void print_userfuncs() {
+    printf("\n-------- Userfuncs table --------\n");
+    if(user_func_list == NULL) 
+        return;
+
+    node* curr = user_func_list->head;
+    int i = 0;
+    while(curr != NULL) {
+        user_func_t* tmp = (user_func_t*) curr->data;
+        printf("index: %-2d ", i++);
+        printf("adress: %-2d\t local size: %-2d \t id: %-10s\n", tmp->iaddress, tmp->total_locals, tmp->name);
         curr = curr->next;
     }
 }
@@ -443,5 +509,3 @@ char* vmarg_t_to_string(enum vmarg_t arg) {
         default:          return "unknown";
     }
 }
-
-

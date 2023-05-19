@@ -90,5 +90,9 @@ void generate_AND         (quad* quad);
 
 void emit_instruction  (instruction* t);
 void print_instructions();
+void print_constnums();
+void print_conststrings();
+void print_libfuncs();
+void print_userfuncs();
 
 #endif /* INSTRUCTION_H */
