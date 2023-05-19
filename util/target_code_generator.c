@@ -12,6 +12,9 @@ linked_list* instructions_list;
 
 unsigned first_stmt_counter = 1;
 
+FILE* output_txt_file;
+FILE* output_bin_file;
+
 generator_func_t generators[] = {
     generate_ASSIGN,     
     generate_ADD,
@@ -466,6 +469,22 @@ void print_userfuncs() {
         curr = curr->next;
     }
 }
+
+void generate_txt_file() {
+    unsigned magic_number  = 340200501;
+
+    if(!output_txt_file) output_txt_file = fopen("text.abc", "w");
+
+    fprintf(output_txt_file, "magicnumber -> %u\n", magic_number);
+}
+
+void generate_bin_file() {
+    unsigned magic_number  = 340200501;
+
+    if(!output_bin_file) output_bin_file = fopen("binary.abc", "wb");
+
+    fwrite(&magic_number, sizeof(unsigned), 1, output_bin_file);
+} 
 
 char* vmopcode_to_string(enum vmopcode op) {
     switch(op) {

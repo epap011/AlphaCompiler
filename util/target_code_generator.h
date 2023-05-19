@@ -88,11 +88,14 @@ void generate_FUNCEND     (quad* quad);
 void generate_UMINUS      (quad* quad);
 void generate_AND         (quad* quad);
 
+void assign_line_only_on_first_stms(quad* q, instruction* i);
 void emit_instruction  (instruction* t);
 void print_instructions();
 void print_constnums();
 void print_conststrings();
 void print_libfuncs();
 void print_userfuncs();
+void generate_txt_file ();
+void generate_bin_file ();
 
 #endif /* INSTRUCTION_H */

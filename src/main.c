@@ -54,6 +54,8 @@ int main(int argc, char** argv) {
         quads_to_external_file();
         generate();
         print_instructions();
+        generate_txt_file();
+        generate_bin_file();
     }
 
     symbol_table_print(symTable);
