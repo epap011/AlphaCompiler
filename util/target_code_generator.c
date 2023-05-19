@@ -10,6 +10,8 @@ linked_list* lib_func_list;
 linked_list* user_func_list;
 linked_list* instructions_list;
 
+unsigned first_stmt_counter = 1;
+
 generator_func_t generators[] = {
     generate_ASSIGN,     
     generate_ADD,
@@ -167,7 +169,7 @@ void generate_ARITHM(quad* q, enum vmopcode op) {
     i->result  = (vmarg*) malloc(sizeof(vmarg));
     i->arg1    = (vmarg*) malloc(sizeof(vmarg));
     i->arg2    = (vmarg*) malloc(sizeof(vmarg));
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_operand(q->result, i->result);
     make_operand(q->arg1  , i->arg1);
@@ -182,7 +184,7 @@ void generate_RELATIONAL(quad* q, enum vmopcode op) {
     i->result  = (vmarg*) malloc(sizeof(vmarg));
     i->arg1    = (vmarg*) malloc(sizeof(vmarg));
     i->arg2    = (vmarg*) malloc(sizeof(vmarg));
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_operand(q->arg1, i->arg1);
     make_operand(q->arg2, i->arg2);
@@ -199,7 +201,7 @@ void generate_ASSIGN(quad* q) {
     i->result  = (vmarg*) malloc(sizeof(vmarg));
     i->arg1    = (vmarg*) malloc(sizeof(vmarg));
     i->arg2    = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_operand(q->result, i->result);
     make_operand(q->arg1  , i->arg1);
@@ -219,7 +221,7 @@ void generate_UMINUS(quad* q) {
     i->result  = (vmarg*) malloc(sizeof(vmarg));
     i->arg1    = (vmarg*) malloc(sizeof(vmarg));
     i->arg2    = (vmarg*) malloc(sizeof(vmarg));
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_operand(q->result, i->result);
     make_operand(q->arg1  , i->arg1);
@@ -244,7 +246,7 @@ void generate_JUMP        (quad* q) {
     i->result = (vmarg*) malloc(sizeof(vmarg));
     i->arg1    = NULL;
     i->arg2    = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     i->result->type = label_a;
     i->result->val  = q->label;
@@ -258,7 +260,7 @@ void generate_CALL(quad* q) {
     i->opcode      = call_vm;
     i->result      = NULL;
     i->arg2        = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     if(q->arg1) {
         i->arg1 = (vmarg*) malloc(sizeof(vmarg));
@@ -275,7 +277,7 @@ void generate_PARAM(quad* q) {
     i->result      = NULL;
     i->arg1        = NULL;
     i->arg2        = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     if(q->arg1) {
         i->arg1 = (vmarg*) malloc(sizeof(vmarg));
@@ -290,7 +292,7 @@ void generate_RETURN(quad* q) {
     i->result      = (vmarg*) malloc(sizeof(vmarg));
     i->arg1        = NULL;
     i->arg2        = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_retvaloperand(i->result);
     if(q->result != NULL){
@@ -307,7 +309,7 @@ void generate_GETRETVAL(quad* q) {
     i->result      = NULL;
     i->arg1        = (vmarg*) malloc(sizeof(vmarg));
     i->arg2        = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     if(q->result) {
         i->result = (vmarg*) malloc(sizeof(vmarg));
@@ -324,7 +326,7 @@ void generate_FUNCSTART(quad* q) {
     i->result      = (vmarg*) malloc(sizeof(vmarg));
     i->arg1        = NULL;
     i->arg2        = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_operand(q->result, i->result);
 
@@ -336,7 +338,7 @@ void generate_FUNCEND(quad* q) {
     i->result      = (vmarg*) malloc(sizeof(vmarg));
     i->arg1        = NULL;
     i->arg2        = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_operand(q->result, i->result);
 
@@ -349,7 +351,7 @@ void generate_NEWTABLE(quad* q) {
     i->result  = (vmarg*) malloc(sizeof(vmarg));
     i->arg1    = NULL;
     i->arg2    = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     make_operand(q->result, i->result);
 
@@ -364,7 +366,7 @@ void generate_NOP(quad* q) {
     i->result  = NULL;
     i->arg1    = NULL;
     i->arg2    = NULL;
-    i->srcLine = q->line;
+    assign_line_only_on_first_stms(q, i);
 
     emit_instruction(i);
 }
@@ -444,4 +446,13 @@ char* vmarg_t_to_string(enum vmarg_t arg) {
     }
 }
 
+void assign_line_only_on_first_stms(quad* q, instruction* i) {
+    if(q->line == first_stmt_counter) {
+        i->srcLine = q->line;
+        first_stmt_counter++;
+    }
+    else {
+        i->srcLine = 0;
+    }
+}
 
