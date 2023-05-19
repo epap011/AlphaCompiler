@@ -45,13 +45,9 @@ void make_operand(expr* e, vmarg* arg){
     assert(arg != NULL);
     switch (e->type) {
         case var_e:
-            break;
         case tableitem_e:
-            break;
         case arithexpr_e:
-            break;
         case boolexpr_e:
-            break;
         case newtable_e:
             assert(e->sym);
             arg->val = e->sym->offset;
@@ -90,7 +86,7 @@ void make_operand(expr* e, vmarg* arg){
 
         case programfunc_e:
             arg->type = userfunc_a;
-            arg->val = e->sym->taddress; //we might need to change this
+            arg->val = userfuncs_newfunc(e->sym);
             break;
 
         case libraryfunc_e:
@@ -130,6 +126,19 @@ unsigned consts_newnumber(double n) {
     *num = n;
     insert_at_the_end_to_linked_list(num_const_list, num);
     return num_const_list->size - 1;
+}
+
+unsigned userfuncs_newfunc (Symbol* sym){
+    if(user_func_list == NULL) user_func_list = create_linked_list();
+
+    user_func_t *tmp = (user_func_t *)malloc(sizeof(user_func_t));
+    tmp->iaddress = sym->iaddress;
+    tmp->total_locals = sym->totalLocals;
+    tmp->name = sym->name;
+
+    insert_at_the_end_to_linked_list(user_func_list, sym);
+
+    return user_func_list->size - 1;
 }
 
 unsigned libfuncs_newused (const char* s)    {
@@ -359,80 +368,30 @@ void print_instructions() {
 
     printf("\n-------- Instructions --------\n");
     node* curr = instructions_list->head;
+    int i = 1;
     while(curr != NULL) {
+        printf("%-2d: ", i++);
         instruction* i = (instruction*) curr->data;
-        enum vmopcode op = i->opcode;
-        unsigned result_index = i->result != NULL ? i->result->val : -1;
-        unsigned arg1_index   = i->arg1   != NULL ? i->arg1->val   : -1;
-        unsigned arg2_index   = i->arg2   != NULL ? i->arg2->val   : -1;
-        
-        printf("%d : OP: %s", i->srcLine, vmopcode_to_string(op));
-        
-        printf("\t\t RESULT: ");
-        if(i->result != NULL) {
-            if(i->result->type == number_a)
-                printf("%s,%d:%lf", vmarg_t_to_string(i->result->type), result_index, *(double*)get_from_linked_list(num_const_list, result_index));
-            else
-            if(i->result->type == string_a)
-                printf("%s,%d:%s", vmarg_t_to_string(i->result->type), result_index, (char*)get_from_linked_list(str_const_list, result_index));
-            else
-            if(i->result->type == bool_a)
-                printf("%s,%d:%d", vmarg_t_to_string(i->result->type), result_index, i->result->val);
+        printf("OP: %-15s ", vmopcode_to_string(i->opcode));
+        if(i->result != NULL) 
+            printf("RESULT: %-8s, %-6d", vmarg_t_to_string(i->result->type), i->result->val);
+         else 
+            printf("RESULT: %-16s", "");
 
-            else
-            if(i->result->type == libfunc_a)
-                printf("%s,%d:", vmarg_t_to_string(i->result->type), result_index);
-            else
-            if(i->result->type == userfunc_a)
-                printf("%s,%d:", vmarg_t_to_string(i->result->type), result_index);
-            else
-            if(i->result->type == global_a || i->result->type == local_a || i->result->type == formal_a)
-                printf("%s,%d:", vmarg_t_to_string(i->result->type), result_index);
-            else
-                printf("NULL, ");
-        }
-        else printf("NULL, ");
+        if(i->arg1 != NULL) 
+            printf("ARG1: %-8s, %-6d", vmarg_t_to_string(i->arg1->type), i->arg1->val);
+         else 
+            printf("ARG1: %-16s", "");
         
-        printf("\t\t ARG1: ");
-        if(i->arg1 != NULL) {
-            if(i->arg1->type == number_a)
-                printf("%s,%d:%lf", vmarg_t_to_string(i->arg1->type), arg1_index, *(double*)get_from_linked_list(num_const_list, arg1_index));
-            else
-            if(i->arg1->type == string_a)
-                printf("%s,%d:%s", vmarg_t_to_string(i->arg1->type), arg1_index, (char*)get_from_linked_list(str_const_list, arg1_index));
-            else
-            if(i->arg1->type == bool_a)
-                printf("%s,%d:%d", vmarg_t_to_string(i->arg1->type), arg1_index, i->arg1->val);
-            else
-            if(i->arg1->type == global_a || i->arg1->type == local_a || i->arg1->type == formal_a)
-                printf("%s,%d:", vmarg_t_to_string(i->arg1->type), arg1_index);
-            else
-                printf("NULL, ");
-        }
-        else printf("NULL, ");
+        if(i->arg2 != NULL)
+            printf("ARG2: %-8s, %-6d", vmarg_t_to_string(i->arg2->type), i->arg2->val);
+         else 
+            printf("ARG2: %-16s", "");
 
-        printf("\t\t ARG2: ");
-        if(i->arg2 != NULL) {
-            if(i->arg2->type == number_a)
-                printf("%s,%d:%lf", vmarg_t_to_string(i->arg2->type), arg2_index, *(double*)get_from_linked_list(num_const_list, arg2_index));
-            else
-            if(i->arg2->type == string_a)
-                printf("%s,%d:%s", vmarg_t_to_string(i->arg2->type), arg2_index, (char*)get_from_linked_list(str_const_list, arg2_index));
-            else
-            if(i->arg2->type == bool_a)
-                printf("%s,%d:%d", vmarg_t_to_string(i->arg2->type), arg2_index, i->arg2->val);
-            if(i->arg2->type == global_a || i->arg2->type == local_a || i->arg2->type == formal_a)
-                printf("%s,%d:", vmarg_t_to_string(i->arg2->type), arg2_index);
-            else
-                printf("NULL, ");
-        }
-        else printf("NULL, ");
-        
+        printf("srcLine: %-2d\n",i->srcLine);
 
-        printf("\n");
         curr = curr->next;
     }
-    printf("------------------------------\n");
 }
 
 char* vmopcode_to_string(enum vmopcode op) {
