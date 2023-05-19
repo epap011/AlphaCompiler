@@ -257,12 +257,12 @@ void generate_CALL(quad* q) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
     i->opcode      = call_vm;
     i->result      = NULL;
-    i->arg1        = NULL;
     i->arg2        = NULL;
+    i->srcLine = q->line;
 
-    if(q->result) {
-        i->result = (vmarg*) malloc(sizeof(vmarg));
-        make_operand(q->result, i->result);
+    if(q->arg1) {
+        i->arg1 = (vmarg*) malloc(sizeof(vmarg));
+        make_operand(q->arg1, i->arg1);
     }
 
     emit_instruction(i);
@@ -275,10 +275,11 @@ void generate_PARAM(quad* q) {
     i->result      = NULL;
     i->arg1        = NULL;
     i->arg2        = NULL;
+    i->srcLine = q->line;
 
-    if(q->result) {
-        i->result = (vmarg*) malloc(sizeof(vmarg));
-        make_operand(q->result, i->result);
+    if(q->arg1) {
+        i->arg1 = (vmarg*) malloc(sizeof(vmarg));
+        make_operand(q->arg1, i->arg1);
     }
 
     emit_instruction(i);
@@ -289,6 +290,7 @@ void generate_RETURN(quad* q) {
     i->result      = (vmarg*) malloc(sizeof(vmarg));
     i->arg1        = NULL;
     i->arg2        = NULL;
+    i->srcLine = q->line;
 
     make_retvaloperand(i->result);
     if(q->result != NULL){
@@ -305,6 +307,7 @@ void generate_GETRETVAL(quad* q) {
     i->result      = NULL;
     i->arg1        = (vmarg*) malloc(sizeof(vmarg));
     i->arg2        = NULL;
+    i->srcLine = q->line;
 
     if(q->result) {
         i->result = (vmarg*) malloc(sizeof(vmarg));
@@ -321,6 +324,7 @@ void generate_FUNCSTART(quad* q) {
     i->result      = (vmarg*) malloc(sizeof(vmarg));
     i->arg1        = NULL;
     i->arg2        = NULL;
+    i->srcLine = q->line;
 
     make_operand(q->result, i->result);
 
@@ -332,6 +336,7 @@ void generate_FUNCEND(quad* q) {
     i->result      = (vmarg*) malloc(sizeof(vmarg));
     i->arg1        = NULL;
     i->arg2        = NULL;
+    i->srcLine = q->line;
 
     make_operand(q->result, i->result);
 
