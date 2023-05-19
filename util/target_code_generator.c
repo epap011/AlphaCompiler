@@ -511,11 +511,66 @@ void generate_txt_file() {
 }
 
 void generate_bin_file() {
-    unsigned magic_number  = 340200501;
+    unsigned magic_number    = 340200501;
+    unsigned numbers_total   = num_const_list    != NULL ? num_const_list->size    : 0;
+    unsigned strings_total   = str_const_list    != NULL ? str_const_list->size    : 0;
+    unsigned libfuncs_total  = lib_func_list     != NULL ? lib_func_list->size     : 0;
+    unsigned userfuncs_total = user_func_list    != NULL ? user_func_list->size    : 0;
+    unsigned total_instr     = instructions_list != NULL ? instructions_list->size : 0;
 
     if(!output_bin_file) output_bin_file = fopen("binary.abc", "wb");
 
     fwrite(&magic_number, sizeof(unsigned), 1, output_bin_file);
+    fwrite(&magic_number, sizeof(unsigned), 1, output_bin_file);
+    
+    fwrite(&numbers_total, sizeof(unsigned), 1, output_bin_file);
+    node* curr = num_const_list != NULL ? num_const_list->head : NULL;
+    while(curr != NULL) {
+        double num = *(double *)(curr->data);
+        fwrite(&num, sizeof(double), 1, output_bin_file);
+        curr = curr->next;
+    }
+
+    fwrite(&strings_total, sizeof(unsigned), 1, output_bin_file);
+    curr = str_const_list != NULL ? str_const_list->head : NULL;
+    while(curr != NULL) {
+        char* str = (char *)(curr->data);
+        fwrite(str, sizeof(char), strlen(str) + 1, output_bin_file);
+        curr = curr->next;
+    }
+
+    fwrite(&libfuncs_total , sizeof(unsigned), 1, output_bin_file);
+    curr = lib_func_list != NULL ? lib_func_list->head : NULL;
+    while(curr != NULL) {
+        char* str = (char *)(curr->data);
+        fwrite(str, sizeof(char), strlen(str) + 1, output_bin_file);
+        curr = curr->next;
+    }
+
+    fwrite(&userfuncs_total, sizeof(unsigned), 1, output_bin_file);
+    curr = user_func_list != NULL ? user_func_list->head : NULL;
+    while(curr != NULL) {
+        user_func_t* tmp = (user_func_t*) curr->data;
+        fwrite(&tmp->iaddress    , sizeof(unsigned), 1, output_bin_file);
+        fwrite(&tmp->total_locals, sizeof(unsigned), 1, output_bin_file);
+        const char* str = tmp->name;
+        fwrite(str, sizeof(char), strlen(str) + 1, output_bin_file);
+        curr = curr->next;
+    }
+    
+    fwrite(&total_instr, sizeof(unsigned), 1, output_bin_file);
+    curr = instructions_list != NULL ? instructions_list->head : NULL;
+    while(curr != NULL) {
+        fwrite(&(((instruction*)curr->data)->opcode), sizeof(enum vmopcode), 1, output_bin_file);
+        if(((instruction*)curr->data)->result)fwrite(&(((instruction*)curr->data)->result->type), sizeof(enum vmarg_t) , 1, output_bin_file);
+        if(((instruction*)curr->data)->result)fwrite(&(((instruction*)curr->data)->result->val) , sizeof(unsigned)     , 1, output_bin_file);
+        if(((instruction*)curr->data)->arg1)  fwrite(&(((instruction*)curr->data)->arg1->type)  , sizeof(enum vmarg_t) , 1, output_bin_file);
+        if(((instruction*)curr->data)->arg1)  fwrite(&(((instruction*)curr->data)->arg1->val)   , sizeof(unsigned)     , 1, output_bin_file);
+        if(((instruction*)curr->data)->arg2)  fwrite(&(((instruction*)curr->data)->arg2->type)  , sizeof(enum vmarg_t) , 1, output_bin_file);
+        if(((instruction*)curr->data)->arg2)  fwrite(&(((instruction*)curr->data)->arg2->val)   , sizeof(unsigned)     , 1, output_bin_file);
+        fwrite(&(((instruction*)curr->data)->srcLine), sizeof(unsigned), 1, output_bin_file);
+        curr = curr->next;
+    }
 } 
 
 char* vmopcode_to_string(enum vmopcode op) {
