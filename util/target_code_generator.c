@@ -377,105 +377,137 @@ void generate_NOP(quad* q) {
 //This function is just for debugging purposes only. VM takes a binary file as input
 void print_instructions() {
 
-    printf("\n-------- Instructions --------\n");
+    if(instructions_list != NULL) 
+        fprintf(output_txt_file, "total instructions : %u\n", instructions_list->size);
+    else{
+        fprintf(output_txt_file, "total instructions : 0\n");
+        return;
+    }
+    
+    fprintf(output_txt_file, "-------- Instructions --------\n");
     node* curr = instructions_list->head;
     int i = 0;
     while(curr != NULL) {
-        printf("%-2d: ", i++);
+        fprintf(output_txt_file, "%-2d: ", i++);
         instruction* i = (instruction*) curr->data;
-        printf("OP: %-15s ", vmopcode_to_string(i->opcode));
+        fprintf(output_txt_file, "OP: %-15s ", vmopcode_to_string(i->opcode));
         if(i->result != NULL) 
-            printf("RESULT: %-8s, %-6d", vmarg_t_to_string(i->result->type), i->result->val);
+            fprintf(output_txt_file, "RESULT: %-8s, %-6d", vmarg_t_to_string(i->result->type), i->result->val);
          else 
-            printf("RESULT: %-16s", "");
+            fprintf(output_txt_file, "RESULT: %-16s", "");
 
         if(i->arg1 != NULL) 
-            printf("ARG1: %-8s, %-6d", vmarg_t_to_string(i->arg1->type), i->arg1->val);
+            fprintf(output_txt_file, "ARG1: %-8s, %-6d", vmarg_t_to_string(i->arg1->type), i->arg1->val);
          else 
-            printf("ARG1: %-16s", "");
+            fprintf(output_txt_file, "ARG1: %-16s", "");
         
         if(i->arg2 != NULL)
-            printf("ARG2: %-8s, %-6d", vmarg_t_to_string(i->arg2->type), i->arg2->val);
+            fprintf(output_txt_file, "ARG2: %-8s, %-6d", vmarg_t_to_string(i->arg2->type), i->arg2->val);
          else 
-            printf("ARG2: %-16s", "");
+            fprintf(output_txt_file, "ARG2: %-16s", "");
 
-        printf("srcLine: %-2d\n",i->srcLine);
+        fprintf(output_txt_file, "srcLine: %-2d\n",i->srcLine);
 
         curr = curr->next;
     }
-    print_constnums();
-    print_conststrings();
-    print_libfuncs();
-    print_userfuncs();
 }
 
 void print_constnums() {
-    printf("\n-------- Constnums table --------\n");
-    if(num_const_list == NULL) 
+    if(num_const_list != NULL) 
+        fprintf(output_txt_file, "total numbers : %u\n", num_const_list->size);
+    else{
+        fprintf(output_txt_file, "total numbers : 0\n");
         return;
+    }
+    fprintf(output_txt_file, "-------- Constnums Table --------\n");
 
     node* curr = num_const_list->head;
     int i = 0;
     while(curr != NULL) {
-        printf("index: %-2d ", i++);
+        fprintf(output_txt_file, "index: %-2d ", i++);
         double num = *(double *)(curr->data);
         if(num == (int)num)
-            printf("value: %-3d\n", (int)num);
+            fprintf(output_txt_file, "value: %-3d\n", (int)num);
         else
-            printf("value: %-3.5f\n", num);
+            fprintf(output_txt_file, "value: %-3.5f\n", num);
         curr = curr->next;
     }
+    fprintf(output_txt_file, "\n");
 }
 
 void print_conststrings() {
-    printf("\n-------- Strings table --------\n");
-    if(str_const_list == NULL) 
+    if(str_const_list != NULL) 
+        fprintf(output_txt_file, "total strings : %u\n", str_const_list->size);
+    else{
+        fprintf(output_txt_file, "total strings : 0\n");
         return;
+    }
+
+    fprintf(output_txt_file, "-------- Strings Table --------\n");
 
     node* curr = str_const_list->head;
     int i = 0;
     while(curr != NULL) {
-        printf("index: %-2d ", i++);
-        printf("value: %-10s\n", (char *)(curr->data));
+        fprintf(output_txt_file, "index: %-2d ", i++);
+        fprintf(output_txt_file, "value: %-10s\n", (char *)(curr->data));
         curr = curr->next;
     }
+    fprintf(output_txt_file, "\n");
 }
 
 void print_libfuncs() {
-    printf("\n-------- Libfuncs table --------\n");
-    if(lib_func_list == NULL) 
+    if(lib_func_list != NULL) 
+        fprintf(output_txt_file, "total lib funcs : %u\n", lib_func_list->size);
+    else{
+        fprintf(output_txt_file, "total lib funcs : 0\n");
         return;
+    }
+
+    fprintf(output_txt_file, "-------- Libfuncs Table --------\n");
 
     node* curr = lib_func_list->head;
     int i = 0;
     while(curr != NULL) {
-        printf("index: %-2d: ", i++);
-        printf("value: %-10s\n", (char *)(curr->data));
+        fprintf(output_txt_file, "index: %-2d: ", i++);
+        fprintf(output_txt_file, "value: %-10s\n", (char *)(curr->data));
         curr = curr->next;
     }
+    fprintf(output_txt_file, "\n");
 }
 
 void print_userfuncs() {
-    printf("\n-------- Userfuncs table --------\n");
-    if(user_func_list == NULL) 
+    if(user_func_list != NULL) 
+        fprintf(output_txt_file, "total user funcs : %u\n", user_func_list->size);
+    else{
+        fprintf(output_txt_file, "total user funcs : 0\n");
         return;
+    }
+    
+    fprintf(output_txt_file, "-------- Userfuncs Table --------\n");
 
     node* curr = user_func_list->head;
     int i = 0;
     while(curr != NULL) {
         user_func_t* tmp = (user_func_t*) curr->data;
-        printf("index: %-2d ", i++);
-        printf("adress: %-2d\t local size: %-2d \t id: %-10s\n", tmp->iaddress, tmp->total_locals, tmp->name);
+        fprintf(output_txt_file, "index: %-2d ", i++);
+        fprintf(output_txt_file, "adress: %-2d\t local size: %-2d \t id: %-10s\n", tmp->iaddress, tmp->total_locals, tmp->name);
         curr = curr->next;
     }
+    fprintf(output_txt_file, "\n");
 }
 
 void generate_txt_file() {
     unsigned magic_number  = 340200501;
 
-    if(!output_txt_file) output_txt_file = fopen("text.abc", "w");
+    if(!output_txt_file) output_txt_file = fopen("binary.txt", "w");
 
-    fprintf(output_txt_file, "magicnumber -> %u\n", magic_number);
+    fprintf(output_txt_file, "magicnumber : %u\n", magic_number);
+    print_constnums();
+    print_conststrings();
+    print_userfuncs();
+    print_libfuncs();
+    print_instructions();
+
 }
 
 void generate_bin_file() {

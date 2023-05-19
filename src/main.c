@@ -47,13 +47,12 @@ int main(int argc, char** argv) {
     
 
     //debug
-    printf("\n----------- Quads -----------\n");
     if(!error_flag){
+        printf("\n----------- Quads -----------\n");
         patch_jump_to_jump_labels();
         printQuads();
         quads_to_external_file();
         generate();
-        print_instructions();
         generate_txt_file();
         generate_bin_file();
     }
