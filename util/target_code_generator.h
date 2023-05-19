@@ -40,6 +40,12 @@ typedef struct instuction {
     unsigned int srcLine;
 } instruction;
 
+typedef struct user_func_t {
+    unsigned iaddress;
+    unsigned total_locals;
+    const char* name;
+} user_func_t;
+
 void make_operand      (expr* e, vmarg* arg);
 void make_numberoperand(vmarg* arg, double val);  //helper for const
 void make_booloperand  (vmarg* arg, unsigned val);//helper for const
@@ -47,6 +53,7 @@ void make_retvaloperand(vmarg* arg);              //helper for return values
 
 unsigned consts_newstring  (char* s);
 unsigned consts_newnumber  (double n);
+unsigned userfuncs_newfunc (Symbol* sym);
 unsigned libfuncs_newused  (const char* s);
 
 char* vmopcode_to_string(enum vmopcode op);

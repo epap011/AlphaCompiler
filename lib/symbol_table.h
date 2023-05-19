@@ -26,7 +26,6 @@ typedef struct Symbol {
     //for functions
     unsigned int totalLocals;
     unsigned int iaddress;
-    unsigned int taddress;
 
 } Symbol;
 
