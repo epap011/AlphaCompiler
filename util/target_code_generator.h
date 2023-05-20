@@ -24,7 +24,8 @@ enum vmarg_t{
     userfunc_a,
     libfunc_a,
     retval_a,
-    label_a
+    label_a,
+    undef_a
 };
 
 typedef struct vmarg {
@@ -97,5 +98,7 @@ void print_libfuncs();
 void print_userfuncs();
 void generate_txt_file ();
 void generate_bin_file ();
+void parse_bin_file    ();
+char* get_string();
 
 #endif /* INSTRUCTION_H */

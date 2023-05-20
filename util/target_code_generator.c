@@ -521,7 +521,6 @@ void generate_bin_file() {
     if(!output_bin_file) output_bin_file = fopen("binary.abc", "wb");
 
     fwrite(&magic_number, sizeof(unsigned), 1, output_bin_file);
-    fwrite(&magic_number, sizeof(unsigned), 1, output_bin_file);
     
     fwrite(&numbers_total, sizeof(unsigned), 1, output_bin_file);
     node* curr = num_const_list != NULL ? num_const_list->head : NULL;
@@ -560,18 +559,125 @@ void generate_bin_file() {
     
     fwrite(&total_instr, sizeof(unsigned), 1, output_bin_file);
     curr = instructions_list != NULL ? instructions_list->head : NULL;
+    enum vmarg_t undef_type = undef_a;
+    unsigned undef_val = -1;
     while(curr != NULL) {
         fwrite(&(((instruction*)curr->data)->opcode), sizeof(enum vmopcode), 1, output_bin_file);
         if(((instruction*)curr->data)->result)fwrite(&(((instruction*)curr->data)->result->type), sizeof(enum vmarg_t) , 1, output_bin_file);
+        else fwrite(&undef_type, sizeof(enum vmarg_t), 1, output_bin_file);
         if(((instruction*)curr->data)->result)fwrite(&(((instruction*)curr->data)->result->val) , sizeof(unsigned)     , 1, output_bin_file);
+        else fwrite(&undef_val, sizeof(unsigned), 1, output_bin_file);
         if(((instruction*)curr->data)->arg1)  fwrite(&(((instruction*)curr->data)->arg1->type)  , sizeof(enum vmarg_t) , 1, output_bin_file);
+        else fwrite(&undef_type, sizeof(enum vmarg_t), 1, output_bin_file);
         if(((instruction*)curr->data)->arg1)  fwrite(&(((instruction*)curr->data)->arg1->val)   , sizeof(unsigned)     , 1, output_bin_file);
+        else fwrite(&undef_val, sizeof(unsigned), 1, output_bin_file);
         if(((instruction*)curr->data)->arg2)  fwrite(&(((instruction*)curr->data)->arg2->type)  , sizeof(enum vmarg_t) , 1, output_bin_file);
+        else fwrite(&undef_type, sizeof(enum vmarg_t), 1, output_bin_file);
         if(((instruction*)curr->data)->arg2)  fwrite(&(((instruction*)curr->data)->arg2->val)   , sizeof(unsigned)     , 1, output_bin_file);
+        else fwrite(&undef_val, sizeof(unsigned), 1, output_bin_file);
         fwrite(&(((instruction*)curr->data)->srcLine), sizeof(unsigned), 1, output_bin_file);
         curr = curr->next;
     }
-} 
+
+    fclose(output_bin_file);
+}
+
+void parse_bin_file() {
+    output_bin_file = fopen("binary.abc", "rb");
+
+    printf("\n------< Parsing Bin File >------\n");
+    
+    unsigned magic_number;
+    unsigned numbers_total;   double*       numbers;
+    unsigned strings_total;   char**        strings;
+    unsigned libfuncs_total;  char**        libfuncs;
+    unsigned userfuncs_total; user_func_t*  userfuncs;
+    unsigned total_instr;     instruction** instructions;
+
+    fread(&magic_number, sizeof(unsigned), 1, output_bin_file);
+    printf("magic-number: %u\n", magic_number);
+
+    if(magic_number != 340200501) {
+        printf("Wrong magic number\n");
+        exit(1);
+    }
+
+    fread(&numbers_total, sizeof(unsigned), 1, output_bin_file);
+    printf("total numbers: %u\n", numbers_total);
+    numbers = (double*) malloc(sizeof(double) * numbers_total);
+    for (unsigned i = 0; i < numbers_total; ++i) {
+        fread(&numbers[i], sizeof(double), 1, output_bin_file);
+        printf("number[%u] = %f\n", i, numbers[i]);
+    }
+    
+    fread(&strings_total, sizeof(unsigned), 1, output_bin_file);
+    printf("total strings: %u\n", strings_total);
+    strings = (char**) malloc(sizeof(char*) * strings_total);
+    for (unsigned i = 0; i < strings_total; ++i) {
+        strings[i] = get_string();
+        printf("string[%u] = %s\n", i, strings[i]);
+    }
+    
+    
+    fread(&libfuncs_total, sizeof(unsigned), 1, output_bin_file);
+    printf("total libfuncs: %u\n", libfuncs_total);
+    libfuncs = (char**) malloc(sizeof(char*) * libfuncs_total);
+    for (unsigned i = 0; i < libfuncs_total; ++i) {
+        libfuncs[i] = get_string();
+        printf("libfuncs[%u] = %s\n", i, libfuncs[i]);
+    }
+
+    
+    fread(&userfuncs_total, sizeof(unsigned), 1, output_bin_file);
+    printf("total userfuncs: %u\n", userfuncs_total);
+    userfuncs = (user_func_t*) malloc(sizeof(user_func_t) * userfuncs_total);
+    for (unsigned i = 0; i < userfuncs_total; ++i) {
+        fread(&userfuncs[i].iaddress, sizeof(unsigned), 1, output_bin_file);
+        fread(&userfuncs[i].total_locals, sizeof(unsigned), 1, output_bin_file);
+        userfuncs[i].name = get_string();
+        printf("userfuncs[%u] = %u %u %s\n", i, userfuncs[i].iaddress, userfuncs[i].total_locals, userfuncs[i].name);
+    }
+
+    
+    fread(&total_instr, sizeof(unsigned), 1, output_bin_file);
+    printf("total instructions: %u\n", total_instr);
+    instructions = (instruction**) malloc(sizeof(instruction*) * total_instr);
+    for (unsigned i = 0; i < total_instr; ++i) {
+        instruction* in = (instruction*) malloc(sizeof(instruction));
+        in->result = (vmarg*) malloc(sizeof(vmarg));
+        in->arg1   = (vmarg*) malloc(sizeof(vmarg));
+        in->arg2   = (vmarg*) malloc(sizeof(vmarg));
+
+        fread(&in->opcode      , sizeof(enum vmopcode), 1, output_bin_file);
+        fread(&in->result->type, sizeof(enum vmarg_t) , 1, output_bin_file);
+        fread(&in->result->val , sizeof(unsigned)     , 1, output_bin_file);
+        fread(&in->arg1->type  , sizeof(enum vmarg_t) , 1, output_bin_file);
+        fread(&in->arg1->val   , sizeof(unsigned)     , 1, output_bin_file);
+        fread(&in->arg2->type  , sizeof(enum vmarg_t) , 1, output_bin_file);
+        fread(&in->arg2->val   , sizeof(unsigned)     , 1, output_bin_file);
+        fread(&in->srcLine     , sizeof(unsigned)     , 1, output_bin_file);
+
+        instructions[i] = in;
+
+        printf("%s %s %d %s %d %s %d %d\n", vmopcode_to_string(in->opcode), vmarg_t_to_string(in->result->type), in->result->val, vmarg_t_to_string(in->arg1->type), in->arg1->val, vmarg_t_to_string(in->arg2->type), in->arg2->val, in->srcLine);  
+    }
+    printf("------< End of Parsing Bin file >------\n");
+}
+
+char* get_string() {
+    int size = 2048;
+    char* str = (char*) malloc(sizeof(char) * size);
+    char c;
+    int i = 0;
+    while((c = getc(output_bin_file)) != '\0') {
+        str[i++] = c;
+        if(i == size) {
+            size *= 2;
+            str = (char*) realloc(str, sizeof(char) * size);
+        }
+    }
+    return str;
+}
 
 char* vmopcode_to_string(enum vmopcode op) {
     switch(op) {
@@ -614,6 +720,7 @@ char* vmarg_t_to_string(enum vmarg_t arg) {
         case userfunc_a:  return "userfunc";
         case libfunc_a:   return "libfunc";
         case retval_a:    return "retval";
+        case undef_a:     return "NULL";
         default:          return "unknown";
     }
 }
