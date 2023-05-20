@@ -19,6 +19,7 @@
 
 int formal_flag = 0;    //Usage: if a function is already declared (or is a built-in ), we don't want to insert it in the symbol table and wee need this flag to skip the formal arguments as well
 extern FILE * out_file;
+int error_flag = 0;    //If we have ANY error, we dont produce quad/binary files
 
 char lib_functions[NUM_OF_LIB_FUNC][19] = {
     "print",
@@ -113,6 +114,7 @@ Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsi
 
    if(is_id_built_in_function(id)) {
         fprintf(out_file,RED"Error:"RESET" Cannot shadow library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id, line);
+        error_flag = 1;
         return NULL;
    }
    
@@ -124,6 +126,7 @@ Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsi
         else
             fprintf(out_file,RED"Error:"RESET" Function \""YEL"%s"RESET"\" already declared in scope "GRN"%d"RESET" (line: "GRN"%d"RESET") \n", id, scope,line);
 
+        error_flag = 1;
         return NULL;
     }
 
@@ -144,11 +147,13 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
          
     if(is_id_built_in_function(id)) {
             fprintf(out_file,RED"Error:"RESET" Cannot declare variable \""YEL"%s"RESET"\", a library function exist with that name (line: "GRN"%d"RESET") \n", id, line);
+            error_flag = 1;
             return;
         }
 
     if(symbol_table_scope_lookup(symTable, id, scope) != NULL){
         fprintf(out_file,RED"Error:"RESET" Formal variable \""YEL"%s"RESET"\" already declared in function (line: "GRN"%d"RESET")\n", id, line);
+        error_flag = 1;
         return;
     } 
 
@@ -192,8 +197,10 @@ int hide_symbol_on_scope(SymbolTable* symTable, const char* id, unsigned int sco
 }
 
 void manage_return(int line, int flag, expr* retval, Stack *retstack){
-    if(!flag)
+    if(!flag){
         fprintf(out_file,RED"Error:"RESET" \""YEL"return"RESET"\" should be part of a function (line: "GRN"%d"RESET")\n", line);
+        error_flag = 1;
+    }
     else{
         emit(ret, retval ? retval : NULL, NULL, NULL, -1, line);
         //Because of multiple returns in multiple funcdefs, a stack of stacks is required (funcdefs x returns).
@@ -265,15 +272,19 @@ stmt_t* manage_stmt_block     (int debug, FILE* out) {
 
 stmt_t* manage_stmt_break(int debug, FILE* out, int line, int flag){
     if(debug) fprintf(yyout, MAG "Detected :" RESET"BREAK ;"CYN""RESET"-> stmt \n");
-    if(!flag)
+    if(!flag){
         fprintf(out_file,RED"Error:"RESET" \""YEL"break; "RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+        error_flag = 1;
+    }
     return NULL;
 }
 
 stmt_t* manage_stmt_continue(int debug, FILE* out, int line, int flag){
     if(debug) fprintf(yyout, MAG "Detected :" RESET"CONTINUE"CYN""RESET"-> while;\n");
-    if(!flag)
+    if(!flag){
         fprintf(out_file,RED"Error:"RESET" \""YEL"continue"RESET"\" should be part of a for/while loop (line: "GRN"%d"RESET")\n", line);
+        error_flag = 1;
+    }
     return NULL;
 }
 
@@ -613,6 +624,7 @@ int check_lvalue(SymbolTable* symTable, const char* id, unsigned int scope, unsi
         Symbol *tmp_symbol = symbol_table_scope_lookup(symTable, id, i);
         if(tmp_symbol != NULL && (tmp_symbol->symbol_type == USERFUNC || tmp_symbol->symbol_type == LIBFUNC)){
             fprintf(out_file,RED "Error:" RESET " Cannot apply arithmetic operation on function \"" YEL "%s" RESET "\" (line: " GRN "%d" RESET ")\n", id, line);
+            error_flag = 1;
             return 1;
         }
         else        
@@ -732,6 +744,7 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
     if(lvalue != NULL) {
         if(is_id_built_in_function(lvalue->sym->name)){
             fprintf(out_file,RED"Error:"RESET" Cannot assign to a library function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", lvalue->sym->name, line);
+            error_flag = 1;
             return NULL;
         }
 
@@ -740,6 +753,7 @@ expr* manage_assignexpr_lvalue_assign_expr(int debug, FILE* out, SymbolTable* sy
             if(tmp_symbol != NULL){
                 if( tmp_symbol->symbol_type == USERFUNC) {
                     fprintf(out_file,RED"Error:"RESET" Cannot assign to a function \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", lvalue->sym->name, line);
+                    error_flag = 1;
                     return NULL;
                 }
                 else{
@@ -817,6 +831,7 @@ expr* manage_lvalue_ident(int debug, FILE* out, SymbolTable* symTable, char* id,
             if(tmp_symbol != NULL && tmp_symbol->is_variable) {
                 if(flag == 1){
                     fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" is not accessible (line: "GRN"%d"RESET")\n", id, line);        
+                    error_flag = 1;
                     return NULL;
                 }
                 else {
@@ -846,6 +861,7 @@ expr* manage_lvalue_local_ident(int debug, FILE* out, SymbolTable* symTable, cha
 
     if(is_id_built_in_function(id)) {
         fprintf(out_file,RED"Error:"RESET" Cannot declare (shadow) Variable with library function name \""YEL"%s"RESET"\" (line: "GRN"%d"RESET") \n", id,line);
+        error_flag = 1;
         return NULL;
     }
 
@@ -864,6 +880,7 @@ expr* manage_lvalue_global_ident(int debug, FILE* out, SymbolTable* symTable, ch
     Symbol* sym =  symbol_table_scope_lookup(symTable, id, 0);
     if(sym != NULL) return new_lvalue_expr(sym);
     fprintf(out_file,RED"Error:"RESET" Variable \""YEL"%s"RESET"\" doesn't exist in global scope (line: "GRN"%d"RESET") \n", id, line);
+    error_flag = 1;
 
     return NULL;
 }

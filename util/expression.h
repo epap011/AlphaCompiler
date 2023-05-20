@@ -36,7 +36,7 @@ typedef struct expr{
     unsigned char boolConst;
     struct expr* next;          //for elist/indexed
 
-    struct expr* hidden_var;
+    struct expr* hidden_var;  //unused
 
     linked_list* truelist;
     linked_list* falselist;

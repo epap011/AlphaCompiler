@@ -72,7 +72,7 @@ void patchLabel(unsigned quadNo, unsigned label){
 void printQuads(){
     int i;
     for(i = 0; i < currQuad; i++){
-        printf("%-2d: OP: "BLU"%-12s"RESET"\t", i + 1, iopcode_tostring(quads[i].op));
+        printf("%-2d: OP: "BLU"%-12s"RESET"\t", i , iopcode_tostring(quads[i].op));
         if(quads[i].result != NULL) {
             if(quads[i].result->sym != NULL)
                 printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->sym->name);
@@ -153,7 +153,7 @@ void printQuads(){
         if (quads[i].label == -1)
             printf(" LABEL: UNSET\t");
         else
-            printf(" LABEL: %d  \t", quads[i].label+1);
+            printf(" LABEL: %d  \t", quads[i].label);
         printf("LINE: "GRN"%d"RESET"\n", quads[i].line);
     }
 }

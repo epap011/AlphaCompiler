@@ -4,9 +4,11 @@
 #include "manage_parser.h"
 #include "parser.h"
 #include "quad.h"
+#include "target_code_generator.h"
     
 extern FILE* yyout;
 extern FILE* yyin;
+extern int error_flag;
 FILE* out_file;
 SymbolTable* symTable;
 
@@ -42,13 +44,19 @@ int main(int argc, char** argv) {
     symTable = symbol_table_create();
     insert_lib_functions(symTable);
     yyparse();
-    patch_jump_to_jump_labels();
+    
 
     //debug
-    printf("\n----------- Quads -----------\n");
-    
-    printQuads();
-    quads_to_external_file();
+    if(!error_flag){
+        printf("\n----------- Quads -----------\n");
+        patch_jump_to_jump_labels();
+        printQuads();
+        quads_to_external_file();
+        generate();
+        generate_txt_file();
+        generate_bin_file();
+        parse_bin_file();
+    }
 
     symbol_table_print(symTable);
     fseek(out_file, 0, SEEK_SET);
