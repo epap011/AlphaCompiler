@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
         generate();
         generate_txt_file();
         generate_bin_file();
-        parse_bin_file();
+        //parse_bin_file();
     }
 
     symbol_table_print(symTable);
