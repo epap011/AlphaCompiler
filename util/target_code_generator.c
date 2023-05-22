@@ -515,6 +515,7 @@ void generate_txt_file() {
 
 void generate_bin_file() {
     unsigned magic_number    = 340200501;
+    unsigned globals_total   = programVarOffset;
     unsigned numbers_total   = num_const_list    != NULL ? num_const_list->size    : 0;
     unsigned strings_total   = str_const_list    != NULL ? str_const_list->size    : 0;
     unsigned libfuncs_total  = lib_func_list     != NULL ? lib_func_list->size     : 0;
@@ -522,6 +523,8 @@ void generate_bin_file() {
     unsigned total_instr     = instructions_list != NULL ? instructions_list->size : 0;
 
     if(!output_bin_file) output_bin_file = fopen("binary.abc", "wb");
+
+    fwrite(&globals_total, sizeof(unsigned), 1, output_bin_file);
 
     fwrite(&magic_number, sizeof(unsigned), 1, output_bin_file);
     
@@ -591,12 +594,16 @@ void parse_bin_file() {
 
     printf("\n------< Parsing Bin File >------\n");
     
+    unsigned globals_total;
     unsigned magic_number;
     unsigned numbers_total;   double*       numbers;
     unsigned strings_total;   char**        strings;
     unsigned libfuncs_total;  char**        libfuncs;
     unsigned userfuncs_total; user_func_t*  userfuncs;
     unsigned total_instr;     instruction** instructions;
+
+    fread(&globals_total, sizeof(unsigned), 1, output_bin_file);
+    printf("total globals: %u\n", globals_total);
 
     fread(&magic_number, sizeof(unsigned), 1, output_bin_file);
     printf("magic-number: %u\n", magic_number);
