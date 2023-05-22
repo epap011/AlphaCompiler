@@ -15,6 +15,8 @@ unsigned first_stmt_counter = 1;
 FILE* output_txt_file;
 FILE* output_bin_file;
 
+extern unsigned int programVarOffset;
+
 generator_func_t generators[] = {
     generate_ASSIGN,     
     generate_ADD,
@@ -502,6 +504,7 @@ void generate_txt_file() {
     if(!output_txt_file) output_txt_file = fopen("binary.txt", "w");
 
     fprintf(output_txt_file, "magicnumber : %u\n", magic_number);
+    fprintf(output_txt_file, "Total Globals : %u\n\n", programVarOffset);
     print_constnums();
     print_conststrings();
     print_userfuncs();
@@ -582,6 +585,7 @@ void generate_bin_file() {
     fclose(output_bin_file);
 }
 
+//This will be moved in vm.c
 void parse_bin_file() {
     output_bin_file = fopen("binary.abc", "rb");
 
