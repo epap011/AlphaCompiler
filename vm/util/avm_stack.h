@@ -7,6 +7,6 @@
 
 avm_memcell stack[AVM_STACKSIZE];
 
-static void avm_initstack(void);
+void avm_initstack();
 
 #endif // AVM_STACK_H
