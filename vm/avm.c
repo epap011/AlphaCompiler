@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "avm.h"
+#include "avm_stack.h"
 #include "instructions.h"
 #include "parse_binfile.h"
 
@@ -13,4 +13,5 @@ int main(int argc, char** argv){
     FILE* bin_file = fopen(argv[1], "rb");
     parse_bin_file(bin_file);
 
+    avm_initstack();
 }
