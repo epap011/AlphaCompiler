@@ -1,7 +1,11 @@
-#include "instructions.h"
 #include "parse_binfile.h"
+#include "avm_stack.h"
 
 FILE* bin_file;
+
+extern unsigned top, topsp;
+extern avm_memcell stack[AVM_STACKSIZE];
+extern avm_memcell retval;
 
 unsigned magic_number;
 unsigned globals_total;
@@ -148,5 +152,59 @@ char* vmarg_t_to_string(enum vmarg_t arg) {
         case retval_a:    return "retval";
         case undef_a:     return "NULL";
         default:          return "unknown";
+    }
+}
+
+double consts_getnumber(unsigned index){
+    return numbers[index];
+}
+
+char* consts_getstring(unsigned index){
+    return strings[index];
+}
+char* libfuncs_getused           (unsigned index){
+    return libfuncs[index];
+}
+user_func_t* userfuncs_getfunc  (unsigned index){
+    return &userfuncs[index];
+}
+
+avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
+    
+    switch(arg->type){
+        case global_a: return &stack[AVM_STACKSIZE-1-arg->val];
+        case local_a: return &stack[topsp-arg->val];
+        case formal_a: return &stack[topsp+AVM_STACKENV_SIZE+1+arg->val];
+        case retval_a: return &retval;
+        case number_a: {
+            reg->type = number_m;
+            reg->data.numVal = consts_getnumber(arg->val);
+            return reg;
+        }
+        case string_a: {
+            reg->type = string_m;
+            reg->data.strVal = strdup(consts_getstring(arg->val));
+            return reg;
+        }
+        case bool_a: {
+            reg->type = bool_m;
+            reg->data.boolVal = arg->val;
+            return reg;
+        }
+        case nil_a: {
+            reg->type = nil_m;
+            return reg;
+        }
+        case userfunc_a: {
+            reg->type = userfunc_m;
+            reg->data.funcVal = userfuncs_getfunc(arg->val);
+            return reg;
+        }
+        case libfunc_a: {
+            reg->type = libfunc_m;
+            reg->data.libfuncVal = strdup(libfuncs_getused(arg->val));
+            return reg;
+        }
+        default: assert(0);
     }
 }

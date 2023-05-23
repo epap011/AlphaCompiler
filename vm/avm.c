@@ -2,6 +2,18 @@
 #include "instructions.h"
 #include "parse_binfile.h"
 
+avm_memcell ax, bx, cx;
+avm_memcell retval;
+unsigned top, topsp;
+
+
+
+
+
+
+
+
+
 int main(int argc, char** argv){
 
     if(argc != 2){

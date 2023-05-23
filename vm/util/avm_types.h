@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "instructions.h"
 
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
@@ -29,7 +30,7 @@ typedef struct avm_memcell {
         char* strVal;
         unsigned char boolVal;
         struct avm_table* tableVal;
-        unsigned funcVal;
+        user_func_t* funcVal;
         char* libfuncVal;
     } data;
 }avm_memcell;
