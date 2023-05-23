@@ -1,4 +1,4 @@
-#include "avm_table.h"
+#include "avm_types.h"
 
 
 avm_table *avm_table_new(){
@@ -56,3 +56,5 @@ void avm_table_dec_refcounter(avm_table *t){
     if(!--t->refCounter)
         avm_table_destroy(t);
 }
+
+void avm_memcell_clear(avm_memcell *m){}

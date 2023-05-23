@@ -11,11 +11,11 @@ CPPFLAGS = -Ilib -Iutil -Isrc
 MAIN     = avm
 BINPARSE = parse_binfile
 STACK	 = avm_stack
-TABLE	 = avm_table
+TABLES	 = avm_tables
 
 #---< Final Targets >---#
 
-avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLE).o| $(BIN_DIR) 
+avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o| $(BIN_DIR) 
 	 $(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o
 
 #---< Object Targets >---#
@@ -28,7 +28,7 @@ $(BINPARSE).o: $(UTIL_DIR)/$(BINPARSE).c | $(OBJ_DIR)
 $(STACK).o: $(UTIL_DIR)/$(STACK).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
-$(TABLE).o: $(UTIL_DIR)/$(TABLE).c | $(OBJ_DIR)
+$(TABLES).o: $(UTIL_DIR)/$(TABLES).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
 $(BIN_DIR) $(OBJ_DIR):

@@ -1,9 +1,38 @@
-#ifndef AVM_TABLE_H
-#define AVM_TABLE_H
+#ifndef AVM_TYPES_H
+#define AVM_TYPES_H
 
-#include "../avm.h"
+#include <string.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
 
+#define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
+
+typedef enum avm_memcell_t {
+    number_m ,
+    string_m ,
+    bool_m ,
+    table_m ,
+    userfunc_m ,
+    libfunc_m ,
+    nil_m ,
+    undef_m
+} avm_memcell_t;
+
+struct avm_table;
+
+typedef struct avm_memcell {
+    avm_memcell_t type;
+    union {
+        double numVal;
+        char* strVal;
+        unsigned char boolVal;
+        struct avm_table* tableVal;
+        unsigned funcVal;
+        char* libfuncVal;
+    } data;
+}avm_memcell;
 
 typedef struct avm_table_bucket {
     
@@ -38,4 +67,4 @@ void avm_table_buckets_destroy(avm_table_bucket **p);
 
 void avm_memcell_clear(avm_memcell *m);
 
-#endif // AVM_TABLE_H
+#endif // AVM_TYPES_H

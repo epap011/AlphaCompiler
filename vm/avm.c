@@ -1,4 +1,3 @@
-#include "avm.h"
 #include "avm_stack.h"
 #include "instructions.h"
 #include "parse_binfile.h"
