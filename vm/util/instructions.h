@@ -1,3 +1,6 @@
+#ifndef INSTRUCTIONS_H
+#define INSTRUCTIONS_H
+
 enum vmopcode{
     assign_vm, add_vm, sub_vm, mul_vm, div_vm, mod_vm, 
     not_vm, 
@@ -39,3 +42,5 @@ typedef struct user_func_t {
     unsigned total_locals;
     const char* name;
 } user_func_t;
+
+#endif // INSTRUCTIONS_H

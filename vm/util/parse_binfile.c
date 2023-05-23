@@ -3,6 +3,14 @@
 
 FILE* bin_file;
 
+unsigned magic_number;
+unsigned globals_total;
+unsigned numbers_total;   double*       numbers;
+unsigned strings_total;   char**        strings;
+unsigned libfuncs_total;  char**        libfuncs;
+unsigned userfuncs_total; user_func_t*  userfuncs;
+unsigned total_instr;     instruction** instructions;
+
 void parse_bin_file(FILE* b) {
 
     bin_file = b;
