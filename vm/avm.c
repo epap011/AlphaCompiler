@@ -13,6 +13,7 @@ unsigned pc                     = 0;
 unsigned currLine               = 0;
 unsigned codeSize               = 0;
 instruction* code               = (instruction*) 0;
+extern unsigned total_instr;
 
 #define AVM_ENDING_PC codeSize  
 
@@ -122,6 +123,8 @@ int main(int argc, char** argv){
     }
 
     parse_bin_file(bin_file);
+    AVM_ENDING_PC = total_instr;
+    printf("Total instructions: %d\n", AVM_ENDING_PC);
 
     avm_initialize();
 
