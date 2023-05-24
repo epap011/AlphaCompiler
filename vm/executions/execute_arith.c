@@ -88,9 +88,8 @@ void execute_arithmetic(instruction* instr){
     printf("execute_arithmetic\n");
 
     avm_memcell* lv;
-    if(instr->result->type == number_a){
+    if(instr->result->type == number_a)
          lv = avm_translate_operand(instr->result, &cx);
-    }
     else
          lv = avm_translate_operand(instr->result, (avm_memcell*) 0);
     avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
@@ -103,7 +102,9 @@ void execute_arithmetic(instruction* instr){
     printf("rv2: %p\n", rv2);
     printf("stack[top]: %p\n", &stack[top]);
 
-   // assert(lv && ((lv > &stack[top]) || lv == &retval));
+    if(instr->result->type != number_a)
+        assert((&stack[AVM_STACKSIZE - 1] >= lv && lv > &stack[top]) || lv == &retval);
+    assert(lv);
     assert(rv1 && rv2);
 
     if(rv1->type != number_m || rv2->type != number_m ){
