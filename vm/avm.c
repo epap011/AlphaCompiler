@@ -182,7 +182,6 @@ void print_vm_state() {
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
     
-    printf("Mpika\n");
     switch(arg->type){
         case global_a: return &stack[AVM_STACKSIZE-1-arg->val];
         case local_a: return &stack[topsp-arg->val];
@@ -221,6 +220,13 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
     }
 }
 
+void avm_error(char* message, unsigned line){
+    fprintf(stderr, RED"Error: "RESET" %s (line " GRN "%d "RESET")\n", message, line);
+}
+void avm_warning(char* message, unsigned line){
+    fprintf(stderr, RED"Warning: "RESET" %s (line " GRN "%d "RESET")\n", message, line);
+}
+
 int main(int argc, char** argv){
 
     FILE* bin_file = NULL;
@@ -241,7 +247,7 @@ int main(int argc, char** argv){
     avm_initialize();
     code = instructions;
     while(!executionFinished){
-        for(int i = 0; i < AVM_MAX_CELLS_PRINT) print_vm_state();
+        print_vm_state();
         execute_cycle();
     }
 }

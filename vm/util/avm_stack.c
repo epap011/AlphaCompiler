@@ -10,7 +10,7 @@ void avm_initstack(){
 }
 
 void print_vm_stack() {
-    for (int i = AVM_STACKSIZE-1; i >= 0; i--) {
+    for (int i = AVM_MAX_CELLS_PRINT-1; i >= 0; i--) {
         printf("stack[%d]: ", i);
         switch (stack[i].type) {
             case number_m:

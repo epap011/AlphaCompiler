@@ -97,9 +97,9 @@ double consts_getnumber(unsigned index){
 char* consts_getstring(unsigned index){
     return strings[index];
 }
-char* libfuncs_getused           (unsigned index){
+char* libfuncs_getused(unsigned index){
     return libfuncs[index];
 }
-user_func_t* userfuncs_getfunc  (unsigned index){
+user_func_t* userfuncs_getfunc(unsigned index){
     return &userfuncs[index];
 }
