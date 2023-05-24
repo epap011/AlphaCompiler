@@ -27,7 +27,11 @@ double mul_impl(double x, double y){
 
 double div_impl(double x, double y){
     printf("Executed div\n");
-    return x / y;
+    if(y == 0){
+        avm_error("Cant divide by  0", currLine);
+        executionFinished = 1;
+    }
+     return x / y;
 }
 
 double mod_impl(double x, double y){
