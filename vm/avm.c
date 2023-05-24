@@ -12,7 +12,7 @@ unsigned char executionFinished = 0;
 unsigned pc                     = 0;
 unsigned currLine               = 0;
 unsigned codeSize               = 0;
-instruction** code               = (instruction**) 0;
+instruction** code              = (instruction**) 0;
 extern unsigned total_instr;
 extern instruction** instructions;
 extern avm_memcell stack[AVM_STACKSIZE];
@@ -110,6 +110,75 @@ void avm_memcell_clear(avm_memcell *m){
     }
 }
 
+char* register_type_to_string(avm_memcell_t type) {
+    switch (type) {
+        case number_m:
+            return "number";
+        case string_m:
+            return "string";
+        case bool_m:
+            return "bool";
+        case table_m:
+            return "table";
+        case userfunc_m:
+            return "userfunc";
+        case libfunc_m:
+            return "libfunc";
+        case nil_m:
+            return "nil";
+        case undef_m:
+            return "undef";
+        default:
+            return "Unknown type";
+    }
+}
+
+void print_memcell_value(avm_memcell *m) {
+    switch(m->type) {
+        case number_m:
+            printf("%lf", m->data.numVal);
+            break;
+        case string_m:
+            printf("%s", m->data.strVal);
+            break;
+        case bool_m:
+            printf("%d", m->data.boolVal);
+            break;
+        case table_m:
+            printf("table");
+            break;
+        case userfunc_m:
+            printf("userfunc");
+            break;
+        case libfunc_m:
+            printf("libfunc");
+            break;
+        case nil_m:
+            printf("nil");
+            break;
+        case undef_m:
+            printf("undef");
+            break;
+        default:
+            printf("Unknown type");
+            break;
+    }
+}
+
+void print_vm_state() {
+    printf("-----------< VM STATE >-----------\n");
+    printf("pc : %d\n", pc);
+    
+    printf("ax: ");        print_memcell_value(&ax);
+    printf(" | bx: ");     print_memcell_value(&bx);
+    printf(" | cx: ");     print_memcell_value(&cx);
+    printf(" | retVal: "); print_memcell_value(&retval);
+    
+    printf("\ntop: %u | topsp: %u\n", top, topsp);
+    print_vm_stack();
+    printf("----------------------------------\n");
+}
+
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
     
@@ -172,7 +241,7 @@ int main(int argc, char** argv){
     avm_initialize();
     code = instructions;
     while(!executionFinished){
+        print_vm_state();
         execute_cycle();
     }
 }
-
