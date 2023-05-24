@@ -12,8 +12,9 @@ unsigned char executionFinished = 0;
 unsigned pc                     = 0;
 unsigned currLine               = 0;
 unsigned codeSize               = 0;
-instruction* code               = (instruction*) 0;
+instruction** code               = (instruction**) 0;
 extern unsigned total_instr;
+extern instruction** instructions;
 
 #define AVM_ENDING_PC codeSize  
 
@@ -52,7 +53,7 @@ void execute_cycle(){
     }
     else{
         assert(pc < AVM_ENDING_PC);
-        instruction* instr = code + pc;
+        instruction* instr = code[pc];
         assert(instr->opcode >= 0 
             && instr->opcode <= AVM_MAX_INSTRUCTIONS);
        
@@ -127,7 +128,7 @@ int main(int argc, char** argv){
     printf("Total instructions: %d\n", AVM_ENDING_PC);
 
     avm_initialize();
-
+    code = instructions;
     while(!executionFinished){
         execute_cycle();
     }
