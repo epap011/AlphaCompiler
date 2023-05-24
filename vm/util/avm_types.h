@@ -72,6 +72,7 @@ void avm_table_dec_refcounter(avm_table *t);
 void avm_memcell_clear(avm_memcell *m);
 void memclear_string(avm_memcell *m);
 void memclear_table(avm_memcell *m);
+void print_memcell_value(avm_memcell *m);
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg);
 
