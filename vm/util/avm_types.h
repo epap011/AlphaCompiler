@@ -10,6 +10,7 @@
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
 
+
 typedef enum avm_memcell_t {
     number_m ,
     string_m ,
@@ -34,6 +35,8 @@ typedef struct avm_memcell {
         char* libfuncVal;
     } data;
 }avm_memcell;
+
+typedef void (*memclear_func_t) (avm_memcell*);
 
 typedef struct avm_table_bucket {
     
@@ -60,12 +63,15 @@ void avm_table_destroy(avm_table *t);
 avm_memcell *avm_table_getelem(avm_table *t, avm_memcell *key);
 void avm_table_setelem(avm_table *t, avm_memcell *key, avm_memcell *value);
 
-void avm_table_inc_refcounter(avm_table *t);
-void avm_table_dec_refcounter(avm_table *t);
-
 void avm_table_buckets_init(avm_table_bucket **p);
 void avm_table_buckets_destroy(avm_table_bucket **p);
 
+void avm_table_inc_refcounter(avm_table *t);
+void avm_table_dec_refcounter(avm_table *t);
+
 void avm_memcell_clear(avm_memcell *m);
+void memclear_string(avm_memcell *m);
+void memclear_table(avm_memcell *m);
+
 
 #endif // AVM_TYPES_H

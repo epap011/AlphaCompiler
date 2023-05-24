@@ -63,6 +63,7 @@ void execute_cycle(){
         if(pc == oldPC)
             ++pc;
     }
+    printf("Kanw kati : %d\n", pc);
 }
 
 
@@ -73,6 +74,37 @@ void avm_initialize(){
     topsp = 0;
 
     //init library functions below
+}
+
+memclear_func_t memclarFuncs[] = {
+
+    0,  /*number*/
+    memclear_string,
+    0, /*bool*/
+    memclear_table,
+    0, /*userfunc*/
+    0, /*libfunc*/
+    0, /*nil*/
+    0  /*undef*/
+};
+
+void memclear_string(avm_memcell *m){
+    assert(m->data.strVal);
+    free(m->data.strVal);
+}
+
+void memclear_table(avm_memcell *m){
+    assert(m->data.tableVal);
+    avm_table_dec_refcounter(m->data.tableVal);
+}
+
+void avm_memcell_clear(avm_memcell *m){
+    if(m->type != undef_m){
+        memclear_func_t f = memclarFuncs[m->type];
+        if(f)
+            (*f)(m);
+        m->type = undef_m;
+    }
 }
 
 
@@ -92,5 +124,9 @@ int main(int argc, char** argv){
     parse_bin_file(bin_file);
 
     avm_initialize();
+
+    while(!executionFinished){
+        execute_cycle();
+    }
 }
 

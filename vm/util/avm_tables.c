@@ -56,5 +56,3 @@ void avm_table_dec_refcounter(avm_table *t){
     if(!--t->refCounter)
         avm_table_destroy(t);
 }
-
-void avm_memcell_clear(avm_memcell *m){}
