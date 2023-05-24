@@ -10,7 +10,7 @@ linked_list* lib_func_list;
 linked_list* user_func_list;
 linked_list* instructions_list;
 
-unsigned first_stmt_counter = 1;
+unsigned first_stmt_counter = -1;
 
 FILE* output_txt_file;
 FILE* output_bin_file;
@@ -635,9 +635,12 @@ char* vmarg_t_to_string(enum vmarg_t arg) {
 }
 
 void assign_line_only_on_first_stms(quad* q, instruction* i) {
-    if(q->line == first_stmt_counter) {
+    if(first_stmt_counter == -1)
+        first_stmt_counter = q->line;
+    
+    if(q->line >= first_stmt_counter) {
         i->srcLine = q->line;
-        first_stmt_counter++;
+        first_stmt_counter = q->line + 1;
     }
     else {
         i->srcLine = 0;
