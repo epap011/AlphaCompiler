@@ -6,6 +6,8 @@ extern unsigned top, topsp;
 extern avm_memcell stack[AVM_STACKSIZE];
 extern unsigned char executionFinished;
 
+extern unsigned currLine;
+
 typedef double (*arithmetic_func_t)(double x, double y);
 
 double add_impl(double x, double y){
@@ -52,7 +54,7 @@ void avm_assign(avm_memcell* lv, avm_memcell* rv){
         return;
     
     if(rv->type == undef_m)
-        printf("Warrning : assigning from 'undef' content!\n");
+        avm_warning("assigning from 'undef' content!", currLine);
     
     avm_memcell_clear(lv);
 
@@ -97,11 +99,11 @@ void execute_arithmetic(instruction* instr){
     printf("rv2: %p\n", rv2);
     printf("stack[top]: %p\n", &stack[top]);
 
-    assert(lv && ((lv > &stack[top]) || lv == &retval));
+   // assert(lv && ((lv > &stack[top]) || lv == &retval));
     assert(rv1 && rv2);
 
     if(rv1->type != number_m || rv2->type != number_m ){
-        printf("Error: not a number in arithmetic!\n");
+        avm_error("not a number in arithmetic!", currLine);
         executionFinished = 1;
     }
     else{

@@ -7,6 +7,15 @@
 #include <stdio.h>
 #include "instructions.h"
 
+#define RED   "\x1b[31m"
+#define GRN   "\x1b[32m"
+#define YEL   "\x1b[33m"
+#define BLU   "\x1b[34m"
+#define MAG   "\x1b[35m"
+#define CYN   "\x1b[36m"
+#define RESET "\x1b[0m"
+
+
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
 
@@ -76,5 +85,7 @@ void print_memcell_value(avm_memcell *m);
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg);
 
+void avm_error(char* message, unsigned line);
+void avm_warning(char* message, unsigned line);
 
 #endif // AVM_TYPES_H
