@@ -2,6 +2,10 @@
 #define _EXECUTE_H_
 
 #include "instructions.h"
+#include <assert.h>
+#include <stdio.h>
+#include "avm_types.h"
+#include "avm_stack.h"
 
 #define AVM_MAX_INSTRUCTIONS (unsigned) nop_vm
 
@@ -33,5 +37,7 @@ void execute_tablegetelem(instruction * instr);
 void execute_tablesetelem(instruction * instr);
 
 void execute_nop(instruction * instr);
+
+void avm_assign (avm_memcell * lv, avm_memcell * rv);
 
 #endif // _EXECUTE_H_

@@ -73,5 +73,7 @@ void avm_memcell_clear(avm_memcell *m);
 void memclear_string(avm_memcell *m);
 void memclear_table(avm_memcell *m);
 
+avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg);
+
 
 #endif // AVM_TYPES_H

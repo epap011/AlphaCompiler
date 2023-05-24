@@ -15,6 +15,5 @@ double consts_getnumber          (unsigned index);
 char* consts_getstring           (unsigned index);
 char* libfuncs_getused           (unsigned index);
 user_func_t* userfuncs_getfunc  (unsigned index);
-avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg);
 
 #endif  // PARSER_BINFILE_H
