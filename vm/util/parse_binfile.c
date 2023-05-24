@@ -72,8 +72,6 @@ void parse_bin_file(FILE* b) {
         fread(&in->srcLine     , sizeof(unsigned)     , 1, bin_file);
 
         instructions[i] = in;
-
-        printf("Line : %d\n", in->srcLine);
     }
 }
 

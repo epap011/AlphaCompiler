@@ -113,6 +113,7 @@ void avm_memcell_clear(avm_memcell *m){
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
     
+    printf("Mpika\n");
     switch(arg->type){
         case global_a: return &stack[AVM_STACKSIZE-1-arg->val];
         case local_a: return &stack[topsp-arg->val];

@@ -11,12 +11,20 @@
 
 typedef void (*execute_func_t)(instruction *);
 
+#define execute_add execute_arithmetic
+#define execute_sub execute_arithmetic
+#define execute_mul execute_arithmetic
+#define execute_div execute_arithmetic
+#define execute_mod execute_arithmetic
+
+
+void execute_arithmetic(instruction* instr);
 void execute_assign(instruction * instr);
-void execute_add(instruction * instr);
+/*void execute_add(instruction * instr);
 void execute_sub(instruction * instr);
-void execute_mul(instruction * instr);
+void execute_mul(instruction * instr); 
 void execute_div(instruction * instr);
-void execute_mod(instruction * instr);
+void execute_mod(instruction * instr);*/
 
 void execute_jmp(instruction * instr);
 
