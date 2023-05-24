@@ -330,7 +330,12 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
 
         if(expr1->type == constnum_e && expr2->type == constnum_e) {
             result = new_expr(constnum_e);
-            result->numConst = expr1->numConst + expr2->numConst;
+
+            if(op == add) result->numConst = expr1->numConst + expr2->numConst;
+            else if(op == sub) result->numConst = expr1->numConst - expr2->numConst;
+            else if(op == mul) result->numConst = expr1->numConst * expr2->numConst;
+            else if(op == i_div) result->numConst = expr1->numConst / expr2->numConst;
+            else result->numConst = (int)expr1->numConst % (int)expr2->numConst;
         }
         else {
             result = new_expr(arithexpr_e);
@@ -606,7 +611,7 @@ expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int s
     expr *result = new_expr(arithexpr_e);
     result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
     incCurrScopeOffset();
-    result->numConst = -(u_expr->numConst);
+    result->numConst = u_expr->numConst;
     emit(uminus, u_expr, NULL, result, -1, line);
 
     return result;
