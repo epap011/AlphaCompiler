@@ -169,10 +169,10 @@ void print_vm_state() {
     printf("-----------< VM STATE >-----------\n");
     printf("pc : %d\n", pc);
     
-    printf("ax: ");        print_memcell_value(&ax);
-    printf(" | bx: ");     print_memcell_value(&bx);
-    printf(" | cx: ");     print_memcell_value(&cx);
-    printf(" | retVal: "); print_memcell_value(&retval);
+    printf("ax: ");        print_memcell_value(&ax);     printf("(%s)", register_type_to_string(ax.type));
+    printf(" | bx: ");     print_memcell_value(&bx);     printf("(%s)", register_type_to_string(bx.type));
+    printf(" | cx: ");     print_memcell_value(&cx);     printf("(%s)", register_type_to_string(cx.type));
+    printf(" | retVal: "); print_memcell_value(&retval); printf("(%s)", register_type_to_string(retval.type));
     
     printf("\ntop: %u | topsp: %u\n", top, topsp);
     print_vm_stack();

@@ -92,7 +92,7 @@ void execute_arithmetic(instruction* instr){
 
     printf("test\n");
 
-    assert(lv && ((&stack[AVM_STACKSIZE - 1] >= lv && lv > &stack[top]) || lv == &retval));
+    assert(lv && ((lv > &stack[top]) || lv == &retval));
     assert(rv1 && rv2);
 
     if(rv1->type != number_m || rv2->type != number_m ){
