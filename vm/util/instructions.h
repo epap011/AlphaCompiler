@@ -2,8 +2,7 @@
 #define INSTRUCTIONS_H
 
 enum vmopcode{
-    assign_vm, add_vm, sub_vm, mul_vm, div_vm, mod_vm, 
-    not_vm, 
+    assign_vm, add_vm, sub_vm, mul_vm, div_vm, mod_vm,  
     jmp_vm, jeq_vm, jne_vm, jle_vm, jge_vm, jlt_vm, jgt_vm, 
     call_vm, pusharg_vm, funcenter_vm, funcexit_vm, 
     newtable_vm, tablegetelem_vm, tablesetelem_vm, nop_vm

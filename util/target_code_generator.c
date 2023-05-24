@@ -596,7 +596,6 @@ char* vmopcode_to_string(enum vmopcode op) {
         case mul_vm:          return "mul_vm";
         case div_vm:          return "div_vm";
         case mod_vm:          return "mod_vm";
-        case not_vm:          return "not_vm";
         case jmp_vm:          return "jmp_vm";
         case jeq_vm:          return "jeq_vm";
         case jne_vm:          return "jne_vm";
