@@ -241,7 +241,7 @@ int main(int argc, char** argv){
     avm_initialize();
     code = instructions;
     while(!executionFinished){
-        print_vm_state();
+        for(int i = 0; i < AVM_MAX_CELLS_PRINT) print_vm_state();
         execute_cycle();
     }
 }

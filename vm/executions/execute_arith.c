@@ -92,6 +92,11 @@ void execute_arithmetic(instruction* instr){
 
     printf("test\n");
 
+    printf("lv : %p\n", lv);
+    printf("rv1: %p\n", rv1);
+    printf("rv2: %p\n", rv2);
+    printf("stack[top]: %p\n", &stack[top]);
+
     assert(lv && ((lv > &stack[top]) || lv == &retval));
     assert(rv1 && rv2);
 
