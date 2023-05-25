@@ -222,7 +222,9 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 
 void avm_error(char* message, unsigned line){
     fprintf(stderr, RED"Error: "RESET" %s (line " GRN "%d "RESET")\n", message, line);
+    executionFinished = 1;
 }
+
 void avm_warning(char* message, unsigned line){
     fprintf(stderr, RED"Warning: "RESET" %s (line " GRN "%d "RESET")\n", message, line);
 }

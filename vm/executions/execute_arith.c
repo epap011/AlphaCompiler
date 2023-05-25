@@ -107,10 +107,8 @@ void execute_arithmetic(instruction* instr){
     assert(lv);
     assert(rv1 && rv2);
 
-    if(rv1->type != number_m || rv2->type != number_m ){
-        avm_error("not a number in arithmetic!", currLine);
-        executionFinished = 1;
-    }
+    if(rv1->type != number_m || rv2->type != number_m )
+        avm_error("not a number in arithmetic!", currLine);  
     else{
         arithmetic_func_t op = arithmeticFuncs[instr->opcode - add_vm];
         avm_memcell_clear(lv);
