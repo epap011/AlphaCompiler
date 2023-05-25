@@ -45,10 +45,10 @@ execute_func_t executeFuncs[] = {
 };
 
 void execute_cycle(){
-    if(executionFinished){
+    if(executionFinished){         //exit due to other reasons (e.g. error)
         return;
     }
-    else if(pc == AVM_ENDING_PC){
+    else if(pc == AVM_ENDING_PC){  //all instructions executed
         executionFinished = 1;
         return;
     }

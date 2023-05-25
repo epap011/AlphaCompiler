@@ -88,7 +88,7 @@ void execute_arithmetic(instruction* instr){
     printf("execute_arithmetic\n");
 
     avm_memcell* lv;
-    if(instr->result->type == number_a)
+    if(instr->result->type == number_a)  //result is a constnum when both args are consts -> we need to use the third register
          lv = avm_translate_operand(instr->result, &cx);
     else
          lv = avm_translate_operand(instr->result, (avm_memcell*) 0);
@@ -102,7 +102,7 @@ void execute_arithmetic(instruction* instr){
     printf("rv2: %p\n", rv2);
     printf("stack[top]: %p\n", &stack[top]);
 
-    if(instr->result->type != number_a)
+    if(instr->result->type != number_a) //when result is a constnum, this assert doesnt have meaning
         assert((&stack[AVM_STACKSIZE - 1] >= lv && lv > &stack[top]) || lv == &retval);
     assert(lv);
     assert(rv1 && rv2);

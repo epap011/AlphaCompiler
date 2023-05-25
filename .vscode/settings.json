@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "target_code_generator.h": "c",
-        "parse_binfile.h": "c"
+        "parse_binfile.h": "c",
+        "avm_stack.h": "c",
+        "execute.h": "c"
     }
 }

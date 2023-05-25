@@ -10,6 +10,7 @@
 #define AVM_MAX_INSTRUCTIONS (unsigned) nop_vm
 
 typedef void (*execute_func_t)(instruction *);
+typedef unsigned char (*tobool_func_t)(avm_memcell *);
 
 #define execute_add execute_arithmetic
 #define execute_sub execute_arithmetic
@@ -34,6 +35,17 @@ void execute_jle(instruction * instr);
 void execute_jge(instruction * instr);
 void execute_jlt(instruction * instr);
 void execute_jgt(instruction * instr);
+
+unsigned char avm_tobool(avm_memcell * m);
+unsigned char number_tobool(avm_memcell * m);
+unsigned char string_tobool(avm_memcell * m);
+unsigned char bool_tobool(avm_memcell * m);
+unsigned char table_tobool(avm_memcell * m);
+unsigned char userfunc_tobool(avm_memcell * m);
+unsigned char libfunc_tobool(avm_memcell * m);
+unsigned char nil_tobool(avm_memcell * m);
+unsigned char undef_tobool(avm_memcell * m);
+
 
 void execute_call(instruction * instr);
 void execute_pusharg(instruction * instr);
