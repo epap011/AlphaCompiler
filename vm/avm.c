@@ -53,6 +53,7 @@ void execute_cycle(){
         return;
     }
     else{
+        printf("Kanw kati : %d\n", pc);
         assert(pc < AVM_ENDING_PC);
         instruction* instr = code[pc];
         assert(instr->opcode >= 0 
@@ -63,10 +64,11 @@ void execute_cycle(){
         
         unsigned oldPC = pc;
         (*executeFuncs[instr->opcode])(instr);
-        if(pc == oldPC)
+        if(pc == oldPC) //if pc chnged in execute, then it was a jump so we must not increase it
             ++pc;
+        
+        print_vm_state();
     }
-    printf("Kanw kati : %d\n", pc);
 }
 
 
@@ -250,6 +252,5 @@ int main(int argc, char** argv){
     code = instructions;
     while(!executionFinished){
         execute_cycle();
-        print_vm_state();
     }
 }

@@ -88,4 +88,6 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg);
 void avm_error(char* message, unsigned line);
 void avm_warning(char* message, unsigned line);
 
+void print_vm_state();
+
 #endif // AVM_TYPES_H

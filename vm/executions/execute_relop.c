@@ -47,9 +47,7 @@ unsigned char libfunc_tobool (avm_memcell * m){return 1;}
 unsigned char nil_tobool     (avm_memcell * m){return 0;}
 unsigned char undef_tobool   (avm_memcell * m){return 0;}
 
-void execute_jeq(instruction* instr){
-    printf("execute_jeq\n");
-
+void execute_jeq_neq(instruction *instr, char * op){
     assert(instr->result->type == label_a);
 
     avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
@@ -57,8 +55,12 @@ void execute_jeq(instruction* instr){
 
     unsigned char result = 0;
 
-    if(rv1->type == undef_m || rv2->type == undef_m)
-        avm_error("'undef' involved in equality!", currLine);
+    if(rv1->type == undef_m || rv2->type == undef_m){
+        char * buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "'undef' involved in %s!", strcmp(op,"==") == 0 ? "equality" : "unequality");
+        avm_error(buffer, currLine);
+        free(buffer);
+    }
 
     else if(rv1->type == nil_m || rv2->type == nil_m)
         result = rv1->type == nil_m && rv2->type == nil_m;
@@ -67,9 +69,10 @@ void execute_jeq(instruction* instr){
         result = (avm_tobool(rv1) == avm_tobool(rv2));
 
     else if(rv1->type != rv2->type){
-        char * buffer = malloc(sizeof(char) * 512);
-        sprintf(buffer, "%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+        char * buffer = malloc(sizeof(char) * 256);
+        sprintf(buffer, "%s %s %s is illegal!", typeStrings[rv1->type], op, typeStrings[rv2->type]);
         avm_error(buffer, currLine);
+        free(buffer);
     }
     else{ //rv1 == rv2
         //equality check for each case
@@ -85,13 +88,25 @@ void execute_jeq(instruction* instr){
             result = !strcmp(rv1->data.libfuncVal, rv2->data.libfuncVal);
     }
 
-    //if there is no runtime error and result is true we have to jump, so we set the pc to the label
-    if(!executionFinished && result) 
-        pc = instr->result->val;
+    
+    if(!executionFinished ){ //if there are no errors 
+        if(result && strcmp(op, "==") == 0) //result is true and operation is equality check, we have to jump (so we set the pc to the label)
+            pc = instr->result->val;
+        else if(!result && strcmp(op, "!=") == 0) //result is false and operation is unequality check, we have to jump
+            pc = instr->result->val;
+    }
+}
+
+void execute_jeq(instruction* instr){
+    printf("execute_jeq\n");
+
+    execute_jeq_neq(instr, "==");    
 }
 
 void execute_jne(instruction* instr){
     printf("execute_jne\n");
+
+    execute_jeq_neq(instr, "!=");
 }
 
 void execute_jle(instruction* instr){
