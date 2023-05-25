@@ -119,7 +119,7 @@ program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
             ;   
 
 stmt        : expr ";"      {short_circuit_emits($1,yylineno,scope); $$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
-            | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
+            | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout, $1);}
             | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
             | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
             | returnstmt    {$$ = manage_stmt_returnstmt(DEBUG_PRINT, yyout);}

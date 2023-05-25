@@ -245,9 +245,9 @@ stmt_t* manage_stmt_expr(int debug, FILE* out) {
     return make_stmt();
 }
 
-stmt_t* manage_stmt_ifstmt(int debug, FILE* out) {
+stmt_t* manage_stmt_ifstmt(int debug, FILE* out, stmt_t* ifstmt) {
     if(debug) fprintf(out, MAG "Detected :" RESET"ifstmt"CYN" ->"RESET" stmt \n");
-    return make_stmt();
+    return ifstmt;
 }
 
 stmt_t* manage_stmt_whilestmt(int debug, FILE* out) {
