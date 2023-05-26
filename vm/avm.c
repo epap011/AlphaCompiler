@@ -47,6 +47,19 @@ execute_func_t executeFuncs[] = {
     execute_nop
 };
 
+tostring_func_t tostringFuncs[] = {
+
+    number_tostring,
+    string_tostring,
+    bool_tostring,
+    table_tostring,
+    userfunc_tostring,
+    libfunc_tostring,
+    nil_tostring,
+    undef_tostring
+};
+
+
 void execute_cycle(){
     if(executionFinished){         //exit due to other reasons (e.g. error)
         return;
@@ -278,4 +291,63 @@ void amv_callsaveenvironment(void){
     avm_push_envvalue(pc+1);
     avm_push_envvalue(top+totalActuals+2);
     avm_push_envvalue(topsp);
+}
+
+
+
+void avm_calllibfunc(char* id){
+    printf("call libfunc %s\n", id);
+}
+
+void avm_call_functor(avm_table* table){
+    printf("call functor\n");
+}
+
+char* avm_tostring(avm_memcell* m){
+    assert(m->type >= 0 && m->type <= undef_m);
+    return (*tostringFuncs[m->type])(m);
+}
+
+char* number_tostring(avm_memcell* m){
+    assert(m->type == number_m);
+    char* str = malloc(sizeof(char) * 100);
+    sprintf(str, "%lf", m->data.numVal);
+    return str;
+}
+
+char* string_tostring(avm_memcell* m){
+    assert(m->type == string_m);
+    return strdup(m->data.strVal);
+}
+
+char* bool_tostring(avm_memcell* m){
+    assert(m->type == bool_m);
+    if(m->data.boolVal)
+        return strdup("true");
+    else
+        return strdup("false");
+}
+
+char* table_tostring(avm_memcell* m){
+    assert(m->type == table_m);
+    return strdup("table");
+}
+
+char* userfunc_tostring(avm_memcell* m){
+    assert(m->type == userfunc_m);
+    return strdup(m->data.funcVal->name);
+}
+
+
+char* libfunc_tostring(avm_memcell* m){
+    assert(m->type == libfunc_m);
+    return strdup(m->data.libfuncVal);
+}
+
+char* nil_tostring(avm_memcell* m){
+    return strdup("nil");
+}
+
+char* undef_tostring(avm_memcell* m){
+    return strdup("undef");
 }
