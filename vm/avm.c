@@ -5,6 +5,11 @@
 #include "avm_helpers.h"
 #include "executions/execute.h"
 
+#define AVM_NUMACTUALS_OFFSET   4
+#define AVM_SAVEDPC_OFFSET      3
+#define AVM_SAVEDTOP_OFFSET     2
+#define AVM_SAVEDTOPSP_OFFSET   1
+
 avm_memcell ax, bx, cx;
 avm_memcell retval;
 unsigned top, topsp;
@@ -279,6 +284,13 @@ void avm_dec_top(void){
         --top;
 }
 
+unsigned avm_get_envvalue(unsigned i){
+    assert(stack[i].type == number_m);
+    unsigned val = (unsigned) stack[i].data.numVal;
+    assert(stack[i].data.numVal == ((double) val));
+    return val;
+}
+
 void avm_push_envvalue(unsigned val){
     stack[top].type = number_m;
     stack[top].data.numVal = val;
@@ -298,6 +310,9 @@ void amv_callsaveenvironment(void){
 void avm_calllibfunc(char* id){
     printf("call libfunc %s\n", id);
 }
+
+
+//void avm_registerlibfunc(char* id, library_func_t addr){}
 
 void avm_push_table_arg(avm_table* t){
     stack[top].type = table_m;
@@ -371,4 +386,24 @@ char* nil_tostring(avm_memcell* m){
 
 char* undef_tostring(avm_memcell* m){
     return strdup("undef");
+}
+
+unsigned avm_totalactuals(void){
+    return avm_get_envvalue(topsp + AVM_NUMACTUALS_OFFSET);
+}
+
+avm_memcell* avm_getactual(unsigned i){
+    assert(i < avm_totalactuals());
+    return &stack[topsp + AVM_STACKENV_SIZE + 1 + i];
+}
+
+
+void libfunc_print(void){
+    unsigned n = avm_totalactuals();
+    unsigned i;
+    for(i = 0; i < n; ++i){
+        char* s = avm_tostring(avm_getactual(i));
+        printf("%s", s);
+        free(s);
+    }
 }
