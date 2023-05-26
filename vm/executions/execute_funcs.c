@@ -16,13 +16,15 @@ extern unsigned codeSize;
 extern unsigned currLine;
 extern unsigned totalActuals;
 
+
+
 void execute_call(instruction* instr){
-    avm_memcell* func = avm_translate_operand(&instr->result, &ax);
+    avm_memcell* func = avm_translate_operand(instr->result, &ax);
     assert(func);
     switch(func->type){
         case userfunc_m:{
             amv_callsaveenvironment();
-            pc = func->data.funcVal;
+            pc = func->data.funcVal->iaddress;
             assert(pc < AVM_ENDING_PC);
             assert(code[pc]->opcode == funcenter_vm);
             break;
@@ -33,7 +35,9 @@ void execute_call(instruction* instr){
 
         default:{
             char* s = avm_tostring(func);
-            avm_error("call: cannot bind '%s' to function!", s);
+            char* error_text = malloc(strlen(s) + 100);
+            sprintf(error_text, "call: cannot bind '%s' to function!", s);
+            avm_error(error_text,currLine);
             free(s);
             executionFinished = 1;
         }
@@ -41,7 +45,7 @@ void execute_call(instruction* instr){
 }
 
 void execute_pusharg(instruction* instr){
-    avm_memcell *arg = avm_translate_operand(&instr->result, &ax);
+    avm_memcell *arg = avm_translate_operand(instr->result, &ax);
     assert(arg);
 
     avm_assign(&stack[top], arg);
