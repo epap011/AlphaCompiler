@@ -1,5 +1,7 @@
 #include "avm_helpers.h"
 
+extern int DEBUG;
+
 libfunc* libfuncs_list = (libfunc*)0;
 
 void avm_registerlibfunc(char* id, library_func_t addr){
@@ -27,7 +29,7 @@ library_func_t avm_getlibraryfunc(char* id){
 void libfunc_print(void){
     unsigned n = avm_totalactuals();
     
-    printf(BLU"AUTO TO PRINT EINAI TIS LIBFUNC: "RESET);
+    if(DEBUG) printf(BLU"AUTO TO PRINT EINAI TIS LIBFUNC: "RESET);
     unsigned i;
     for(i = 0; i < n; ++i){
 

@@ -74,7 +74,6 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == string_m) {
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
-        printf("setelem: hash_key: %d\n", hash_key);
         bucket->next = table->strIndexed[hash_key];
         table->strIndexed[hash_key] = bucket;
     }

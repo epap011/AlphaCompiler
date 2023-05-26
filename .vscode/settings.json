@@ -4,6 +4,7 @@
         "parse_binfile.h": "c",
         "avm_stack.h": "c",
         "execute.h": "c",
-        "libfunc_utils.h": "c"
+        "libfunc_utils.h": "c",
+        "avm_types.h": "c"
     }
 }

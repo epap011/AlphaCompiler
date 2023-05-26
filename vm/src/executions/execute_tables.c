@@ -11,8 +11,10 @@ extern unsigned currLine;
 
 extern char * typeStrings[];
 
+extern int DEBUG;
+
 void execute_newtable(instruction* instr){
-    printf("execute_newtable\n");
+    if(DEBUG) printf("execute_newtable\n");
 
     avm_memcell* lv = avm_translate_operand(instr->result, (avm_memcell*) 0);
     assert(lv && ((&stack[AVM_STACKSIZE - 1] >= lv && lv > &stack[top]) || lv == &retval));
@@ -25,7 +27,7 @@ void execute_newtable(instruction* instr){
 }
 
 void execute_tablegetelem(instruction* instr){
-    printf("execute_tablegetelem\n");
+    if(DEBUG) printf("execute_tablegetelem\n");
 
     assert(instr->result);
     assert(instr->arg1);
@@ -68,13 +70,13 @@ void execute_tablegetelem(instruction* instr){
 }
 
 void execute_tablesetelem(instruction* instr){
-    printf("execute_tablesetelem\n");
+    if(DEBUG) printf("execute_tablesetelem\n");
 
     assert(instr->result);
     assert(instr->arg1);
     assert(instr->arg2);
 
-    printf("result: %s\n", typeStrings[instr->result->type]);
+    if(DEBUG) printf("result: %s\n", typeStrings[instr->result->type]);
 
     avm_memcell* table = avm_translate_operand(instr->result, (avm_memcell*) 0);
     avm_memcell* key   = avm_translate_operand(instr->arg1  , &ax);
@@ -100,6 +102,6 @@ void execute_tablesetelem(instruction* instr){
 }
 
 void execute_nop(instruction* instr){
-    printf("execute_nop\n");
+   if(DEBUG) printf("execute_nop\n");
 }
 

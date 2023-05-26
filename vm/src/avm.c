@@ -20,6 +20,8 @@ extern instruction** instructions;
 extern avm_memcell stack[AVM_STACKSIZE];
 extern unsigned globals_total;
 
+int DEBUG = 0;
+
 #define AVM_ENDING_PC codeSize  
 
 execute_func_t executeFuncs[] = {
@@ -69,7 +71,7 @@ void execute_cycle(){
         return;
     }
     else{
-        printf("pc : %d  ", pc);
+       if(DEBUG) printf("pc : %d  ", pc);
         assert(pc < AVM_ENDING_PC);
         instruction* instr = code[pc];
         assert(instr->opcode >= 0 
@@ -261,7 +263,6 @@ int main(int argc, char** argv){
 
     parse_bin_file(bin_file);
     AVM_ENDING_PC = total_instr;
-    printf("Total instructions: %d\n", AVM_ENDING_PC);
 
     avm_initialize();
     code = instructions;
@@ -303,7 +304,7 @@ void amv_callsaveenvironment(void){
 
 
 void avm_calllibfunc(char* id){
-    printf("call libfunc %s\n", id);
+    if(DEBUG) printf("call libfunc %s\n", id);
 
     library_func_t f = avm_getlibraryfunc(id);
     if(!f){
@@ -317,7 +318,7 @@ void avm_calllibfunc(char* id){
         topsp = top;
         totalActuals = 0;
         (*f)(); //this is actually funcenter
-        printf("\nlibfuc :");
+        if(DEBUG) printf("\nlibfuc :");
         if(!executionFinished)
             execute_funcexit((instruction*) 0);
     }

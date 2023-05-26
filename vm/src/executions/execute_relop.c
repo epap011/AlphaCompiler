@@ -12,24 +12,25 @@ extern unsigned currLine;
 
 typedef double (*cmp_func_t)(double x, double y);
 
+extern int DEBUG;
 
 double jle_impl(double x, double y){
-    printf("Executed <=\n");
+    if(DEBUG) printf("Executed <=\n");
     return x <= y;
 }
 
 double jge_impl(double x, double y){
-    printf("Executed >=\n");
+    if(DEBUG) printf("Executed >=\n");
     return x >= y;
 }
 
 double jlt_impl(double x, double y){
-    printf("Executed <\n");
+    if(DEBUG) printf("Executed <\n");
     return x < y;
 }
 
 double jgt_impl(double x, double y){
-    printf("Executed >\n");
+    if(DEBUG) printf("Executed >\n");
     return x > y;
 }
 
@@ -135,19 +136,19 @@ void execute_jeq_neq(instruction *instr, char * op){
 }
 
 void execute_jeq(instruction* instr){
-    printf("execute_jeq\n");
+    if(DEBUG) printf("execute_jeq\n");
 
     execute_jeq_neq(instr, "==");    
 }
 
 void execute_jne(instruction* instr){
-    printf("execute_jne\n");
+    if(DEBUG) printf("execute_jne\n");
 
     execute_jeq_neq(instr, "!=");
 }
 
 void execute_relational(instruction * instr){
-    printf("execute_relational\n");
+    if(DEBUG) printf("execute_relational\n");
 
     assert(instr->result->type == label_a);
 
@@ -174,7 +175,7 @@ void execute_relational(instruction * instr){
 }
 
 void execute_jmp(instruction* instr){
-    printf("execute_jmp\n");
+    if(DEBUG) printf("execute_jmp\n");
 
     assert(instr->result->type == label_a);
     pc = instr->result->val;

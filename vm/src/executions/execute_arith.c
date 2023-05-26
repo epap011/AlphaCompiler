@@ -9,6 +9,8 @@ extern unsigned char executionFinished;
 extern unsigned currLine;
 extern char * typeStrings[];
 
+extern int DEBUG;
+
 char* typeArithOP[] = {
     "undef",
     "+",
@@ -22,22 +24,22 @@ char* typeArithOP[] = {
 typedef double (*arithmetic_func_t)(double x, double y);
 
 double add_impl(double x, double y){
-    printf("Executed add\n");
+    if(DEBUG) printf("Executed add\n");
     return x + y;
 }
 
 double sub_impl(double x, double y){
-    printf("Executed sub\n");
+    if(DEBUG) printf("Executed sub\n");
     return x - y;
 }
 
 double mul_impl(double x, double y){
-    printf("Executed mul\n");
+    if(DEBUG) printf("Executed mul\n");
     return x * y;
 }
 
 double div_impl(double x, double y){
-    printf("Executed div\n");
+    if(DEBUG) printf("Executed div\n");
     if(y == 0){
         avm_error("Cant divide by  0", currLine);
         executionFinished = 1;
@@ -46,7 +48,7 @@ double div_impl(double x, double y){
 }
 
 double mod_impl(double x, double y){
-    printf("Executed mod\n");
+    if(DEBUG) printf("Executed mod\n");
     return ((unsigned) x) % ((unsigned) y);
 }
 
@@ -84,7 +86,7 @@ void avm_assign(avm_memcell* lv, avm_memcell* rv){
 }
 
 void execute_assign(instruction* instr){
-    printf("execute_assign\n");
+    if(DEBUG) printf("execute_assign\n");
 
     avm_memcell* lv = avm_translate_operand(instr->result, (avm_memcell*) 0);
     avm_memcell* rv = avm_translate_operand(instr->arg1, &ax);
@@ -96,7 +98,7 @@ void execute_assign(instruction* instr){
 }
 
 void execute_arithmetic(instruction* instr){
-    printf("execute_arithmetic\n");
+    if(DEBUG) printf("execute_arithmetic\n");
 
     avm_memcell* lv;
     if(instr->result->type == number_a)  //result is a constnum when both args are consts -> we need to use the third register

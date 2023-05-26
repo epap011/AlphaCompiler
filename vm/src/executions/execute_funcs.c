@@ -17,9 +17,11 @@ extern unsigned currLine;
 extern unsigned totalActuals;
 
 extern char * typeStrings[];
+
+extern int DEBUG;
     
 void execute_call(instruction* instr){
-    printf("execute_call\n");
+    if(DEBUG) printf("execute_call\n");
     avm_memcell* func = avm_translate_operand(instr->result, &ax);
     assert(func);
     switch(func->type){
@@ -53,7 +55,7 @@ void execute_call(instruction* instr){
 }
 
 void execute_pusharg(instruction* instr){
-     printf("execute_pusharg\n");
+    if(DEBUG) printf("execute_pusharg\n");
     avm_memcell *arg = avm_translate_operand(instr->result, &ax);
     assert(arg);
 
@@ -63,7 +65,7 @@ void execute_pusharg(instruction* instr){
 }
 
 void execute_funcenter(instruction* instr){
-     printf("execute_funcenter\n");
+    if(DEBUG) printf("execute_funcenter\n");
     avm_memcell* func = avm_translate_operand(instr->result, &ax);
     assert(func);
     assert(pc == func->data.funcVal->iaddress);
@@ -76,7 +78,7 @@ void execute_funcenter(instruction* instr){
 }
 
 void execute_funcexit(instruction* instr){
-    printf("execute_funcexit\n");
+    if(DEBUG) printf("execute_funcexit\n");
     unsigned oldTop = top;
     top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
     pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
