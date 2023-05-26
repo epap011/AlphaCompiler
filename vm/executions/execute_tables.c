@@ -48,7 +48,7 @@ void execute_tablegetelem(instruction* instr){
         avm_error(msg, currLine);
     }
     else{
-       /* avm_memcell * content = avm_table_getelem(table->data.tableVal, index);
+        avm_memcell* content = avm_table_getelem(table->data.tableVal, index);
         if(content)
             avm_assign(lv, content);
         else{
@@ -56,7 +56,7 @@ void execute_tablegetelem(instruction* instr){
             sprintf(buffer, YEL "%s" RESET"[%s] not found !", typeStrings[table->type], typeStrings[index->type]);
             avm_warning(buffer, currLine);
             free(buffer);
-        }*/
+        }
     }
 }
 
@@ -82,7 +82,7 @@ void execute_tablesetelem(instruction* instr){
         avm_error(msg, currLine);
     }
     else{
-        //avm_table_setelem(table->data.tableVal, key, value);
+        avm_table_setelem(table->data.tableVal, key, value);
     }
 }
 
