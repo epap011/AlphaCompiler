@@ -69,8 +69,19 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == string_m)
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
-    else    
+    else  
         assert(0);
+
+    if(value->type == nil_m) {
+        for(avm_table_bucket* bucket = table->numIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(bucket->key.data.numVal == key->data.numVal) {
+                avm_memcell_clear(&bucket->value);
+                bucket->value.type = nil_m;
+                break;
+            }
+        }
+        return;
+    }
 
     bucket->next = table->numIndexed[hash_key];
     table->numIndexed[hash_key] = bucket;
