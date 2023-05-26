@@ -13,8 +13,9 @@ avm_table *avm_table_new(){
 
 void avm_table_destroy(avm_table *t){
 
-    avm_table_buckets_destroy(t->strIndexed);
     avm_table_buckets_destroy(t->numIndexed);
+    avm_table_buckets_destroy(t->strIndexed);
+    avm_table_buckets_destroy(t->boolIndexed);
     free(t);
 
 }
@@ -63,15 +64,23 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     bucket->value = *value;
 
     unsigned hash_key;
-    //for now only numbers are supported
-    if(bucket->key.type == number_m) 
+    if(bucket->key.type == number_m) {
         hash_key = (unsigned)bucket->key.data.numVal % AVM_TABLE_HASHSIZE;
+        bucket->next = table->numIndexed[hash_key];
+        table->numIndexed[hash_key] = bucket;
+    }
     else
-    if(bucket->key.type == string_m)
+    if(bucket->key.type == string_m) {
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
+        bucket->next = table->strIndexed[hash_key];
+        table->strIndexed[hash_key] = bucket;
+    }
     else
-    if(bucket->key.type == bool_m)
+    if(bucket->key.type == bool_m) {
         hash_key = (unsigned)bucket->key.data.boolVal % 2;
+        bucket->next = table->boolIndexed[hash_key];
+        table->boolIndexed[hash_key] = bucket;
+    }
     else
         assert(0);
 
@@ -80,14 +89,26 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
             if(bucket->key.data.numVal == key->data.numVal) {
                 avm_memcell_clear(&bucket->value);
                 bucket->value.type = nil_m;
-                break;
+                return;
             }
         }
-        return;
+        for(avm_table_bucket* bucket = table->strIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(strcmp(bucket->key.data.strVal, key->data.strVal) == 0) {
+                avm_memcell_clear(&bucket->value);
+                bucket->value.type = nil_m;
+                return;
+            }
+        }
+        for(avm_table_bucket* bucket = table->boolIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(bucket->key.data.boolVal == key->data.boolVal) {
+                avm_memcell_clear(&bucket->value);
+                bucket->value.type = nil_m;
+                return;
+            }
+        }
+        assert(0);
     }
 
-    bucket->next = table->numIndexed[hash_key];
-    table->numIndexed[hash_key] = bucket;
     table->total++;
 }
 
@@ -104,12 +125,13 @@ avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
     if(key->type == bool_m)
         hash_key = (unsigned)key->data.boolVal % 2;
     else
+    if(key->type == libfunc_m)
+        hash_key = hash_string(key->data.libfuncVal) % AVM_TABLE_HASHSIZE;
         assert(0);
 
     avm_memcell* ret = (avm_memcell *)malloc(sizeof(avm_memcell));
     for(avm_table_bucket* bucket = table->numIndexed[hash_key]; bucket; bucket = bucket->next) {
         if(bucket->key.data.numVal == key->data.numVal) {
-            printf("#####found#####\n");
             return &bucket->value;
         }
     }
