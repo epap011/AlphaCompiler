@@ -17,6 +17,7 @@ void avm_table_destroy(avm_table *t){
     avm_table_buckets_destroy(t->strIndexed);
     avm_table_buckets_destroy(t->boolIndexed);
     avm_table_buckets_destroy(t->libfuncIndexed);
+    avm_table_buckets_destroy(t->userfuncIndexed);
     free(t);
 
 }
@@ -88,6 +89,12 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         table->libfuncIndexed[hash_key] = bucket;
     }
     else
+    if(bucket->key.type == userfunc_m) {
+        hash_key = (unsigned)bucket->key.data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
+        bucket->next = table->userfuncIndexed[hash_key];
+        table->userfuncIndexed[hash_key] = bucket;
+    }
+    else
         assert(0);
 
     if(value->type == nil_m) {
@@ -114,6 +121,13 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         }
         for(avm_table_bucket* bucket = table->libfuncIndexed[hash_key]; bucket; bucket = bucket->next) {
             if(strcmp(bucket->key.data.libfuncVal, key->data.libfuncVal) == 0) {
+                avm_memcell_clear(&bucket->value);
+                bucket->value.type = nil_m;
+                return;
+            }
+        }
+        for(avm_table_bucket* bucket = table->userfuncIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(bucket->key.data.funcVal->iaddress == key->data.funcVal->iaddress) {
                 avm_memcell_clear(&bucket->value);
                 bucket->value.type = nil_m;
                 return;

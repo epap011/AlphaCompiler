@@ -62,6 +62,7 @@ typedef struct avm_table {
     avm_table_bucket *strIndexed     [AVM_TABLE_HASHSIZE];
     avm_table_bucket *boolIndexed    [AVM_TABLE_HASHSIZE];
     avm_table_bucket *libfuncIndexed [AVM_TABLE_HASHSIZE];
+    avm_table_bucket *userfuncIndexed[AVM_TABLE_HASHSIZE];
     unsigned total;
 }avm_table;
 
