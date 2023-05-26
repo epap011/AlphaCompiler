@@ -16,4 +16,5 @@ char* nil_tostring(avm_memcell* m);
 char* undef_tostring(avm_memcell* m);
 
 void avm_calllibfunc(char* id);
-void avm_call_functor(avm_table* table);
+void avm_push_table_arg(avm_table* t);
+void avm_call_functor(avm_table* t);

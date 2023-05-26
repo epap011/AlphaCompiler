@@ -299,8 +299,29 @@ void avm_calllibfunc(char* id){
     printf("call libfunc %s\n", id);
 }
 
-void avm_call_functor(avm_table* table){
-    printf("call functor\n");
+void avm_push_table_arg(avm_table* t){
+    stack[top].type = table_m;
+    avm_table_inc_refcounter(stack[top].data.tableVal = t);
+    ++totalActuals;
+    avm_dec_top();
+}
+
+void avm_call_functor(avm_table* t){
+    cx.type = string_m;
+    cx.data.strVal = strdup("()");
+    avm_memcell* f = avm_tablegetelem(t, &cx);
+    if(!f)
+        avm_error("in calling table: no '()' element found!", currLine);
+    else if(f->type != table_m)
+        avm_call_functor(f->data.tableVal);
+    else if(f->type == userfunc_m){
+        avm_push_table_arg(t);
+        amv_callsaveenvironment();
+        pc = f->data.funcVal->iaddress;
+        assert(pc < AVM_ENDING_PC && code[pc]->opcode == funcenter_vm);
+    }
+    else
+        avm_error("in calling table: '()' illegal element value!", currLine);
 }
 
 char* avm_tostring(avm_memcell* m){
