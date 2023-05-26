@@ -1,7 +1,8 @@
+SRC_DIR  = src
 BIN_DIR  = bin
 OBJ_DIR  = obj
 UTIL_DIR = util
-EXEC_DIR = executions
+EXEC_DIR = src/executions
 LIB_DIR  = libfuncs_util
 
 #Compiler, Compiler flags and C Pre Processor Flags
@@ -26,7 +27,7 @@ avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXEC_ARITH).o $(EXEC_RELOP
 	 $(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o
 
 #---< Object Targets >---#
-$(MAIN).o: $(MAIN).c | $(OBJ_DIR)
+$(MAIN).o: $(SRC_DIR)/$(MAIN).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
 $(BINPARSE).o: $(UTIL_DIR)/$(BINPARSE).c | $(OBJ_DIR)

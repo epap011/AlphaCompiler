@@ -252,13 +252,10 @@ void avm_warning(char* message, unsigned line){
 int main(int argc, char** argv){
 
     FILE* bin_file = NULL;
+    char* filename = "../compiler/binary.abc";
 
-    if(argc != 2){
-        printf("Invalid arguments.\n");
-        exit(EXIT_FAILURE);
-    }
-    else if(!(bin_file = fopen(argv[1], "rb"))){
-          fprintf(stderr, "Could not open input file: %s\n", argv[1]);
+    if(!(bin_file = fopen(filename, "rb"))){
+          fprintf(stderr, "Could not open input file: %s\n", filename);
           exit(EXIT_FAILURE);
     }
 
