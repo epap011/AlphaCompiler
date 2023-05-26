@@ -293,17 +293,23 @@ void generate_PARAM(quad* q) {
 }
 void generate_RETURN(quad* q) {
     instruction* i = (instruction*) malloc(sizeof(instruction));
-    i->opcode      = assign_vm;
-    i->result      = (vmarg*) malloc(sizeof(vmarg));
-    i->arg1        = NULL;
-    i->arg2        = NULL;
-    assign_line_only_on_first_stms(q, i);
+    if(q->arg1 != NULL){
+        i->opcode = assign_vm;
+        i->result = (vmarg*) malloc(sizeof(vmarg));
+        make_retvaloperand(i->result);
 
-    make_retvaloperand(i->result);
-    if(q->result != NULL){
         i->arg1 = (vmarg*) malloc(sizeof(vmarg));
         make_operand(q->arg1, i->arg1);
     }
+    else{
+        i->opcode = nop_vm;
+        i->result = NULL;
+        i->arg1 = NULL;
+    }
+    i->arg2 = NULL;
+
+    assign_line_only_on_first_stms(q, i);
+
 
     emit_instruction(i);
 }
