@@ -309,7 +309,7 @@ void avm_push_table_arg(avm_table* t){
 void avm_call_functor(avm_table* t){
     cx.type = string_m;
     cx.data.strVal = strdup("()");
-    avm_memcell* f = avm_tablegetelem(t, &cx);
+    avm_memcell* f = avm_table_getelem(t, &cx);
     if(!f)
         avm_error("in calling table: no '()' element found!", currLine);
     else if(f->type != table_m)
