@@ -2,6 +2,7 @@
 #include "instructions.h"
 #include "parse_binfile.h"
 #include "avm_types.h"
+#include "avm_helpers.h"
 #include "executions/execute.h"
 
 avm_memcell ax, bx, cx;
@@ -12,6 +13,7 @@ unsigned char executionFinished = 0;
 unsigned pc                     = 0;
 unsigned currLine               = 0;
 unsigned codeSize               = 0;
+unsigned totalActuals           = 0;
 instruction** code              = (instruction**) 0;
 extern unsigned total_instr;
 extern instruction** instructions;
