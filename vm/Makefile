@@ -2,6 +2,7 @@ BIN_DIR  = bin
 OBJ_DIR  = obj
 UTIL_DIR = util
 EXEC_DIR = executions
+LIB_DIR  = libfuncs_util
 
 #Compiler, Compiler flags and C Pre Processor Flags
 CC       = gcc
@@ -17,10 +18,11 @@ EXEC_ARITH 	= execute_arith
 EXEC_RELOP 	= execute_relop
 EXEC_FUNCS 	= execute_funcs
 EXEC_TABLES = execute_tables
+LIBFUNCS  	= libfuncs
 
 #---< Final Targets >---#
 
-avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXEC_ARITH).o $(EXEC_RELOP).o $(EXEC_FUNCS).o $(EXEC_TABLES).o | $(BIN_DIR) 
+avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXEC_ARITH).o $(EXEC_RELOP).o $(EXEC_FUNCS).o $(EXEC_TABLES).o $(LIBFUNCS).o | $(BIN_DIR) 
 	 $(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o
 
 #---< Object Targets >---#
@@ -46,7 +48,10 @@ $(EXEC_FUNCS).o: $(EXEC_DIR)/$(EXEC_FUNCS).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
 $(EXEC_TABLES).o: $(EXEC_DIR)/$(EXEC_TABLES).c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+
+$(LIBFUNCS).o: $(LIB_DIR)/$(LIBFUNCS).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@		
 
 $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@
