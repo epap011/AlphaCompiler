@@ -14,7 +14,7 @@ typedef double (*cmp_func_t)(double x, double y);
 
 
 double jle_impl(double x, double y){
-    printf("Executed <=>\n");
+    printf("Executed <=\n");
     return x <= y;
 }
 

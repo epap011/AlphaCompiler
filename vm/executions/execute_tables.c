@@ -9,7 +9,7 @@ extern avm_memcell stack[AVM_STACKSIZE];
 extern unsigned char executionFinished;
 extern unsigned currLine;
 
-extern char* register_type_to_string(avm_memcell_t type);
+extern char * typeStrings[];
 
 void execute_newtable(instruction* instr){
     printf("execute_newtable\n");
@@ -35,7 +35,7 @@ void execute_tablesetelem(instruction* instr){
     assert(instr->arg1);
     assert(instr->arg2);
 
-    printf("result: %s\n", register_type_to_string(instr->result->type));
+    printf("result: %s\n", typeStrings[instr->result->type]);
 
     avm_memcell* table = avm_translate_operand(instr->result, (avm_memcell*) 0);
     avm_memcell* key   = avm_translate_operand(instr->arg1  , &ax);
@@ -46,11 +46,11 @@ void execute_tablesetelem(instruction* instr){
 
     if(table->type != table_m){
         char* msg = malloc(sizeof(char) * 128);
-        sprintf(msg, "illegal use of type %s as table", register_type_to_string(table->type));
+        sprintf(msg, "illegal use of type " YEL "%s" RESET" as table", typeStrings[table->type]);
         avm_error(msg, currLine);
     }
     else{
-        avm_table_setelem(table->data.tableVal, key, value);
+        //avm_table_setelem(table->data.tableVal, key, value);
     }
 }
 
