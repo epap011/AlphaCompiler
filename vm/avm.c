@@ -256,3 +256,26 @@ int main(int argc, char** argv){
         execute_cycle();
     }
 }
+
+void avm_dec_top(void){
+    if(!top){
+        avm_error("stack overflow", currLine);
+        executionFinished = 1;
+    }
+    else
+        --top;
+}
+
+void avm_push_envvalue(unsigned val){
+    stack[top].type = number_m;
+    stack[top].data.numVal = val;
+    avm_dec_top();
+}
+
+void amv_callsaveenvironment(void){
+    avm_push_envvalue(totalActuals);
+    assert( code[pc]->opcode == call_vm );
+    avm_push_envvalue(pc+1);
+    avm_push_envvalue(top+totalActuals+2);
+    avm_push_envvalue(topsp);
+}
