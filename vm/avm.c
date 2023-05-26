@@ -16,6 +16,7 @@ instruction** code              = (instruction**) 0;
 extern unsigned total_instr;
 extern instruction** instructions;
 extern avm_memcell stack[AVM_STACKSIZE];
+extern unsigned globals_total;
 
 #define AVM_ENDING_PC codeSize  
 
@@ -53,7 +54,7 @@ void execute_cycle(){
         return;
     }
     else{
-        printf("Kanw kati : %d\n", pc);
+        printf("pc : %d  ", pc);
         assert(pc < AVM_ENDING_PC);
         instruction* instr = code[pc];
         assert(instr->opcode >= 0 
@@ -75,8 +76,8 @@ void execute_cycle(){
 void avm_initialize(){
     
     avm_initstack();
-    top = 0;
-    topsp = 0;
+    top = AVM_STACKSIZE - globals_total - 1;
+    topsp = AVM_STACKSIZE - 1;
 
     //init library functions below
 }
@@ -169,7 +170,6 @@ void print_memcell_value(avm_memcell *m) {
 
 void print_vm_state() {
     printf("-----------< VM STATE >-----------\n");
-    printf("pc : %d\n", pc);
     
     printf("ax: ");        print_memcell_value(&ax);     printf("(%s)", register_type_to_string(ax.type));
     printf(" | bx: ");     print_memcell_value(&bx);     printf("(%s)", register_type_to_string(bx.type));

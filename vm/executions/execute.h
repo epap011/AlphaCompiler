@@ -18,23 +18,20 @@ typedef unsigned char (*tobool_func_t)(avm_memcell *);
 #define execute_div execute_arithmetic
 #define execute_mod execute_arithmetic
 
+#define execute_jle execute_relational
+#define execute_jge execute_relational
+#define execute_jlt execute_relational
+#define execute_jgt execute_relational
+
 
 void execute_arithmetic(instruction* instr);
 void execute_assign(instruction * instr);
-/*void execute_add(instruction * instr);
-void execute_sub(instruction * instr);
-void execute_mul(instruction * instr); 
-void execute_div(instruction * instr);
-void execute_mod(instruction * instr);*/
 
 void execute_jmp(instruction * instr);
 
+void execute_relational(instruction * instr);
 void execute_jeq(instruction * instr);
 void execute_jne(instruction * instr);
-void execute_jle(instruction * instr);
-void execute_jge(instruction * instr);
-void execute_jlt(instruction * instr);
-void execute_jgt(instruction * instr);
 
 unsigned char avm_tobool(avm_memcell * m);
 unsigned char number_tobool(avm_memcell * m);

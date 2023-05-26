@@ -7,6 +7,17 @@ extern avm_memcell stack[AVM_STACKSIZE];
 extern unsigned char executionFinished;
 
 extern unsigned currLine;
+extern char * typeStrings[];
+
+char* typeArithOP[] = {
+    "undef",
+    "+",
+    "-",
+    "*",
+    "/",
+    (char *)'%'
+};
+
 
 typedef double (*arithmetic_func_t)(double x, double y);
 
@@ -95,20 +106,17 @@ void execute_arithmetic(instruction* instr){
     avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
     avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
 
-    printf("test\n");
-
-    printf("lv : %p\n", lv);
-    printf("rv1: %p\n", rv1);
-    printf("rv2: %p\n", rv2);
-    printf("stack[top]: %p\n", &stack[top]);
-
     if(instr->result->type != number_a) //when result is a constnum, this assert doesnt have meaning
         assert((&stack[AVM_STACKSIZE - 1] >= lv && lv > &stack[top]) || lv == &retval);
     assert(lv);
     assert(rv1 && rv2);
 
-    if(rv1->type != number_m || rv2->type != number_m )
-        avm_error("not a number in arithmetic!", currLine);  
+    if(rv1->type != number_m || rv2->type != number_m ){
+        char *buffer = malloc(sizeof(char) * 256);
+        sprintf(buffer, "not a number in arithmetic operation ("YEL"%s" RESET " %s"YEL" %s" RESET")!", typeStrings[rv1->type], typeArithOP[instr->opcode], typeStrings[rv2->type]);
+        avm_error(buffer, currLine);  
+        free(buffer);
+    }   
     else{
         arithmetic_func_t op = arithmeticFuncs[instr->opcode - add_vm];
         avm_memcell_clear(lv);

@@ -10,6 +10,36 @@ extern unsigned char executionFinished;
 
 extern unsigned currLine;
 
+typedef double (*cmp_func_t)(double x, double y);
+
+
+double jle_impl(double x, double y){
+    printf("Executed <=>\n");
+    return x <= y;
+}
+
+double jge_impl(double x, double y){
+    printf("Executed >=\n");
+    return x >= y;
+}
+
+double jlt_impl(double x, double y){
+    printf("Executed <\n");
+    return x < y;
+}
+
+double jgt_impl(double x, double y){
+    printf("Executed >\n");
+    return x > y;
+}
+
+cmp_func_t RelationalFuncs[] = {
+    jle_impl, 
+    jge_impl, 
+    jlt_impl, 
+    jgt_impl,
+};
+
 
 tobool_func_t toboolFuncs[] = {
     number_tobool,
@@ -31,6 +61,13 @@ char * typeStrings[] = {
     "libfunc",
     "nil",
     "undef"
+};
+
+char* TypeRelOp[] = {
+    "<=",
+    ">=",
+    "<",
+    ">"
 };
 
 unsigned char avm_tobool(avm_memcell * m){
@@ -70,7 +107,7 @@ void execute_jeq_neq(instruction *instr, char * op){
 
     else if(rv1->type != rv2->type){
         char * buffer = malloc(sizeof(char) * 256);
-        sprintf(buffer, "%s %s %s is illegal!", typeStrings[rv1->type], op, typeStrings[rv2->type]);
+        sprintf(buffer, YEL"%s" RESET" %s " YEL"%s"RESET" is illegal!", typeStrings[rv1->type], op, typeStrings[rv2->type]);
         avm_error(buffer, currLine);
         free(buffer);
     }
@@ -109,22 +146,36 @@ void execute_jne(instruction* instr){
     execute_jeq_neq(instr, "!=");
 }
 
-void execute_jle(instruction* instr){
-    printf("execute_jle\n");
-}
+void execute_relational(instruction * instr){
+    printf("execute_relational\n");
 
-void execute_jge(instruction* instr){
-    printf("execute_jge\n");
-}
+    assert(instr->result->type == label_a);
 
-void execute_jlt(instruction* instr){
-    printf("execute_jlt\n");
-}
+    avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
+    avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
 
-void execute_jgt(instruction* instr){
-    printf("execute_jgt\n");
+    unsigned char result = 0;
+
+    assert(rv1 && rv2);
+
+    if(rv1->type != number_m || rv2->type != number_m ){
+        char *buffer = malloc(sizeof(char) * 256);
+        sprintf(buffer, "not a number in relational comparison (" YEL "%s" RESET" %s " YEL"%s" RESET")!", typeStrings[rv1->type], TypeRelOp[instr->opcode - jle_vm], typeStrings[rv2->type]);
+        avm_error(buffer, currLine);  
+        free(buffer);
+    }
+    else{
+        cmp_func_t operation = RelationalFuncs[instr->opcode - jle_vm];
+        result = (*operation)(rv1->data.numVal, rv2->data.numVal);
+    }
+
+    if(!executionFinished && result)
+        pc = instr->result->val;
 }
 
 void execute_jmp(instruction* instr){
     printf("execute_jmp\n");
-}
+
+    assert(instr->result->type == label_a);
+    pc = instr->result->val;
+}   
