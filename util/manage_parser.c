@@ -175,8 +175,8 @@ expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned i
         temp = temp->next;
     }
     while( (temp = (expr*)pop(elist_s)) )
-        emit(param,temp,NULL,NULL,-1,line);
-    emit(call,func,NULL,NULL,-1,line);
+        emit(param,NULL,NULL,temp,-1,line);
+    emit(call,NULL,NULL,func,-1,line);
     expr* result = new_expr(var_e);
     result->sym = symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
     incCurrScopeOffset();

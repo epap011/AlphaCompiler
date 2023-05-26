@@ -19,7 +19,7 @@ extern unsigned totalActuals;
 
 
 void execute_call(instruction* instr){
-    avm_memcell* func = avm_translate_operand(instr->arg1, &ax);
+    avm_memcell* func = avm_translate_operand(instr->result, &ax);
     assert(func);
     switch(func->type){
         case userfunc_m:{
@@ -45,7 +45,7 @@ void execute_call(instruction* instr){
 }
 
 void execute_pusharg(instruction* instr){
-    avm_memcell *arg = avm_translate_operand(instr->arg1, &ax);
+    avm_memcell *arg = avm_translate_operand(instr->result, &ax);
     assert(arg);
 
     avm_assign(&stack[top], arg);
