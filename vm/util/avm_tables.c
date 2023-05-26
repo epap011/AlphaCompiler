@@ -69,7 +69,10 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == string_m)
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
-    else  
+    else
+    if(bucket->key.type == bool_m)
+        hash_key = (unsigned)bucket->key.data.boolVal % 2;
+    else
         assert(0);
 
     if(value->type == nil_m) {
@@ -92,10 +95,15 @@ avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
     assert(table); assert(key);
 
     unsigned hash_key;
-    //for now only numbers are supported
     if(key->type == number_m) 
         hash_key = (unsigned)key->data.numVal % AVM_TABLE_HASHSIZE;
-    else 
+    else
+    if(key->type == string_m)
+        hash_key = hash_string(key->data.strVal) % AVM_TABLE_HASHSIZE;
+    else
+    if(key->type == bool_m)
+        hash_key = (unsigned)key->data.boolVal % 2;
+    else
         assert(0);
 
     avm_memcell* ret = (avm_memcell *)malloc(sizeof(avm_memcell));
