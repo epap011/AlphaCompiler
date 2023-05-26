@@ -154,7 +154,11 @@ avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
     else
     if(key->type == libfunc_m)
         hash_key = hash_string(key->data.libfuncVal) % AVM_TABLE_HASHSIZE;
-        assert(0);
+    else
+    if(key->type == userfunc_m)
+        hash_key = (unsigned)key->data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
+    else    
+    assert(0);
 
     avm_memcell* ret = (avm_memcell *)malloc(sizeof(avm_memcell));
     for(avm_table_bucket* bucket = table->numIndexed[hash_key]; bucket; bucket = bucket->next) {
