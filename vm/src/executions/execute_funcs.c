@@ -46,10 +46,9 @@ void execute_call(instruction* instr){
 
         default:{
             char* error_text = malloc(sizeof(char) * 100);
-            sprintf(error_text, "call: cannot bind "YEL"%s"RESET" to function!",typeStrings[func->type]);
+            sprintf(error_text, "call: cannot bind "YEL"%s"RESET" to function!",avm_tostring(func));
             avm_error(error_text,currLine);
             free(error_text);
-            executionFinished = 1;
         }
     }
 }

@@ -379,18 +379,24 @@ char* bool_tostring(avm_memcell* m){
 
 char* table_tostring(avm_memcell* m){
     assert(m->type == table_m);
-    return strdup("table");
+
+    char* buffer = malloc(sizeof(char) * 512);
+    return strdup("table"); //TODO : prepei na tupwnei to table opws stin javascript [ {key : value}, {key : value}]
 }
 
 char* userfunc_tostring(avm_memcell* m){
     assert(m->type == userfunc_m);
-    return strdup(m->data.funcVal->name);
+    char* buffer = malloc(sizeof(char) * 256);
+    sprintf(buffer, "user function : %d", m->data.funcVal->iaddress);
+    return buffer;
 }
 
 
 char* libfunc_tostring(avm_memcell* m){
     assert(m->type == libfunc_m);
-    return strdup(m->data.libfuncVal);
+    char* buffer = malloc(sizeof(char) * 256);
+    sprintf(buffer, "library function : %s", m->data.libfuncVal);
+    return buffer;
 }
 
 char* nil_tostring(avm_memcell* m){
