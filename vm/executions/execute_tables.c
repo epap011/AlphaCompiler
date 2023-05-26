@@ -40,12 +40,19 @@ void execute_tablegetelem(instruction* instr){
     assert(index);
 
     avm_memcell_clear(lv);
-    lv->type = nil_m;
+    lv->type = nil_m;       //Default value
 
     if(table->type != table_m){
-        char* msg = malloc(sizeof(char) * 128);
-        sprintf(msg, "illegal use of type " YEL "%s" RESET" as table", typeStrings[table->type]);
-        avm_error(msg, currLine);
+        char* buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "illegal use of type " YEL "%s" RESET" as table", typeStrings[table->type]);
+        avm_error(buffer, currLine);
+        free(buffer);
+    }
+    else if(index->type == nil_m || index->type == undef_m){
+        char* buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "index can't be" YEL "%s" RESET, typeStrings[index->type]);
+        avm_error(buffer, currLine);
+        free(buffer);
     }
     else{
        /* avm_memcell * content = avm_table_getelem(table->data.tableVal, index);
@@ -80,6 +87,12 @@ void execute_tablesetelem(instruction* instr){
         char* msg = malloc(sizeof(char) * 128);
         sprintf(msg, "illegal use of type " YEL "%s" RESET" as table", typeStrings[table->type]);
         avm_error(msg, currLine);
+    }
+    else if(key->type == nil_m || key->type == undef_m){
+        char* buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "index can't be " YEL "%s" RESET, typeStrings[key->type]);
+        avm_error(buffer, currLine);
+        free(buffer);
     }
     else{
         //avm_table_setelem(table->data.tableVal, key, value);
