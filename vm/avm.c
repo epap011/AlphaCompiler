@@ -311,7 +311,7 @@ void avm_calllibfunc(char* id){
     library_func_t f = avm_getlibraryfunc(id);
     if(!f){
         char * buffer = malloc(sizeof(char) * 100);
-        sprintf(buffer, "unsupported lib func '%s' called!", id);
+        sprintf(buffer, "unsupported lib func "YEL"%s"RESET" called!", id);
         avm_error(buffer, currLine);
         executionFinished = 1;
         free(buffer);

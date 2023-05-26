@@ -21,13 +21,13 @@ library_func_t avm_getlibraryfunc(char* id){
         }
         temp = temp->next;
     }
-    printf("Did not find libfunc %s\n", id); //will remove this!
     return NULL;
 }
 
 
 void libfunc_print(void){
     unsigned n = avm_totalactuals();
+    printf("kala eimai\n");
     unsigned i;
     for(i = 0; i < n; ++i){
         char* s = avm_tostring(avm_getactual(i));
