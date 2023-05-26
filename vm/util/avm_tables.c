@@ -8,11 +8,7 @@ avm_table *avm_table_new(){
 
     t->refCounter = t->total = 0;
     avm_table_buckets_init(t->strIndexed);
-    avm_table_buckets_init(t->numIndexed);
-    //Bono gia bool/userfunc/libfunc
-
     return t;
-
 }
 
 void avm_table_destroy(avm_table *t){
@@ -55,4 +51,47 @@ void avm_table_dec_refcounter(avm_table *t){
     assert(t->refCounter > 0);
     if(!--t->refCounter)
         avm_table_destroy(t);
+}
+
+void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
+    assert(table); assert(key); assert(value);
+
+    avm_table_bucket *bucket = (avm_table_bucket *)malloc(sizeof(avm_table_bucket));
+    AVM_WIPEOUT(*bucket);
+
+    bucket->key   = *key;
+    bucket->value = *value;
+
+    unsigned hash_key;
+    //for now only numbers are supported
+    if(bucket->key.type == number_m) 
+        hash_key = (unsigned)bucket->key.data.numVal % AVM_TABLE_HASHSIZE;
+    else 
+        assert(0);
+
+    bucket->next = table->numIndexed[hash_key];
+    table->numIndexed[hash_key] = bucket;
+    table->total++;
+}
+
+avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
+    assert(table); assert(key);
+
+    unsigned hash_key;
+    //for now only numbers are supported
+    if(key->type == number_m) 
+        hash_key = (unsigned)key->data.numVal % AVM_TABLE_HASHSIZE;
+    else 
+        assert(0);
+
+    avm_memcell* ret = (avm_memcell *)malloc(sizeof(avm_memcell));
+    for(avm_table_bucket* bucket = table->numIndexed[hash_key]; bucket; bucket = bucket->next) {
+        if(bucket->key.data.numVal == key->data.numVal) {
+            printf("#####found#####\n");
+            return &bucket->value;
+        }
+    }
+
+    ret->type = nil_m;
+    return ret;
 }
