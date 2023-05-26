@@ -351,7 +351,7 @@ void avm_call_functor(avm_table* t){
 }
 
 char* avm_tostring(avm_memcell* m){
-   // assert(m->type >= 0 && m->type <= undef_m);
+    assert(m->type >= 0 && m->type <= undef_m);
     return (*tostringFuncs[m->type])(m);
 }
 

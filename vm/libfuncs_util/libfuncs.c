@@ -30,6 +30,7 @@ void libfunc_print(void){
     printf("kala eimai\n");
     unsigned i;
     for(i = 0; i < n; ++i){
+        printf("mpika sto loop\n");
         char* s = avm_tostring(avm_getactual(i));
         printf("%s", s);
         free(s);
