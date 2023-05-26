@@ -83,7 +83,7 @@ void execute_cycle(){
         if(pc == oldPC) //if pc chnged in execute, then it was a jump so we must not increase it
             ++pc;
         
-        print_vm_state();
+        //print_vm_state();
     }
 }
 
@@ -316,7 +316,8 @@ void avm_calllibfunc(char* id){
     else{
         topsp = top;
         totalActuals = 0;
-        (*f)();
+        (*f)(); //this is actually funcenter
+        printf("\nlibfuc :");
         if(!executionFinished)
             execute_funcexit((instruction*) 0);
     }

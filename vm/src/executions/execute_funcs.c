@@ -30,8 +30,16 @@ void execute_call(instruction* instr){
             assert(code[pc]->opcode == funcenter_vm);
             break;
         }
-        case string_m: avm_calllibfunc(func->data.strVal); break;
-        case libfunc_m: avm_calllibfunc(func->data.libfuncVal); break;
+        case string_m: { 
+            amv_callsaveenvironment();
+            avm_calllibfunc(func->data.strVal); 
+            break;
+        }
+        case libfunc_m: {
+            amv_callsaveenvironment();
+            avm_calllibfunc(func->data.libfuncVal); 
+            break;
+        }
         case table_m: avm_call_functor(func->data.tableVal); break;
 
         default:{

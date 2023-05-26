@@ -16,7 +16,6 @@ library_func_t avm_getlibraryfunc(char* id){
     libfunc* temp = libfuncs_list;
     while(temp){
         if(!strcmp(temp->id, id)){
-            printf("Found libfunc %s\n", id);
             return temp->addr;
         }
         temp = temp->next;
@@ -27,10 +26,11 @@ library_func_t avm_getlibraryfunc(char* id){
 
 void libfunc_print(void){
     unsigned n = avm_totalactuals();
-    printf("kala eimai\n");
+    
+    printf(BLU"AUTO TO PRINT EINAI TIS LIBFUNC: "RESET);
     unsigned i;
     for(i = 0; i < n; ++i){
-        printf("mpika sto loop\n");
+
         char* s = avm_tostring(avm_getactual(i));
         printf("%s", s);
         free(s);
