@@ -162,7 +162,7 @@ void execute_relational(instruction * instr){
     if(rv1->type != number_m || rv2->type != number_m ){
         char *buffer = malloc(sizeof(char) * 256);
         sprintf(buffer, "not a number in relational comparison (" YEL "%s" RESET" %s " YEL"%s" RESET")!", typeStrings[rv1->type], TypeRelOp[instr->opcode - jle_vm], typeStrings[rv2->type]);
-        avm_error(buffer, currLine);  
+        avm_warning(buffer, currLine);  
         free(buffer);
     }
     else{

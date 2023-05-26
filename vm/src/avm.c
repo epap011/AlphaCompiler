@@ -380,7 +380,6 @@ char* bool_tostring(avm_memcell* m){
 char* table_tostring(avm_memcell* m){
     assert(m->type == table_m);
 
-    char* buffer = malloc(sizeof(char) * 512);
     return strdup("table"); //TODO : prepei na tupwnei to table opws stin javascript [ {key : value}, {key : value}]
 }
 
