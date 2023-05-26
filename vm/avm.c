@@ -194,11 +194,11 @@ void print_vm_state() {
     printf("\ntop: %u | topsp: %u\n", top, topsp);
     print_vm_stack();
     printf("----------------------------------\n");
+    getchar();
 }
 
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
-    
     switch(arg->type){
         case global_a: return &stack[AVM_STACKSIZE-1-arg->val];
         case local_a: return &stack[topsp-arg->val];
