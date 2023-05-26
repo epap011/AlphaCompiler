@@ -18,6 +18,7 @@ void avm_table_destroy(avm_table *t){
     avm_table_buckets_destroy(t->boolIndexed);
     avm_table_buckets_destroy(t->libfuncIndexed);
     avm_table_buckets_destroy(t->userfuncIndexed);
+    avm_table_buckets_destroy(t->tableIndexed);
     free(t);
 
 }
@@ -94,6 +95,12 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = (unsigned)bucket->key.data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
         bucket->next = table->userfuncIndexed[hash_key];
         table->userfuncIndexed[hash_key] = bucket;
+    }
+    else
+    if(bucket->key.type == table_m) {
+        hash_key = (long unsigned)bucket->key.data.tableVal % AVM_TABLE_HASHSIZE;
+        bucket->next = table->tableIndexed[hash_key];
+        table->tableIndexed[hash_key] = bucket;
     }
     else
         assert(0);
@@ -188,7 +195,16 @@ avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
             }
         }
     }
-    else    
+    else
+    if(key->type == table_m) {
+        hash_key = (long unsigned)key->data.tableVal % AVM_TABLE_HASHSIZE;
+        for(avm_table_bucket* bucket = table->tableIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(bucket->key.data.tableVal == key->data.tableVal) {
+                return &bucket->value;
+            }
+        }
+    }
+    else   
         assert(0);
     
     return (avm_memcell *)0;

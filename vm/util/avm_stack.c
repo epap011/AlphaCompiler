@@ -23,7 +23,7 @@ void print_vm_stack() {
                 printf("%d\n", stack[i].data.boolVal);
                 break;
             case table_m:
-                printf("table\n");
+                printf("table: ref_counter(%d)\n", stack[i].data.tableVal->refCounter);
                 break;
             case userfunc_m:
                 printf("userfunc\n");
