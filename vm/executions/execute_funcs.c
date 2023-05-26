@@ -54,9 +54,23 @@ void execute_pusharg(instruction* instr){
 }
 
 void execute_funcenter(instruction* instr){
-    printf("execute_funcenter\n");
+    avm_memcell* func = avm_translate_operand(instr->result, &ax);
+    assert(func);
+    assert(pc == func->data.funcVal->iaddress);
+
+    totalActuals = 0;
+    user_func_t* funcInfo = func->data.funcVal;
+
+    topsp = top;
+    top = top - funcInfo->total_locals;
 }
 
 void execute_funcexit(instruction* instr){
-    printf("execute_funcexit\n");
+    unsigned oldTop = top;
+    top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
+    pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
+    topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
+
+    while(++oldTop <= top)
+        avm_memcell_clear(&stack[oldTop]);
 }

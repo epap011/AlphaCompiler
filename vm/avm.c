@@ -5,11 +5,6 @@
 #include "avm_helpers.h"
 #include "executions/execute.h"
 
-#define AVM_NUMACTUALS_OFFSET   4
-#define AVM_SAVEDPC_OFFSET      3
-#define AVM_SAVEDTOP_OFFSET     2
-#define AVM_SAVEDTOPSP_OFFSET   1
-
 avm_memcell ax, bx, cx;
 avm_memcell retval;
 unsigned top, topsp;

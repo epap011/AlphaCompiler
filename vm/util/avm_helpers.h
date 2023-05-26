@@ -1,3 +1,9 @@
+
+#define AVM_NUMACTUALS_OFFSET   4
+#define AVM_SAVEDPC_OFFSET      3
+#define AVM_SAVEDTOP_OFFSET     2
+#define AVM_SAVEDTOPSP_OFFSET   1
+
 typedef char* (*tostring_func_t)(avm_memcell*);
 
 void avm_dec_top(void);
