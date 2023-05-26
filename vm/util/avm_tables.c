@@ -66,7 +66,10 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     //for now only numbers are supported
     if(bucket->key.type == number_m) 
         hash_key = (unsigned)bucket->key.data.numVal % AVM_TABLE_HASHSIZE;
-    else 
+    else
+    if(bucket->key.type == string_m)
+        hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
+    else    
         assert(0);
 
     bucket->next = table->numIndexed[hash_key];
@@ -94,4 +97,14 @@ avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
 
     ret->type = nil_m;
     return ret;
+}
+
+unsigned hash_string(char *str) {
+    unsigned hash = 6666;
+    int c;
+
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c;
+
+    return hash % AVM_TABLE_HASHSIZE;
 }
