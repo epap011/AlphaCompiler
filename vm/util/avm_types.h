@@ -58,11 +58,11 @@ typedef struct avm_table_bucket {
 typedef struct avm_table {
    
     unsigned refCounter;
-    avm_table_bucket *numIndexed [AVM_TABLE_HASHSIZE];
-    avm_table_bucket *strIndexed [AVM_TABLE_HASHSIZE];
-    avm_table_bucket *boolIndexed[AVM_TABLE_HASHSIZE];
-    unsigned total; //Anti gia total counter sunolikwn stoixeiwn mporoume na exoume ksexwristes metavlites gia kathe hash table
-
+    avm_table_bucket *numIndexed     [AVM_TABLE_HASHSIZE];
+    avm_table_bucket *strIndexed     [AVM_TABLE_HASHSIZE];
+    avm_table_bucket *boolIndexed    [AVM_TABLE_HASHSIZE];
+    avm_table_bucket *libfuncIndexed [AVM_TABLE_HASHSIZE];
+    unsigned total;
 }avm_table;
 
 
