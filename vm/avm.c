@@ -95,6 +95,9 @@ void avm_initialize(){
     topsp = AVM_STACKSIZE - 1;
 
     //init library functions below
+    avm_registerlibfunc("print", libfunc_print);
+    avm_registerlibfunc("typeof", libfunc_typeof);
+
 }
 
 memclear_func_t memclarFuncs[] = {
@@ -243,7 +246,7 @@ void avm_error(char* message, unsigned line){
 }
 
 void avm_warning(char* message, unsigned line){
-    fprintf(stderr, RED"Warning: "RESET" %s (line " GRN "%d "RESET")\n", message, line);
+    fprintf(stderr, MAG"Warning: "RESET" %s (line " GRN "%d "RESET")\n", message, line);
 }
 
 int main(int argc, char** argv){
@@ -304,8 +307,24 @@ void amv_callsaveenvironment(void){
 
 void avm_calllibfunc(char* id){
     printf("call libfunc %s\n", id);
-}
 
+    library_func_t f = avm_getlibraryfunc(id);
+    if(!f){
+        char * buffer = malloc(sizeof(char) * 100);
+        sprintf(buffer, "unsupported lib func '%s' called!", id);
+        avm_error(buffer, currLine);
+        executionFinished = 1;
+        free(buffer);
+    }
+    else{
+        topsp = top;
+        totalActuals = 0;
+        (*f)();
+        if(!executionFinished)
+            execute_funcexit((instruction*) 0);
+    }
+
+}
 
 //void avm_registerlibfunc(char* id, library_func_t addr){}
 
@@ -335,7 +354,7 @@ void avm_call_functor(avm_table* t){
 }
 
 char* avm_tostring(avm_memcell* m){
-    assert(m->type >= 0 && m->type <= undef_m);
+   // assert(m->type >= 0 && m->type <= undef_m);
     return (*tostringFuncs[m->type])(m);
 }
 
@@ -393,12 +412,4 @@ avm_memcell* avm_getactual(unsigned i){
 }
 
 
-void libfunc_print(void){
-    unsigned n = avm_totalactuals();
-    unsigned i;
-    for(i = 0; i < n; ++i){
-        char* s = avm_tostring(avm_getactual(i));
-        printf("%s", s);
-        free(s);
-    }
-}
+

@@ -15,9 +15,9 @@ extern unsigned codeSize;
 
 extern unsigned currLine;
 extern unsigned totalActuals;
+
+extern char * typeStrings[];
     
-
-
 void execute_call(instruction* instr){
     avm_memcell* func = avm_translate_operand(instr->result, &ax);
     assert(func);
@@ -34,11 +34,10 @@ void execute_call(instruction* instr){
         case table_m: avm_call_functor(func->data.tableVal); break;
 
         default:{
-            char* s = avm_tostring(func);
-            char* error_text = malloc(strlen(s) + 100);
-            sprintf(error_text, "call: cannot bind '%s' to function!", s);
+            char* error_text = malloc(sizeof(char) * 100);
+            sprintf(error_text, "call: cannot bind "YEL"%s"RESET" to function!",typeStrings[func->type]);
             avm_error(error_text,currLine);
-            free(s);
+            free(error_text);
             executionFinished = 1;
         }
     }
