@@ -73,6 +73,7 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == string_m) {
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
+        printf("setelem: hash_key: %d\n", hash_key);
         bucket->next = table->strIndexed[hash_key];
         table->strIndexed[hash_key] = bucket;
     }
@@ -139,36 +140,58 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     table->total++;
 }
 
-avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
+avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {            
     assert(table); assert(key);
 
     unsigned hash_key;
-    if(key->type == number_m) 
+    if(key->type == number_m) {
         hash_key = (unsigned)key->data.numVal % AVM_TABLE_HASHSIZE;
-    else
-    if(key->type == string_m)
-        hash_key = hash_string(key->data.strVal) % AVM_TABLE_HASHSIZE;
-    else
-    if(key->type == bool_m)
-        hash_key = (unsigned)key->data.boolVal % 2;
-    else
-    if(key->type == libfunc_m)
-        hash_key = hash_string(key->data.libfuncVal) % AVM_TABLE_HASHSIZE;
-    else
-    if(key->type == userfunc_m)
-        hash_key = (unsigned)key->data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
-    else    
-    assert(0);
-
-    avm_memcell* ret = (avm_memcell *)malloc(sizeof(avm_memcell));
-    for(avm_table_bucket* bucket = table->numIndexed[hash_key]; bucket; bucket = bucket->next) {
-        if(bucket->key.data.numVal == key->data.numVal) {
-            return &bucket->value;
+        for(avm_table_bucket* bucket = table->numIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(bucket->key.data.numVal == key->data.numVal) {
+                return &bucket->value;
+            }
         }
     }
-
-    ret->type = nil_m;
-    return ret;
+    else
+    if(key->type == string_m) {
+        hash_key = hash_string(key->data.strVal) % AVM_TABLE_HASHSIZE;
+        for(avm_table_bucket* bucket = table->strIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(strcmp(bucket->key.data.strVal, key->data.strVal) == 0) {
+                return &bucket->value;
+            }
+        }
+    }
+    else
+    if(key->type == bool_m) {
+        hash_key = (unsigned)key->data.boolVal % 2;
+        for(avm_table_bucket* bucket = table->boolIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(bucket->key.data.boolVal == key->data.boolVal) {
+                return &bucket->value;
+            }
+        }
+    }
+    else
+    if(key->type == libfunc_m) {
+        hash_key = hash_string(key->data.libfuncVal) % AVM_TABLE_HASHSIZE;
+        for(avm_table_bucket* bucket = table->libfuncIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(strcmp(bucket->key.data.libfuncVal, key->data.libfuncVal) == 0) {
+                return &bucket->value;
+            }
+        }
+    }
+    else
+    if(key->type == userfunc_m) {
+        hash_key = (unsigned)key->data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
+        for(avm_table_bucket* bucket = table->userfuncIndexed[hash_key]; bucket; bucket = bucket->next) {
+            if(bucket->key.data.funcVal->iaddress == key->data.funcVal->iaddress) {
+                return &bucket->value;
+            }
+        }
+    }
+    else    
+        assert(0);
+    
+    return (avm_memcell *)0;
 }
 
 unsigned hash_string(char *str) {
