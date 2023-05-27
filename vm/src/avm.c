@@ -94,11 +94,13 @@ void avm_initialize(){
     
     avm_initstack();
     top = AVM_STACKSIZE - globals_total - 1;
-    topsp = AVM_STACKSIZE - 1;
+    // topsp = 0; // den xreiazetai initialize, kathws ginetai otan exoume klisi sunartisis
 
     //init library functions below
     avm_registerlibfunc("print", libfunc_print);
     avm_registerlibfunc("typeof", libfunc_typeof);
+    avm_registerlibfunc("totalarguments", libfunc_totalarguments);
+    avm_registerlibfunc("argument", libfunc_argument);
 
 }
 

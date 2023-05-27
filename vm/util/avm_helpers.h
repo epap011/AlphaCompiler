@@ -50,5 +50,9 @@ void avm_registerlibfunc(char* id, library_func_t addr);
 
 void libfunc_print(void);
 void libfunc_typeof(void);
+void libfunc_totalarguments(void);
+void libfunc_argument(void);
+
+//bonus lib funcs
 
 #endif // AVM_HELPERS_H

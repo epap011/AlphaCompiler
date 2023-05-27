@@ -3,6 +3,7 @@
 extern int DEBUG;
 extern unsigned currLine;
 extern avm_memcell retval;
+extern unsigned top, topsp;
 extern char * typeStrings[];
 
 libfunc* libfuncs_list = (libfunc*)0;
@@ -57,4 +58,27 @@ void libfunc_typeof(void){
         retval.type = string_m;
         retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
     }
+}
+
+void libfunc_totalarguments(void){
+    //Save topsp of previous activation record
+    unsigned prev_topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
+    printf("PREV_TOPSP: %d\n", prev_topsp);
+    avm_memcell_clear(&retval);
+
+    if(!prev_topsp){    //if prev_topsp == 0, then we are in global scope
+        char * buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "'totalarguments' called outside of a function!");
+        avm_warning(buffer, currLine);
+        retval.type = nil_m;
+        free(buffer);
+    }
+    else{
+        retval.type = number_m;
+        retval.data.numVal = avm_get_envvalue(prev_topsp + AVM_NUMACTUALS_OFFSET);
+    }
+}
+
+void libfunc_argument(void){
+
 }
