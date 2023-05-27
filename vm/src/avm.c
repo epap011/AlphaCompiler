@@ -85,7 +85,7 @@ void execute_cycle(){
         if(pc == oldPC) //if pc chnged in execute, then it was a jump so we must not increase it
             ++pc;
         
-        //print_vm_state();
+        print_vm_state();
     }
 }
 
@@ -377,10 +377,57 @@ char* bool_tostring(avm_memcell* m){
         return strdup("false");
 }
 
-char* table_tostring(avm_memcell* m){
+char* table_tostring(avm_memcell* m) {
     assert(m->type == table_m);
+    avm_table* table = m->data.tableVal;
+    char* content = (char*) malloc(sizeof(char) * 16384);
+    int i = 0, totals_found = 0;
 
-    return strdup("table"); //TODO : prepei na tupwnei to table opws stin javascript [ {key : value}, {key : value}]
+    sprintf(content, "[ ");
+    while(totals_found < table->total || i < AVM_TABLE_HASHSIZE){
+        char* key;
+        char* value;
+        if(table->numIndexed[i] != NULL){
+            key   = avm_tostring(&table->numIndexed[i]->key);
+            value = avm_tostring(&table->numIndexed[i]->value);
+            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            totals_found++;
+        }
+        if(table->strIndexed[i] != NULL){
+            key   = avm_tostring(&table->strIndexed[i]->key);
+            value = avm_tostring(&table->strIndexed[i]->value);
+            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            totals_found++;
+        }
+        if(table->boolIndexed[i] != NULL){
+            key   = avm_tostring(&table->boolIndexed[i]->key);
+            value = avm_tostring(&table->boolIndexed[i]->value);
+            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            totals_found++;
+        }
+        if(table->tableIndexed[i] != NULL){
+            key   = avm_tostring(&table->tableIndexed[i]->key);
+            value = avm_tostring(&table->tableIndexed[i]->value);
+            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            totals_found++;
+        }
+        if(table->userfuncIndexed[i] != NULL){
+            key   = avm_tostring(&table->userfuncIndexed[i]->key);
+            value = avm_tostring(&table->userfuncIndexed[i]->value);
+            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            totals_found++;
+        }
+        if(table->libfuncIndexed[i] != NULL){
+            key   = avm_tostring(&table->libfuncIndexed[i]->key);
+            value = avm_tostring(&table->libfuncIndexed[i]->value);
+            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            totals_found++;
+        }
+        i++;
+    }
+
+    strcat(content, "]");
+    return content;
 }
 
 char* userfunc_tostring(avm_memcell* m){

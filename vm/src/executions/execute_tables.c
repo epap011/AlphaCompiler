@@ -1,6 +1,7 @@
-#include "execute.h"
 #include <stdio.h>
 #include <assert.h>
+#include "execute.h"
+#include "avm_helpers.h"
 
 extern avm_memcell ax, bx, cx;
 extern avm_memcell retval;
@@ -98,6 +99,7 @@ void execute_tablesetelem(instruction* instr){
     }
     else{
         avm_table_setelem(table->data.tableVal, key, value);
+        //printf("\ntable: %s\n", table_tostring(table)); //uncomment to test table_tostring after every setelem
     }
 }
 
