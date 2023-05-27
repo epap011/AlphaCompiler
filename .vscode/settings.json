@@ -6,6 +6,7 @@
         "execute.h": "c",
         "libfunc_utils.h": "c",
         "avm_types.h": "c",
-        "avm_helpers.h": "c"
+        "avm_helpers.h": "c",
+        "string.h": "c"
     }
 }
