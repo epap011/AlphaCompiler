@@ -87,7 +87,7 @@ void libfunc_argument(void){
 
     if(!prev_topsp){    
         char * buffer = malloc(sizeof(char) * 128);
-        sprintf(buffer, "'totalarguments' called outside of a function!");
+        sprintf(buffer, "'argument' called outside of a function!");
         avm_warning(buffer, currLine);
         free(buffer);
         retval.type = nil_m;
@@ -120,5 +120,42 @@ void libfunc_argument(void){
         else
             retval = stack[prev_topsp + AVM_STACKENV_SIZE + 1 + (int)lib_arg->data.numVal];
 
+    }
+}
+
+void libfunc_strtonum(){
+
+    unsigned n = avm_totalactuals();
+    if(n != 1){
+        char * buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "one argument (not %d) expected in 'strtonum'!", n);
+        avm_error(buffer, currLine);
+        free(buffer);
+    }
+    else{
+        avm_memcell_clear(&retval);
+        avm_memcell *lib_arg = avm_getactual(0);  //argument of 'libfunc' function
+        
+        if(lib_arg->type != string_m){
+            char * buffer = malloc(sizeof(char) * 128);
+            sprintf(buffer, "'strtonum' takes only string arguments! not" YEL" %s" RESET, typeStrings[lib_arg->type]);
+            avm_error(buffer, currLine);
+            free(buffer);
+        }
+        
+        char *endptr;
+        double val = strtod(lib_arg->data.strVal, &endptr);
+        
+        if(endptr == lib_arg->data.strVal){
+            char * buffer = malloc(sizeof(char) * 128);
+            sprintf(buffer, "argument of 'strtonum' is not a number!");
+            avm_warning(buffer, currLine);
+            free(buffer);
+            retval.type = nil_m;
+        }
+        else{
+            retval.type = number_m;
+            retval.data.numVal = val;
+        }
     }
 }

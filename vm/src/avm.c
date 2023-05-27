@@ -85,7 +85,7 @@ void execute_cycle(){
         if(pc == oldPC) //if pc chnged in execute, then it was a jump so we must not increase it
             ++pc;
         
-       print_vm_state();
+       //print_vm_state();
     }
 }
 
@@ -101,6 +101,7 @@ void avm_initialize(){
     avm_registerlibfunc("typeof", libfunc_typeof);
     avm_registerlibfunc("totalarguments", libfunc_totalarguments);
     avm_registerlibfunc("argument", libfunc_argument);
+    avm_registerlibfunc("strtonum", libfunc_strtonum);
 
 }
 

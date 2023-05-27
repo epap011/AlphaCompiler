@@ -52,7 +52,6 @@ void libfunc_print(void);
 void libfunc_typeof(void);
 void libfunc_totalarguments(void);
 void libfunc_argument(void);
-
-//bonus lib funcs
+void libfunc_strtonum(void);
 
 #endif // AVM_HELPERS_H
