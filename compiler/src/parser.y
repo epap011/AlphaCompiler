@@ -351,8 +351,8 @@ com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"co
                 | "," IDENT com_id_opt {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
                 ;
 
-ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT, yyout, $1, scope, yylineno);     $$ = $2;}
-                | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno); $$ = $4;}
+ifstmt          : ifprefix stmt %prec LP_ELSE   {$$ = manage_ifstmt     (DEBUG_PRINT, yyout, $1, $2, scope, yylineno);}
+                | ifprefix stmt elseprefix stmt {$$ = manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $2, $3, $4, scope, yylineno);}
                 ;
 
 ifprefix        : IF "(" expr ")" {short_circuit_emits($3,yylineno,scope); $$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}

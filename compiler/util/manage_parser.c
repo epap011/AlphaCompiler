@@ -1102,19 +1102,23 @@ expr* manage_stmtList_stmt_stmtList(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_ifstmt(int debug, FILE* out, int ifprefix, unsigned int scope, unsigned int line) {
+stmt_t* manage_ifstmt(int debug, FILE* out, int ifprefix, stmt_t* stmt, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"IF ( expr ) stmt"CYN"-> "RESET"ifstmt  \n");
 
     patchLabel(ifprefix, nextQuadLabel());
-    return NULL;
+    return stmt;
 }
 
-expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line) {
+stmt_t* manage_ifstmt_else(int debug, FILE* out, int ifprefix, stmt_t* stmt1, int elseprefix, stmt_t* stmt2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"IF ( expr ) stmt ELSE stmt"CYN"-> "RESET"ifstmt \n");
 
     patchLabel(ifprefix, elseprefix+1);
     patchLabel(elseprefix, nextQuadLabel());
-    return NULL;
+
+    stmt_t *stmt     = make_stmt();
+    stmt->break_list = merge_list(stmt1->break_list, stmt2->break_list);
+    stmt->cont_list  = merge_list(stmt1->cont_list , stmt2->cont_list);
+    return stmt;
 }
 
 int manage_ifprefix(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {
