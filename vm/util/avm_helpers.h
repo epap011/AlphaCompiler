@@ -54,5 +54,7 @@ void libfunc_totalarguments(void);
 void libfunc_argument(void);
 void libfunc_strtonum(void);
 void libfunc_sqrt(void);
+void libfunc_cos(void);
+void libfunc_sin(void);
 
 #endif // AVM_HELPERS_H

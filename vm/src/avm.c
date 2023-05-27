@@ -105,6 +105,8 @@ void avm_initialize(){
     avm_registerlibfunc("argument", libfunc_argument);
     avm_registerlibfunc("strtonum", libfunc_strtonum);
     avm_registerlibfunc("sqrt", libfunc_sqrt);
+    avm_registerlibfunc("cos", libfunc_cos);
+    avm_registerlibfunc("sin", libfunc_sin);
 
 }
 

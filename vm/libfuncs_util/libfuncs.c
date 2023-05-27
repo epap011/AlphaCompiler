@@ -194,3 +194,43 @@ void libfunc_sqrt(){
         }
     }
 }
+
+void cos_sin_impl(char * func){
+    
+    unsigned n = avm_totalactuals();
+    if(n != 1){
+        char * buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "one argument (not %d) expected in '%s'!", n, func);
+        avm_error(buffer, currLine);
+        free(buffer);
+    }
+
+    avm_memcell *lib_arg = avm_getactual(0);  
+
+    if(lib_arg->type != number_m){
+        char * buffer = malloc(sizeof(char) * 128);
+        sprintf(buffer, "'%s' takes only numeric arguments! not" YEL" %s" RESET, func, typeStrings[lib_arg->type]);
+        avm_error(buffer, currLine);
+        free(buffer);
+    }
+    else{
+        avm_memcell_clear(&retval);
+        retval.type = number_m;
+        if(!strcmp(func, "sin"))
+            retval.data.numVal = sin(lib_arg->data.numVal);
+        else
+            retval.data.numVal = cos(lib_arg->data.numVal);
+    }
+}
+
+void libfunc_cos(){
+
+    cos_sin_impl("cos");
+
+}
+
+void libfunc_sin(){
+
+    cos_sin_impl("sin");
+}
+
