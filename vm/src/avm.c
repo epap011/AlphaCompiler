@@ -5,6 +5,8 @@
 #include "avm_helpers.h"
 #include "executions/execute.h"
 
+#define MAX_INT 10
+
 avm_memcell ax, bx, cx;
 avm_memcell retval;
 unsigned top, topsp;
@@ -213,8 +215,11 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
         case formal_a: {
             if( arg->val < avm_totalactuals())
                 return &stack[topsp+AVM_STACKENV_SIZE+(avm_totalactuals() - arg->val)];
-            else
-                avm_error("Formal argument %d is out of bounds", arg->val);
+            else{
+                char* s = malloc(strlen("Formal argument  is out of bounds") + MAX_INT + 1);
+                sprintf(s, "Formal argument %d is out of bounds", arg->val);
+                avm_error(s, arg->val);
+            }
         }
         case retval_a: return &retval;
         case number_a: {
