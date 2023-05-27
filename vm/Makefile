@@ -8,6 +8,7 @@ LIB_DIR  = libfuncs_util
 #Compiler, Compiler flags and C Pre Processor Flags
 CC       = gcc
 CFLAGS   = -Wall
+MATHFLAGS = -lm
 CPPFLAGS = -Ilib -Iutil -Isrc
 
 #File names (no extension)
@@ -24,7 +25,7 @@ LIBFUNCS  	= libfuncs
 #---< Final Targets >---#
 
 avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXEC_ARITH).o $(EXEC_RELOP).o $(EXEC_FUNCS).o $(EXEC_TABLES).o $(LIBFUNCS).o | $(BIN_DIR) 
-	 $(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o
+	 $(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o $(MATHFLAGS)
 
 #---< Object Targets >---#
 $(MAIN).o: $(SRC_DIR)/$(MAIN).c | $(OBJ_DIR)
