@@ -76,6 +76,12 @@ void printQuads(){
         if(quads[i].result != NULL) {
             if(quads[i].result->sym != NULL)
                 printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->sym->name);
+            else if(quads[i].result->type == constnum_e) {
+                if(is_int(quads[i].result->numConst))
+                    printf(" RESULT: "YEL"%-15d"RESET"\t", (int) quads[i].result->numConst);
+                else
+                    printf(" RESULT: "YEL"%-15.5f"RESET"\t", quads[i].result->numConst);
+            }
         }
         else
             printf(" RESULT: "RED"NULL           "RESET"\t");   
