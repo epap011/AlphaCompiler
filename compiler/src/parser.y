@@ -352,7 +352,7 @@ com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"co
                 ;
 
 ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT, yyout, $1, scope, yylineno);     $$ = $2;}
-                | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+                | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno); $$ = $4;}
                 ;
 
 ifprefix        : IF "(" expr ")" {short_circuit_emits($3,yylineno,scope); $$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}
