@@ -408,7 +408,7 @@ void key_value_pair_to_string(avm_table_bucket* bucket, char* content, unsigned*
 char* table_tostring(avm_memcell* m) {
     assert(m->type == table_m);
     avm_table* table = m->data.tableVal;
-    unsigned i, totals_found, total_chars = 0, initial_capacity = 65536;
+    unsigned i = 0, totals_found = 0, total_chars = 0, initial_capacity = 65536;
     char* content = (char*) malloc(sizeof(char) * initial_capacity);
 
     sprintf(content, "[ "); total_chars += 2;
