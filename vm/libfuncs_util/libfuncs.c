@@ -147,7 +147,7 @@ void libfunc_strtonum(){
         char *endptr;
         double val = strtod(lib_arg->data.strVal, &endptr);
         
-        if(endptr == lib_arg->data.strVal){
+        if(*endptr != '\0'){
             char * buffer = malloc(sizeof(char) * 128);
             sprintf(buffer, "convertion failed! argument of 'strtonum' is not a number!");
             avm_warning(buffer, currLine);
