@@ -18,6 +18,7 @@
 #define NUM_OF_LIB_FUNC 12
 
 int formal_flag = 0;    //Usage: if a function is already declared (or is a built-in ), we don't want to insert it in the symbol table and wee need this flag to skip the formal arguments as well
+extern int formal_offsets_flag;
 extern FILE * out_file;
 int error_flag = 0;    //If we have ANY error, we dont produce quad/binary files
 
@@ -144,35 +145,24 @@ Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsi
 
 void flip_offsets(linked_list* offsets){
     if(!offsets) return;
-    linked_list* reverse_list = create_linked_list();
-    node *reverse, *forward = offsets->head;
+    if(offsets->size < 2) return;    //If there is only one element, no need to reverse
+    int i=0;
     Stack* rev_stack = new_stack();
     void *tmp;
-    while(forward){
-        push(rev_stack, forward->data);
-        forward = forward->next;
-    }
-    while( (tmp = pop(rev_stack)) ){
-        Symbol* tmp_sym = (Symbol*)tmp;
+
+    while(i < offsets->size){
         unsigned* tmp_offset = malloc(sizeof(unsigned));
-        *tmp_offset = tmp_sym->offset;
-        insert_at_the_end_to_linked_list(reverse_list, tmp_offset);
+        *tmp_offset = ((Symbol*)(get_from_linked_list(offsets, i)))->offset;
+        push(rev_stack, tmp_offset);
+        i++;
+    }
+    i=0;
+    while( (tmp = pop(rev_stack))){
+        ((Symbol*)(get_from_linked_list(offsets, i)))->offset = *(unsigned*)tmp;
+        i++;
     }
 
-    reverse = reverse_list->head;
-    forward = offsets->head;
-
-    while(forward && reverse){
-        Symbol *tmp_sym = (Symbol*)(forward->data);
-        tmp_sym->offset = *((unsigned*)(reverse->data));
-        forward = forward->next;
-        reverse = reverse->next;
-    }
-
-    free_linked_list(reverse_list);
-    free_linked_list(offsets);
     free(rev_stack);
-
 }
 
 void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
@@ -199,7 +189,8 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
     symbol_table_insert(symTable, symbol);
 
     if(!formal_offsets) {formal_offsets = create_linked_list();}
-    insert_at_the_beginning_to_linked_list(formal_offsets, symbol);
+    insert_at_the_end_to_linked_list(formal_offsets, symbol);
+    formal_offsets_flag = 1;
 
 }
 
