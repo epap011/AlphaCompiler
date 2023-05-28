@@ -28,6 +28,8 @@
 
     Symbol* func_sym;
 
+     linked_list *formal_offsets;
+
     //variable offset counters
     extern unsigned int programVarOffset;
     extern unsigned int functionLocalOffset;
@@ -267,7 +269,9 @@ funcdef         : funcprefix
                                                             enterScopeSpace(); 
                                                             resetFormalArgsOffset();
                                                         } 
-                                    idlist ")"          {decrease_scope(&scope); enterScopeSpace(); resetFunctionLocalsOffset();
+                                    idlist ")"          {
+                                                        flip_offsets(formal_offsets);
+                                                        decrease_scope(&scope); enterScopeSpace(); resetFunctionLocalsOffset();
                                                         return_flag++;
                                                         is_function_block=1;
                                                         is_function_active++;

@@ -21,6 +21,8 @@ int formal_flag = 0;    //Usage: if a function is already declared (or is a buil
 extern FILE * out_file;
 int error_flag = 0;    //If we have ANY error, we dont produce quad/binary files
 
+extern linked_list *formal_offsets;
+
 char lib_functions[NUM_OF_LIB_FUNC][19] = {
     "print",
     "input",
@@ -140,6 +142,39 @@ Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsi
     return symbol;
 }
 
+void flip_offsets(linked_list* offsets){
+    if(!offsets) return;
+    linked_list* reverse_list = create_linked_list();
+    node *reverse, *forward = offsets->head;
+    Stack* rev_stack = new_stack();
+    void *tmp;
+    while(forward){
+        push(rev_stack, forward->data);
+        forward = forward->next;
+    }
+    while( (tmp = pop(rev_stack)) ){
+        Symbol* tmp_sym = (Symbol*)tmp;
+        unsigned* tmp_offset = malloc(sizeof(unsigned));
+        *tmp_offset = tmp_sym->offset;
+        insert_at_the_end_to_linked_list(reverse_list, tmp_offset);
+    }
+
+    reverse = reverse_list->head;
+    forward = offsets->head;
+
+    while(forward && reverse){
+        Symbol *tmp_sym = (Symbol*)(forward->data);
+        tmp_sym->offset = *((unsigned*)(reverse->data));
+        forward = forward->next;
+        reverse = reverse->next;
+    }
+
+    free_linked_list(reverse_list);
+    free_linked_list(offsets);
+    free(rev_stack);
+
+}
+
 void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
 
     if(formal_flag)
@@ -162,6 +197,9 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
     incCurrScopeOffset();
 
     symbol_table_insert(symTable, symbol);
+
+    if(!formal_offsets) {formal_offsets = create_linked_list();}
+    insert_at_the_beginning_to_linked_list(formal_offsets, symbol);
 
 }
 

@@ -22,6 +22,7 @@ Symbol* manage_local_id (SymbolTable* symTable, const char* id, unsigned int sco
 Symbol* manage_global_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 Symbol* manage_funcdef  (SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
+void flip_offsets(linked_list* offsets);
 void manage_lvalue_inc(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 void manage_lvalue_dec(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned int line);

@@ -218,10 +218,10 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
         case local_a: return &stack[topsp-arg->val];
         case formal_a: {
             if( arg->val < avm_totalactuals())
-                return &stack[topsp+AVM_STACKENV_SIZE+(avm_totalactuals() - arg->val)];
+                return &stack[topsp+AVM_STACKENV_SIZE+1+arg->val];
             else{
-                char* s = malloc(strlen("Formal argument  is out of bounds") + MAX_INT + 1);
-                sprintf(s, "Formal argument %d is out of bounds", arg->val);
+                char* s = malloc(strlen("Stack corruption: formal argument  is out of bounds") + MAX_INT + 1);
+                sprintf(s, "Stack corruption: formal argument %d is out of bounds", arg->val);
                 avm_error(s, arg->val);
             }
         }
