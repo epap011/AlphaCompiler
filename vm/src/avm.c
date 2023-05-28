@@ -414,30 +414,54 @@ char* table_tostring(avm_memcell* m) {
     char* content = (char*) malloc(sizeof(char) * initial_capacity);
 
     sprintf(content, "[ "); total_chars += 2;
-    while(totals_found < table->total || i < AVM_TABLE_HASHSIZE){
-        if(table->numIndexed[i] != NULL){
-            key_value_pair_to_string(table->numIndexed[i], content, &total_chars, &initial_capacity);
-            totals_found++;
+    while(totals_found < table->total && i < AVM_TABLE_HASHSIZE){
+        if(table->total_nums > 0 && table->numIndexed[i] != NULL){
+            avm_table_bucket* temp = table->numIndexed[i];
+            while(temp != NULL){
+                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                totals_found++;
+                temp = temp->next;
+            }
         }
-        if(table->strIndexed[i] != NULL){
-            key_value_pair_to_string(table->strIndexed[i], content, &total_chars, &initial_capacity);
-            totals_found++;
+        if(table->total_strings > 0 && table->strIndexed[i] != NULL) {
+            avm_table_bucket* temp = table->strIndexed[i];
+            while(temp != NULL){
+                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                totals_found++;
+                temp = temp->next;
+            }
         }
-        if(table->boolIndexed[i] != NULL){
-            key_value_pair_to_string(table->boolIndexed[i], content, &total_chars, &initial_capacity);
-            totals_found++;
+        if(table->total_bools > 0 && table->boolIndexed[i] != NULL) {
+            avm_table_bucket* temp = table->boolIndexed[i];
+            while(temp != NULL){
+                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                totals_found++;
+                temp = temp->next;
+            }
         }
-        if(table->tableIndexed[i] != NULL){
-            key_value_pair_to_string(table->tableIndexed[i], content, &total_chars, &initial_capacity);
-            totals_found++;
+        if(table->total_tables > 0 && table->tableIndexed[i] != NULL) {
+            avm_table_bucket* temp = table->tableIndexed[i];
+            while(temp != NULL){
+                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                totals_found++;
+                temp = temp->next;
+            }
         }
-        if(table->userfuncIndexed[i] != NULL){
-            key_value_pair_to_string(table->userfuncIndexed[i], content, &total_chars, &initial_capacity);
-            totals_found++;
+        if(table->total_userfuncs > 0 && table->userfuncIndexed[i] != NULL) {
+            avm_table_bucket* temp = table->userfuncIndexed[i];
+            while(temp != NULL){
+                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                totals_found++;
+                temp = temp->next;
+            }
         }
-        if(table->libfuncIndexed[i] != NULL){
-            key_value_pair_to_string(table->libfuncIndexed[i] , content, &total_chars, &initial_capacity);
-            totals_found++;
+        if(table->total_libfuncs > 0 && table->libfuncIndexed[i] != NULL) {
+            avm_table_bucket* temp = table->libfuncIndexed[i];
+            while(temp != NULL){
+                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                totals_found++;
+                temp = temp->next;
+            }
         }
         i++;
     }

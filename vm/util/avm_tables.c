@@ -6,7 +6,14 @@ avm_table *avm_table_new(){
     avm_table *t = (avm_table *)malloc(sizeof(avm_table));
     AVM_WIPEOUT(*t);
 
-    t->refCounter = t->total = 0;
+    t->refCounter      = 0;
+    t->total           = 0;
+    t->total_nums      = 0;
+    t->total_strings   = 0;
+    t->total_bools     = 0;
+    t->total_libfuncs  = 0;
+    t->total_userfuncs = 0;
+    t->total_tables    = 0;
     avm_table_buckets_init(t->numIndexed);
     avm_table_buckets_init(t->strIndexed);
     avm_table_buckets_init(t->boolIndexed);
@@ -81,36 +88,42 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = (unsigned)bucket->key.data.numVal % AVM_TABLE_HASHSIZE;
         bucket->next = table->numIndexed[hash_key];
         table->numIndexed[hash_key] = bucket;
+        table->total_nums++;
     }
     else
     if(bucket->key.type == string_m) {
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
         bucket->next = table->strIndexed[hash_key];
         table->strIndexed[hash_key] = bucket;
+        table->total_strings++;
     }
     else
     if(bucket->key.type == bool_m) {
         hash_key = (unsigned)bucket->key.data.boolVal % 2;
         bucket->next = table->boolIndexed[hash_key];
         table->boolIndexed[hash_key] = bucket;
+        table->total_bools++;
     }
     else
     if(bucket->key.type == libfunc_m) {
         hash_key = hash_string(bucket->key.data.libfuncVal) % AVM_TABLE_HASHSIZE;
         bucket->next = table->libfuncIndexed[hash_key];
         table->libfuncIndexed[hash_key] = bucket;
+        table->total_libfuncs++;
     }
     else
     if(bucket->key.type == userfunc_m) {
         hash_key = (unsigned)bucket->key.data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
         bucket->next = table->userfuncIndexed[hash_key];
         table->userfuncIndexed[hash_key] = bucket;
+        table->total_userfuncs++;
     }
     else
     if(bucket->key.type == table_m) {
         hash_key = (long unsigned)bucket->key.data.tableVal % AVM_TABLE_HASHSIZE;
         bucket->next = table->tableIndexed[hash_key];
         table->tableIndexed[hash_key] = bucket;
+        table->total_tables++;
     }
     else
         assert(0);
