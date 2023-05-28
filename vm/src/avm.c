@@ -403,7 +403,6 @@ void key_value_pair_to_string(avm_table_bucket* bucket, char* content, unsigned*
         content = realloc(content, sizeof(char) * *initial_capacity);
     }
     strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
-    free(key); free(value);
 }
 
 char* table_tostring(avm_memcell* m) {

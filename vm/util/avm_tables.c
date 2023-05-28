@@ -46,7 +46,7 @@ void avm_table_buckets_destroy(avm_table_bucket **p){
             avm_memcell_clear(&del->value);
             free(del);
         }
-        p[i] = (avm_table_bucket *)0; //this thing causes a weird bug with the stack and memory of the table
+        //p[i] = (avm_table_bucket *)0; //this thing causes a weird bug with the stack and memory of the table
     }
 }
 
