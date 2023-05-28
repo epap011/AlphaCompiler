@@ -127,7 +127,7 @@ memclear_func_t memclarFuncs[] = {
 
 void memclear_string(avm_memcell *m){
     assert(m->data.strVal);
-    free(m->data.strVal);
+  //  free(m->data.strVal);
 }
 
 void memclear_table(avm_memcell *m){
@@ -401,6 +401,7 @@ void key_value_pair_to_string(avm_table_bucket* bucket, char* content, unsigned*
     char* value = avm_tostring(&bucket->value);
     *total_chars += strlen(key) + strlen(value) + 6;
     if(*total_chars > *initial_capacity){
+        printf("realloc fileee\n");
         *initial_capacity *= 2;
         content = realloc(content, sizeof(char) * *initial_capacity);
     }
@@ -410,7 +411,7 @@ void key_value_pair_to_string(avm_table_bucket* bucket, char* content, unsigned*
 char* table_tostring(avm_memcell* m) {
     assert(m->type == table_m);
     avm_table* table = m->data.tableVal;
-    unsigned i = 0, totals_found = 0, total_chars = 0, initial_capacity = 65536;
+    unsigned i = 0, totals_found = 0, total_chars = 0, initial_capacity = 1073741824;
     char* content = (char*) malloc(sizeof(char) * initial_capacity);
 
     sprintf(content, "[ "); total_chars += 2;

@@ -149,7 +149,7 @@ void libfunc_strtonum(){
         
         if(endptr == lib_arg->data.strVal){
             char * buffer = malloc(sizeof(char) * 128);
-            sprintf(buffer, "convertion faile! argument of 'strtonum' is not a number!");
+            sprintf(buffer, "convertion failed! argument of 'strtonum' is not a number!");
             avm_warning(buffer, currLine);
             free(buffer);
             retval.type = nil_m;
@@ -206,7 +206,7 @@ void cos_sin_impl(char * func){
         free(buffer);
         return ;
     }
-
+    avm_memcell_clear(&retval);
     avm_memcell *lib_arg = avm_getactual(0);  
 
     if(lib_arg->type != number_m){
@@ -216,12 +216,13 @@ void cos_sin_impl(char * func){
         free(buffer);
     }
     else{
-        avm_memcell_clear(&retval);
+       
         retval.type = number_m;
+        double rad = (M_PI / 180.0) * lib_arg->data.numVal;
         if(!strcmp(func, "sin"))
-            retval.data.numVal = sin(lib_arg->data.numVal);
+            retval.data.numVal = sin(rad);
         else
-            retval.data.numVal = cos(lib_arg->data.numVal);
+            retval.data.numVal = cos(rad);
     }
 }
 
