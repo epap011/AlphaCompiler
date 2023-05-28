@@ -7,7 +7,12 @@ avm_table *avm_table_new(){
     AVM_WIPEOUT(*t);
 
     t->refCounter = t->total = 0;
+    avm_table_buckets_init(t->numIndexed);
     avm_table_buckets_init(t->strIndexed);
+    avm_table_buckets_init(t->boolIndexed);
+    avm_table_buckets_init(t->libfuncIndexed);
+    avm_table_buckets_init(t->userfuncIndexed);
+    avm_table_buckets_init(t->tableIndexed);
     return t;
 }
 
@@ -41,8 +46,7 @@ void avm_table_buckets_destroy(avm_table_bucket **p){
             avm_memcell_clear(&del->value);
             free(del);
         }
-        p[i] = (avm_table_bucket *)0;
-
+        p[i] = (avm_table_bucket *)0; //this thing causes a weird bug with the stack and memory of the table
     }
 }
 
@@ -65,7 +69,14 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     bucket->key   = *key;
     bucket->value = *value;
 
-    unsigned hash_key;
+    if(key->type == table_m)   {
+        avm_table_inc_refcounter(key->data.tableVal);
+    }
+    if(value->type == table_m) {
+        avm_table_inc_refcounter(value->data.tableVal);
+    }
+
+    unsigned hash_key = 0;
     if(bucket->key.type == number_m) {
         hash_key = (unsigned)bucket->key.data.numVal % AVM_TABLE_HASHSIZE;
         bucket->next = table->numIndexed[hash_key];
@@ -142,7 +153,6 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         }
         assert(0);
     }
-
     table->total++;
 }
 
