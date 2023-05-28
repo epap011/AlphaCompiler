@@ -110,6 +110,7 @@ void avm_initialize(){
     avm_registerlibfunc("input", libfunc_input);
     avm_registerlibfunc("objecttotalmembers", libfunc_objecttotalmembers);
     avm_registerlibfunc("objectmemberkeys", libfunc_objectmemberkeys);
+    avm_registerlibfunc("objectcopy", libfunc_objectcopy);
 }
 
 memclear_func_t memclarFuncs[] = {
