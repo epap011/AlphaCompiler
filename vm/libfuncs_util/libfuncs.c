@@ -275,7 +275,7 @@ void libfunc_input(){
         char *endptr;
         double val = strtod(str, &endptr);
 
-        if(endptr == str){                  //second way of user to give a string without quotes
+        if(*endptr != '\0'){                  //second way of user to give a string without quotes
             retval.type = string_m;
             retval.data.strVal = strdup(str);
         }
