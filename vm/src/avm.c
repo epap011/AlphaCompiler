@@ -109,6 +109,7 @@ void avm_initialize(){
     avm_registerlibfunc("sin", libfunc_sin);
     avm_registerlibfunc("input", libfunc_input);
     avm_registerlibfunc("objecttotalmembers", libfunc_objecttotalmembers);
+    avm_registerlibfunc("objectmemberkeys", libfunc_objectmemberkeys);
 }
 
 memclear_func_t memclarFuncs[] = {

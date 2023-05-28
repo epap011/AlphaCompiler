@@ -58,5 +58,6 @@ void libfunc_cos(void);
 void libfunc_sin(void);
 void libfunc_input(void);
 void libfunc_objecttotalmembers(void);
+void libfunc_objectmemberkeys(void);
 
 #endif // AVM_HELPERS_H
