@@ -87,7 +87,7 @@ void execute_cycle(){
         if(pc == oldPC) //if pc chnged in execute, then it was a jump so we must not increase it
             ++pc;
         
-       //print_vm_state();
+        if(DEBUG) print_vm_state();
     }
 }
 
@@ -394,50 +394,48 @@ char* bool_tostring(avm_memcell* m){
         return strdup("false");
 }
 
+void key_value_pair_to_string(avm_table_bucket* bucket, char* content, unsigned* total_chars, unsigned* initial_capacity){
+    char* key   = avm_tostring(&bucket->key);
+    char* value = avm_tostring(&bucket->value);
+    *total_chars += strlen(key) + strlen(value) + 6;
+    if(*total_chars > *initial_capacity){
+        *initial_capacity *= 2;
+        content = realloc(content, sizeof(char) * *initial_capacity);
+    }
+    strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+    free(key); free(value);
+}
+
 char* table_tostring(avm_memcell* m) {
     assert(m->type == table_m);
     avm_table* table = m->data.tableVal;
-    char* content = (char*) malloc(sizeof(char) * 16384);
-    int i = 0, totals_found = 0;
+    unsigned i, totals_found, total_chars = 0, initial_capacity = 65536;
+    char* content = (char*) malloc(sizeof(char) * initial_capacity);
 
-    sprintf(content, "[ ");
+    sprintf(content, "[ "); total_chars += 2;
     while(totals_found < table->total || i < AVM_TABLE_HASHSIZE){
-        char* key;
-        char* value;
         if(table->numIndexed[i] != NULL){
-            key   = avm_tostring(&table->numIndexed[i]->key);
-            value = avm_tostring(&table->numIndexed[i]->value);
-            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            key_value_pair_to_string(table->numIndexed[i], content, &total_chars, &initial_capacity);
             totals_found++;
         }
         if(table->strIndexed[i] != NULL){
-            key   = avm_tostring(&table->strIndexed[i]->key);
-            value = avm_tostring(&table->strIndexed[i]->value);
-            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            key_value_pair_to_string(table->strIndexed[i], content, &total_chars, &initial_capacity);
             totals_found++;
         }
         if(table->boolIndexed[i] != NULL){
-            key   = avm_tostring(&table->boolIndexed[i]->key);
-            value = avm_tostring(&table->boolIndexed[i]->value);
-            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            key_value_pair_to_string(table->boolIndexed[i], content, &total_chars, &initial_capacity);
             totals_found++;
         }
         if(table->tableIndexed[i] != NULL){
-            key   = avm_tostring(&table->tableIndexed[i]->key);
-            value = avm_tostring(&table->tableIndexed[i]->value);
-            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            key_value_pair_to_string(table->tableIndexed[i], content, &total_chars, &initial_capacity);
             totals_found++;
         }
         if(table->userfuncIndexed[i] != NULL){
-            key   = avm_tostring(&table->userfuncIndexed[i]->key);
-            value = avm_tostring(&table->userfuncIndexed[i]->value);
-            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            key_value_pair_to_string(table->userfuncIndexed[i], content, &total_chars, &initial_capacity);
             totals_found++;
         }
         if(table->libfuncIndexed[i] != NULL){
-            key   = avm_tostring(&table->libfuncIndexed[i]->key);
-            value = avm_tostring(&table->libfuncIndexed[i]->value);
-            strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+            key_value_pair_to_string(table->libfuncIndexed[i] , content, &total_chars, &initial_capacity);
             totals_found++;
         }
         i++;
@@ -478,6 +476,3 @@ avm_memcell* avm_getactual(unsigned i){
     assert(i < avm_totalactuals());
     return &stack[topsp + AVM_STACKENV_SIZE + 1 + i];
 }
-
-
-
