@@ -219,10 +219,14 @@ void cos_sin_impl(char * func){
        
         retval.type = number_m;
         double rad = (M_PI / 180.0) * lib_arg->data.numVal;
-        if(!strcmp(func, "sin"))
-            retval.data.numVal = sin(rad);
-        else
-            retval.data.numVal = cos(rad);
+        if(!strcmp(func, "sin")){
+            double x = sin(rad);
+            retval.data.numVal = round(x * 100000) / 100000; // Round to 5 decimal places because c is a garbage ass language, even stupider than js
+        }
+        else{
+            double x = cos(rad);
+            retval.data.numVal = round(x * 100000) / 100000;
+        }
     }
 }
 
