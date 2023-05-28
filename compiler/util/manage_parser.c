@@ -18,11 +18,11 @@
 #define NUM_OF_LIB_FUNC 12
 
 int formal_flag = 0;    //Usage: if a function is already declared (or is a built-in ), we don't want to insert it in the symbol table and wee need this flag to skip the formal arguments as well
-extern int formal_offsets_flag;
 extern FILE * out_file;
 int error_flag = 0;    //If we have ANY error, we dont produce quad/binary files
 
-extern linked_list *formal_offsets;
+extern unsigned formal_counter;
+extern Stack *formal_stack;
 
 char lib_functions[NUM_OF_LIB_FUNC][19] = {
     "print",
@@ -143,28 +143,6 @@ Symbol* manage_funcdef(SymbolTable* symTable, char* id, unsigned int scope, unsi
     return symbol;
 }
 
-void flip_offsets(linked_list* offsets){
-    if(!offsets) return;
-    if(offsets->size < 2) return;    //If there is only one element, no need to reverse
-    int i=0;
-    Stack* rev_stack = new_stack();
-    void *tmp;
-
-    while(i < offsets->size){
-        unsigned* tmp_offset = malloc(sizeof(unsigned));
-        *tmp_offset = ((Symbol*)(get_from_linked_list(offsets, i)))->offset;
-        push(rev_stack, tmp_offset);
-        i++;
-    }
-    i=0;
-    while( (tmp = pop(rev_stack))){
-        ((Symbol*)(get_from_linked_list(offsets, i)))->offset = *(unsigned*)tmp;
-        i++;
-    }
-
-    free(rev_stack);
-}
-
 void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line){
 
     if(formal_flag)
@@ -185,12 +163,31 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
     char* name     = strdup(id);
     Symbol* symbol = symbol_create(name, scope, line, FORMAL, VAR, var_s, currScopeSpace(), currScopeOffset());
     incCurrScopeOffset();
-
+    
     symbol_table_insert(symTable, symbol);
 
-    if(!formal_offsets) {formal_offsets = create_linked_list();}
-    insert_at_the_end_to_linked_list(formal_offsets, symbol);
-    formal_offsets_flag = 1;
+    if(!formal_stack)
+        formal_stack = new_stack();
+
+    formal_counter++;
+    push(formal_stack, symbol);
+
+}
+
+void flip_formal_offsets(){
+
+    if(!formal_stack){
+        formal_stack = new_stack();
+        return;
+    }
+
+    unsigned t_formal_counter = formal_counter;
+    for(int i=0; i<formal_counter; i++){
+        Symbol* tmp_symbol = (Symbol*)pop(formal_stack);
+        tmp_symbol->offset = tmp_symbol->offset - (--t_formal_counter) +i;
+    }
+
+    formal_counter = 0;
 
 }
 
