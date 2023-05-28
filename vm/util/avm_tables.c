@@ -67,6 +67,78 @@ void avm_table_dec_refcounter(avm_table *t){
         avm_table_destroy(t);
 }
 
+int key_exists(avm_table_bucket* bucket_head, avm_memcell key) {
+    avm_table_bucket* temp = bucket_head;
+    while(temp) {
+        if(temp->key.type == key.type) {
+            if(temp->key.type == number_m && temp->key.data.numVal == key.data.numVal) 
+                return 1;
+            else
+            if(temp->key.type == string_m && strcmp(temp->key.data.strVal, key.data.strVal) == 0) 
+                return 1;
+            else
+            if(temp->key.type == bool_m && temp->key.data.boolVal == key.data.boolVal) 
+                return 1;
+            else
+            if(temp->key.type == libfunc_m && strcmp(temp->key.data.libfuncVal, key.data.libfuncVal) == 0) 
+                return 1;
+            else
+            if(temp->key.type == userfunc_m && temp->key.data.funcVal->iaddress == key.data.funcVal->iaddress) 
+                return 1;
+            else
+            if(temp->key.type == table_m && temp->key.data.tableVal == key.data.tableVal) 
+                return 1;
+        }
+        temp = temp->next;
+    }
+    return 0;
+}
+
+int overwrite_key(avm_table_bucket* bucket_head, avm_memcell key, avm_memcell value) {
+    avm_table_bucket* temp = bucket_head;
+    while(temp) {
+        if(temp->key.type == key.type) {
+            if(temp->key.type == number_m && temp->key.data.numVal == key.data.numVal) {
+                avm_memcell_clear(&temp->value);
+                temp->value = value;
+                return 1;
+            }
+            else
+            if(temp->key.type == string_m && strcmp(temp->key.data.strVal, key.data.strVal) == 0) {
+                avm_memcell_clear(&temp->value);
+                temp->value = value;
+                return 1;
+            }
+            else
+            if(temp->key.type == bool_m && temp->key.data.boolVal == key.data.boolVal) {
+                avm_memcell_clear(&temp->value);
+                temp->value = value;
+                return 1;
+            }
+            else
+            if(temp->key.type == libfunc_m && strcmp(temp->key.data.libfuncVal, key.data.libfuncVal) == 0) {
+                avm_memcell_clear(&temp->value);
+                temp->value = value;
+                return 1;
+            }
+            else
+            if(temp->key.type == userfunc_m && temp->key.data.funcVal->iaddress == key.data.funcVal->iaddress) {
+                avm_memcell_clear(&temp->value);
+                temp->value = value;
+                return 1;
+            }
+            else
+            if(temp->key.type == table_m && temp->key.data.tableVal == key.data.tableVal) {
+                avm_memcell_clear(&temp->value);
+                temp->value = value;
+                return 1;
+            }
+        }
+        temp = temp->next;
+    }
+    return 0;
+}
+
 void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     assert(table); assert(key); assert(value);
 
@@ -86,6 +158,10 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     unsigned hash_key = 0;
     if(bucket->key.type == number_m) {
         hash_key = (unsigned)bucket->key.data.numVal % AVM_TABLE_HASHSIZE;
+        if(key_exists(table->numIndexed[hash_key], bucket->key)) {
+            overwrite_key(table->numIndexed[hash_key], bucket->key, bucket->value);
+            return;
+        }
         bucket->next = table->numIndexed[hash_key];
         table->numIndexed[hash_key] = bucket;
         table->total_nums++;
@@ -93,6 +169,11 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == string_m) {
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
+        if(key_exists(table->strIndexed[hash_key], bucket->key)) {
+            if(overwrite_key(table->strIndexed[hash_key], bucket->key, bucket->value)) {
+                return;
+            }
+        }
         bucket->next = table->strIndexed[hash_key];
         table->strIndexed[hash_key] = bucket;
         table->total_strings++;
@@ -100,6 +181,11 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == bool_m) {
         hash_key = (unsigned)bucket->key.data.boolVal % 2;
+        if(key_exists(table->boolIndexed[hash_key], bucket->key)) {
+            if(overwrite_key(table->boolIndexed[hash_key], bucket->key, bucket->value)) {
+                return;
+            }
+        }
         bucket->next = table->boolIndexed[hash_key];
         table->boolIndexed[hash_key] = bucket;
         table->total_bools++;
@@ -107,6 +193,11 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == libfunc_m) {
         hash_key = hash_string(bucket->key.data.libfuncVal) % AVM_TABLE_HASHSIZE;
+        if(key_exists(table->libfuncIndexed[hash_key], bucket->key)) {
+            if(overwrite_key(table->libfuncIndexed[hash_key], bucket->key, bucket->value)) {
+                return;
+            }
+        }
         bucket->next = table->libfuncIndexed[hash_key];
         table->libfuncIndexed[hash_key] = bucket;
         table->total_libfuncs++;
@@ -114,6 +205,11 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == userfunc_m) {
         hash_key = (unsigned)bucket->key.data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
+        if(key_exists(table->userfuncIndexed[hash_key], bucket->key)) {
+            if(overwrite_key(table->userfuncIndexed[hash_key], bucket->key, bucket->value)) {
+                return;
+            }
+        }
         bucket->next = table->userfuncIndexed[hash_key];
         table->userfuncIndexed[hash_key] = bucket;
         table->total_userfuncs++;
@@ -121,6 +217,11 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     else
     if(bucket->key.type == table_m) {
         hash_key = (long unsigned)bucket->key.data.tableVal % AVM_TABLE_HASHSIZE;
+        if(key_exists(table->tableIndexed[hash_key], bucket->key)) {
+            if(overwrite_key(table->tableIndexed[hash_key], bucket->key, bucket->value)) {
+                return;
+            }
+        }
         bucket->next = table->tableIndexed[hash_key];
         table->tableIndexed[hash_key] = bucket;
         table->total_tables++;
