@@ -127,7 +127,7 @@ memclear_func_t memclarFuncs[] = {
 
 void memclear_string(avm_memcell *m){
     assert(m->data.strVal);
-  //  free(m->data.strVal);
+    //free(m->data.strVal);
 }
 
 void memclear_table(avm_memcell *m){
@@ -396,30 +396,31 @@ char* bool_tostring(avm_memcell* m){
         return strdup("false");
 }
 
-void key_value_pair_to_string(avm_table_bucket* bucket, char* content, unsigned* total_chars, unsigned* initial_capacity){
+void key_value_pair_to_string(avm_table_bucket* bucket, char** content, unsigned* total_chars, unsigned* initial_capacity){
     char* key   = avm_tostring(&bucket->key);
     char* value = avm_tostring(&bucket->value);
-    *total_chars += strlen(key) + strlen(value) + 6;
+    *total_chars += strlen(key) + 1 + strlen(value) + 1 + 6;
     if(*total_chars > *initial_capacity){
-        printf("realloc fileee\n");
-        *initial_capacity *= 2;
-        content = realloc(content, sizeof(char) * *initial_capacity);
+        *initial_capacity = *total_chars * 2;
+        *content = (char*) realloc(*content, sizeof(char) * *initial_capacity);
     }
-    strcat(content, "{"); strcat(content, key); strcat(content, " : "); strcat(content, value); strcat(content, "} ");
+    strcat(*content, "{"); strcat(*content, key); strcat(*content, " : "); strcat(*content, value); strcat(*content, "} ");
 }
 
 char* table_tostring(avm_memcell* m) {
     assert(m->type == table_m);
     avm_table* table = m->data.tableVal;
-    unsigned i = 0, totals_found = 0, total_chars = 0, initial_capacity = 1073741824;
+    unsigned i = 0, totals_found = 0, total_chars = 0, initial_capacity = 16384;
+    
     char* content = (char*) malloc(sizeof(char) * initial_capacity);
+    memset((void *)content, 0, initial_capacity);
 
     sprintf(content, "[ "); total_chars += 2;
     while(totals_found < table->total && i < AVM_TABLE_HASHSIZE){
         if(table->total_nums > 0 && table->numIndexed[i] != NULL){
             avm_table_bucket* temp = table->numIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
                 totals_found++;
                 temp = temp->next;
             }
@@ -427,7 +428,7 @@ char* table_tostring(avm_memcell* m) {
         if(table->total_strings > 0 && table->strIndexed[i] != NULL) {
             avm_table_bucket* temp = table->strIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
                 totals_found++;
                 temp = temp->next;
             }
@@ -435,7 +436,7 @@ char* table_tostring(avm_memcell* m) {
         if(table->total_bools > 0 && table->boolIndexed[i] != NULL) {
             avm_table_bucket* temp = table->boolIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
                 totals_found++;
                 temp = temp->next;
             }
@@ -443,7 +444,7 @@ char* table_tostring(avm_memcell* m) {
         if(table->total_tables > 0 && table->tableIndexed[i] != NULL) {
             avm_table_bucket* temp = table->tableIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
                 totals_found++;
                 temp = temp->next;
             }
@@ -451,7 +452,7 @@ char* table_tostring(avm_memcell* m) {
         if(table->total_userfuncs > 0 && table->userfuncIndexed[i] != NULL) {
             avm_table_bucket* temp = table->userfuncIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
                 totals_found++;
                 temp = temp->next;
             }
@@ -459,7 +460,7 @@ char* table_tostring(avm_memcell* m) {
         if(table->total_libfuncs > 0 && table->libfuncIndexed[i] != NULL) {
             avm_table_bucket* temp = table->libfuncIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, content, &total_chars, &initial_capacity);
+                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
                 totals_found++;
                 temp = temp->next;
             }
@@ -467,7 +468,7 @@ char* table_tostring(avm_memcell* m) {
         i++;
     }
 
-    strcat(content, "]");
+    strcat(content, "]\0");
     return content;
 }
 
