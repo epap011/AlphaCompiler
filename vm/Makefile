@@ -2,12 +2,12 @@ SRC_DIR  = src
 BIN_DIR  = bin
 OBJ_DIR  = obj
 UTIL_DIR = util
-EXEC_DIR = src/executions
-LIB_DIR  = libfuncs_util
+EXEC_DIR = src/executors
+LIB_DIR  = src/libfuncs
 
 #Compiler, Compiler flags and C Pre Processor Flags
 CC       = gcc
-CFLAGS   = -Wall
+CFLAGS   = -Wall -g
 MATHFLAGS = -lm
 CPPFLAGS = -Ilib -Iutil -Isrc
 

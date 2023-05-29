@@ -3,7 +3,7 @@
 #include "parse_binfile.h"
 #include "avm_types.h"
 #include "avm_helpers.h"
-#include "executions/execute.h"
+#include "executors/execute.h"
 
 #define MAX_INT 10
 
