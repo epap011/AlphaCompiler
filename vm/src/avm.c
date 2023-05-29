@@ -359,7 +359,7 @@ void avm_call_functor(avm_table* t){
     avm_memcell* f = avm_table_getelem(t, &cx);
     if(!f)
         avm_error("in calling table: no '()' element found!", currLine);
-    else if(f->type != table_m)
+    else if(f->type == table_m)
         avm_call_functor(f->data.tableVal);
     else if(f->type == userfunc_m){
         avm_push_table_arg(t);
