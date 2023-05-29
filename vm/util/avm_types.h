@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "instructions.h"
+#include "avm_types.h"
 
 #define RED   "\x1b[31m"
 #define GRN   "\x1b[32m"
@@ -19,6 +19,46 @@
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
 
+enum vmopcode{
+    assign_vm, add_vm, sub_vm, mul_vm, div_vm, mod_vm,  
+    jmp_vm, jeq_vm, jne_vm, jle_vm, jge_vm, jlt_vm, jgt_vm, 
+    call_vm, pusharg_vm, funcenter_vm, funcexit_vm, 
+    newtable_vm, tablegetelem_vm, tablesetelem_vm, nop_vm
+};
+
+enum vmarg_t{
+    global_a,
+    local_a,
+    formal_a,
+    number_a,
+    string_a,
+    bool_a,
+    nil_a,
+    userfunc_a,
+    libfunc_a,
+    retval_a,
+    label_a,
+    undef_a
+};
+
+typedef struct vmarg {
+    enum vmarg_t type;
+    unsigned val;
+} vmarg;
+
+typedef struct instuction {
+    enum vmopcode opcode;
+    vmarg* result;
+    vmarg* arg1;
+    vmarg* arg2;
+    unsigned int srcLine;
+} instruction;
+
+typedef struct user_func_t {
+    unsigned iaddress;
+    unsigned total_locals;
+    const char* name;
+} user_func_t;
 
 typedef enum avm_memcell_t {
     number_m ,
@@ -72,18 +112,6 @@ typedef struct avm_table {
     unsigned total_userfuncs;
     unsigned total_tables;
 }avm_table;
-
-
-avm_table *avm_table_new(void);
-void avm_table_destroy(avm_table *t);
-avm_memcell *avm_table_getelem(avm_table *t, avm_memcell *key);
-void avm_table_setelem(avm_table *t, avm_memcell *key, avm_memcell *value);
-
-void avm_table_buckets_init(avm_table_bucket **p);
-void avm_table_buckets_destroy(avm_table_bucket **p);
-
-void avm_table_inc_refcounter(avm_table *t);
-void avm_table_dec_refcounter(avm_table *t);
 
 void avm_memcell_clear(avm_memcell *m);
 void memclear_string(avm_memcell *m);

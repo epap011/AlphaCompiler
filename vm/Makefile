@@ -21,10 +21,14 @@ EXEC_RELOP 	= execute_relop
 EXEC_FUNCS 	= execute_funcs
 EXEC_TABLES = execute_tables
 LIBFUNCS  	= libfuncs
+HELPERS		= avm_helpers
+
+LIBFUNCS_SRC := $(wildcard src/libfuncs/*.c)
+LIBFUNCS_OBJ := $(patsubst src/libfuncs/%.c, obj/%.o, $(LIBFUNCS_SRC))
 
 #---< Final Targets >---#
 
-avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXEC_ARITH).o $(EXEC_RELOP).o $(EXEC_FUNCS).o $(EXEC_TABLES).o $(LIBFUNCS).o | $(BIN_DIR) 
+avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXEC_ARITH).o $(EXEC_RELOP).o $(EXEC_FUNCS).o $(EXEC_TABLES).o $(LIBFUNCS).o $(HELPERS).o $(LIBFUNCS_OBJ) | $(BIN_DIR) 
 	 $(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o $(MATHFLAGS)
 
 #---< Object Targets >---#
@@ -34,10 +38,10 @@ $(MAIN).o: $(SRC_DIR)/$(MAIN).c | $(OBJ_DIR)
 $(BINPARSE).o: $(UTIL_DIR)/$(BINPARSE).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
-$(STACK).o: $(UTIL_DIR)/$(STACK).c | $(OBJ_DIR)
+$(STACK).o: $(SRC_DIR)/stack/$(STACK).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
-$(TABLES).o: $(UTIL_DIR)/$(TABLES).c | $(OBJ_DIR)
+$(TABLES).o: $(SRC_DIR)/tables/$(TABLES).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
 $(EXEC_ARITH).o: $(EXEC_DIR)/$(EXEC_ARITH).c | $(OBJ_DIR)
@@ -53,7 +57,13 @@ $(EXEC_TABLES).o: $(EXEC_DIR)/$(EXEC_TABLES).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
 
 $(LIBFUNCS).o: $(LIB_DIR)/$(LIBFUNCS).c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@		
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+
+$(HELPERS).o: $(UTIL_DIR)/$(HELPERS).c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+
+$(LIBFUNCS_OBJ): $(OBJ_DIR)/%.o: $(LIB_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(BIN_DIR) $(OBJ_DIR):
 	mkdir -p $@

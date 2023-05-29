@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "avm_types.h"
-#include "instructions.h"
 
 void parse_bin_file(FILE* bin_file);
 char* get_string();

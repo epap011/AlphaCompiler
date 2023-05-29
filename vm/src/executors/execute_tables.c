@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "execute.h"
 #include "avm_helpers.h"
+#include "../tables/avm_tables.h"
 
 extern avm_memcell ax, bx, cx;
 extern avm_memcell retval;

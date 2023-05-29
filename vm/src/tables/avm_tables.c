@@ -1,5 +1,5 @@
 #include "avm_types.h"
-
+#include "avm_tables.h"
 
 avm_table *avm_table_new(){
 

@@ -1,5 +1,5 @@
 #include "parse_binfile.h"
-#include "avm_stack.h"
+#include "../src/stack/avm_stack.h"
 
 FILE* bin_file;
 

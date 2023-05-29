@@ -1,11 +1,10 @@
 #ifndef _EXECUTE_H_
 #define _EXECUTE_H_
 
-#include "instructions.h"
 #include <assert.h>
 #include <stdio.h>
 #include "avm_types.h"
-#include "avm_stack.h"
+#include "../stack/avm_stack.h"
 
 #define AVM_MAX_INSTRUCTIONS (unsigned) nop_vm
 

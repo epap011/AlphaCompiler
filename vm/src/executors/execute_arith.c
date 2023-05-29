@@ -1,4 +1,5 @@
 #include "execute.h"
+#include "../tables/avm_tables.h"
 
 extern avm_memcell ax, bx, cx;
 extern avm_memcell retval;
