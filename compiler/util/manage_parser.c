@@ -951,9 +951,14 @@ expr* manage_member_call_dot_ident(int debug, FILE* out, expr* call, char* id, i
     return e_for_name;
 }
 
-expr* manage_member_call_lbr_expr_rbr(int debug, FILE* out, expr* call, expr* expr1) {
+void manage_member_call_lbr_expr_rbr(int debug, FILE* out, expr* call, expr* expr1, expr** tableitem, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");
-    return NULL;
+    
+    call = emit_if_tableitem(call,scope,line);
+    (*tableitem) = new_expr(tableitem_e);
+    (*tableitem)->sym = call->sym;
+    (*tableitem)->index = expr1;
+    
 }
 
 expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out, unsigned int scope, unsigned int line, expr* lvalue, expr* elist) {
