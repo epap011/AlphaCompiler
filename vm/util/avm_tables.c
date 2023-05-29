@@ -329,7 +329,7 @@ avm_memcell* avm_table_getelem(avm_table *table, avm_memcell *key) {
     }
     else   
         assert(0);
-    
+
     return (avm_memcell *)0;
 }
 
