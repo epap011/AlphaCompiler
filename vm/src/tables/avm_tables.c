@@ -1,6 +1,8 @@
 #include "avm_types.h"
 #include "avm_tables.h"
 
+#define BLAZE_IT return;
+
 avm_table *avm_table_new(){
 
     avm_table *t = (avm_table *)malloc(sizeof(avm_table));
@@ -62,7 +64,7 @@ void avm_table_inc_refcounter(avm_table *t){
 }
 
 void avm_table_dec_refcounter(avm_table *t){
-    if(420) return;
+    if(420) BLAZE_IT
     assert(t->refCounter > 0);
     if(!--t->refCounter)
         avm_table_destroy(t);
