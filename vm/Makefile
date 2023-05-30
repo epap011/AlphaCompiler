@@ -26,9 +26,12 @@ HELPERS		= avm_helpers
 LIBFUNCS_SRC := $(wildcard src/libfuncs/*.c)
 LIBFUNCS_OBJ := $(patsubst src/libfuncs/%.c, obj/%.o, $(LIBFUNCS_SRC))
 
+EXECUTORS_SRC := $(wildcard src/executors/*.c)
+EXECUTORS_OBJ := $(patsubst src/executors/%.c, obj/%.o, $(EXECUTORS_SRC))
+
 #---< Final Targets >---#
 
-avm: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXEC_ARITH).o $(EXEC_RELOP).o $(EXEC_FUNCS).o $(EXEC_TABLES).o $(LIBFUNCS).o $(HELPERS).o $(LIBFUNCS_OBJ) | $(BIN_DIR) 
+alpha: $(MAIN).o $(BINPARSE).o $(STACK).o $(TABLES).o $(EXECUTORS_OBJ) $(LIBFUNCS).o $(HELPERS).o $(LIBFUNCS_OBJ) | $(BIN_DIR) 
 	 $(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o $(MATHFLAGS)
 
 #---< Object Targets >---#
@@ -44,17 +47,8 @@ $(STACK).o: $(SRC_DIR)/stack/$(STACK).c | $(OBJ_DIR)
 $(TABLES).o: $(SRC_DIR)/tables/$(TABLES).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
 
-$(EXEC_ARITH).o: $(EXEC_DIR)/$(EXEC_ARITH).c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
-
-$(EXEC_RELOP).o: $(EXEC_DIR)/$(EXEC_RELOP).c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
-
-$(EXEC_FUNCS).o: $(EXEC_DIR)/$(EXEC_FUNCS).c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@	
-
-$(EXEC_TABLES).o: $(EXEC_DIR)/$(EXEC_TABLES).c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@
+$(EXECUTORS_OBJ): $(OBJ_DIR)/%.o: $(EXEC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(LIBFUNCS).o: $(LIB_DIR)/$(LIBFUNCS).c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $(OBJ_DIR)/$@

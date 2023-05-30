@@ -30,7 +30,7 @@ TCGENERATOR = target_code_generator
 
 #---< Final Targets >---#
 # exe target is the final product of the phase 2
-ac: $(PARSER).o $(MANAGE).o $(MAIN).o $(LLIST).o $(SYMTABLE).o $(SCANNER).o $(STACK).o $(YACC_UTIL).o $(QUAD).o $(EXPRESSION).o $(SCOPE_SPACE).o $(PANOKLIST).o $(TCGENERATOR).o | $(BIN_DIR) 
+alphac: $(PARSER).o $(MANAGE).o $(MAIN).o $(LLIST).o $(SYMTABLE).o $(SCANNER).o $(STACK).o $(YACC_UTIL).o $(QUAD).o $(EXPRESSION).o $(SCOPE_SPACE).o $(PANOKLIST).o $(TCGENERATOR).o | $(BIN_DIR) 
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/$@ $(OBJ_DIR)/*.o
 
 #---< Object Targets >---#
