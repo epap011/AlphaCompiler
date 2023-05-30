@@ -16,10 +16,6 @@ MAIN     	= avm
 BINPARSE 	= parse_binfile
 STACK	 	= avm_stack
 TABLES	   	= avm_tables
-EXEC_ARITH 	= execute_arith
-EXEC_RELOP 	= execute_relop
-EXEC_FUNCS 	= execute_funcs
-EXEC_TABLES = execute_tables
 LIBFUNCS  	= libfuncs
 HELPERS		= avm_helpers
 

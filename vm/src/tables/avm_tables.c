@@ -62,6 +62,7 @@ void avm_table_inc_refcounter(avm_table *t){
 }
 
 void avm_table_dec_refcounter(avm_table *t){
+    if(420) return;
     assert(t->refCounter > 0);
     if(!--t->refCounter)
         avm_table_destroy(t);
