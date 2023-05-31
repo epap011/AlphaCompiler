@@ -163,6 +163,8 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = (unsigned)bucket->key.data.numVal % AVM_TABLE_HASHSIZE;
         if(key_exists(table->numIndexed[hash_key], bucket->key)) {
             overwrite_key(table->numIndexed[hash_key], bucket->key, bucket->value);
+                if (bucket->value.type == nil_m)
+                    assert(--table->total >= 0);
             return;
         }
         bucket->next = table->numIndexed[hash_key];
@@ -174,6 +176,8 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = hash_string(bucket->key.data.strVal) % AVM_TABLE_HASHSIZE;
         if(key_exists(table->strIndexed[hash_key], bucket->key)) {
             if(overwrite_key(table->strIndexed[hash_key], bucket->key, bucket->value)) {
+                if (bucket->value.type == nil_m)
+                    assert(--table->total >= 0);
                 return;
             }
         }
@@ -186,6 +190,8 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = (unsigned)bucket->key.data.boolVal % 2;
         if(key_exists(table->boolIndexed[hash_key], bucket->key)) {
             if(overwrite_key(table->boolIndexed[hash_key], bucket->key, bucket->value)) {
+                if (bucket->value.type == nil_m)
+                    assert(--table->total >= 0);
                 return;
             }
         }
@@ -198,6 +204,8 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = hash_string(bucket->key.data.libfuncVal) % AVM_TABLE_HASHSIZE;
         if(key_exists(table->libfuncIndexed[hash_key], bucket->key)) {
             if(overwrite_key(table->libfuncIndexed[hash_key], bucket->key, bucket->value)) {
+                if (bucket->value.type == nil_m)
+                    assert(--table->total >= 0);
                 return;
             }
         }
@@ -210,6 +218,8 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = (unsigned)bucket->key.data.funcVal->iaddress % AVM_TABLE_HASHSIZE;
         if(key_exists(table->userfuncIndexed[hash_key], bucket->key)) {
             if(overwrite_key(table->userfuncIndexed[hash_key], bucket->key, bucket->value)) {
+                if (bucket->value.type == nil_m)
+                    assert(--table->total >= 0);
                 return;
             }
         }
@@ -222,6 +232,8 @@ void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
         hash_key = (long unsigned)bucket->key.data.tableVal % AVM_TABLE_HASHSIZE;
         if(key_exists(table->tableIndexed[hash_key], bucket->key)) {
             if(overwrite_key(table->tableIndexed[hash_key], bucket->key, bucket->value)) {
+                if (bucket->value.type == nil_m)
+                    assert(--table->total >= 0);
                 return;
             }
         }
