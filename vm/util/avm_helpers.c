@@ -153,7 +153,7 @@ char* table_tostring(avm_memcell* m) {
 
 void memclear_string(avm_memcell *m){
     assert(m->data.strVal);
-    //free(m->data.strVal);
+    free(m->data.strVal);
 }
 
 void memclear_table(avm_memcell *m){

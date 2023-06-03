@@ -1,6 +1,7 @@
 #include "avm_helpers.h"
 #include "../stack/avm_stack.h"
 #include "../tables/avm_tables.h"
+#include "../executors/execute.h" 
 #include <math.h>
 
 extern int DEBUG;
@@ -47,8 +48,11 @@ void libfunc_argument(void){
             avm_error(buffer, currLine);
             free(buffer);
         }
-        else
-            retval = stack[prev_topsp + AVM_STACKENV_SIZE + 1 + (int)lib_arg->data.numVal];
-
+        else {
+            avm_memcell tmp = stack[prev_topsp + AVM_STACKENV_SIZE + 1 + (int)lib_arg->data.numVal];
+            if(tmp.type == string_m) avm_assign(&retval, &tmp);
+            else retval.data = tmp.data;
+            retval.type = tmp.type;
+        }
     }
 }
