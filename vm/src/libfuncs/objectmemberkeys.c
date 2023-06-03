@@ -66,7 +66,8 @@ void libfunc_objectmemberkeys(){
             }
             i++;
         }
+        avm_memcell_clear(&retval);
         retval.type = table_m;
         retval.data.tableVal = new_table;
-    }
+        avm_table_inc_refcounter(new_table);    }
 }
