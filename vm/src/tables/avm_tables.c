@@ -3,6 +3,61 @@
 
 #define BLAZE_IT return;
 
+//debug functions start
+
+#define MAX_INT 10
+#define TBL_DEBUG 0
+
+unsigned tbl_cnt = 0;
+
+extern unsigned currLine;
+
+typedef struct dbg_tbl{
+    char* name;
+    avm_table* tbl;
+    struct dbg_tbl* next;
+}dbg_tbl;
+
+dbg_tbl* dbg_tables = NULL;
+
+void dbg_add_table(char* name, avm_table* tbl){
+    dbg_tbl* new = (dbg_tbl*)malloc(sizeof(dbg_tbl));
+    
+    if(name)
+        new->name = strdup(name);
+    else
+        new->name = NULL;
+    new->tbl = tbl;
+    new->next = dbg_tables;
+    dbg_tables = new;
+}
+
+void dbg_table_baptize(char *name, avm_table* tbl){
+    dbg_tbl* temp = dbg_tables;
+    while(temp != NULL){
+        if(temp->tbl == tbl){
+            if(name)
+                temp->name = strdup(name);
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("Table %p is not in the debug list\n", tbl);
+}
+
+char* dbg_table_name(avm_table* tbl){
+    dbg_tbl* temp = dbg_tables;
+    while(temp != NULL){
+        if(temp->tbl == tbl){
+            return temp->name;
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+//debug functions end
+
 avm_table *avm_table_new(){
 
     avm_table *t = (avm_table *)malloc(sizeof(avm_table));
@@ -22,6 +77,14 @@ avm_table *avm_table_new(){
     avm_table_buckets_init(t->libfuncIndexed);
     avm_table_buckets_init(t->userfuncIndexed);
     avm_table_buckets_init(t->tableIndexed);
+    //debug start
+    if(TBL_DEBUG){
+        char tbl_name[5+MAX_INT+1];
+        sprintf(tbl_name,"_tbl_%d",++tbl_cnt);
+        dbg_add_table(tbl_name, t);
+        printf("create(%s)\trefCnt:(%d)\tline:%d\n", dbg_table_name(t) ? dbg_table_name(t) : "(null)", t->refCounter, currLine);
+    }
+    //debug end
     return t;
 }
 
@@ -59,14 +122,17 @@ void avm_table_buckets_destroy(avm_table_bucket **p){
 }
 
 void avm_table_inc_refcounter(avm_table *t){
+    if(TBL_DEBUG) printf("ref(%s)++\trefCnt:(%d -> %d)\tline:%d\n", dbg_table_name(t) ? dbg_table_name(t) : "(null)", t->refCounter, t->refCounter+1, currLine);
     ++t->refCounter;
 }
 
 void avm_table_dec_refcounter(avm_table *t){
-
+    if(TBL_DEBUG) printf("ref(%s)--\trefCnt:(%d -> %d)\tline:%d\n", dbg_table_name(t) ? dbg_table_name(t) : "(null)", t->refCounter, t->refCounter-1, currLine);
     assert(t->refCounter > 0);
-    if(!--t->refCounter)
+    if(!--t->refCounter){
+        if(TBL_DEBUG) printf("destroy(%s)\trefCnt:(%d ->doom)\tline:%d\n", dbg_table_name(t) ? dbg_table_name(t) : "(null)", t->refCounter, currLine);
         avm_table_destroy(t);
+    }
 }
 
 int key_exists(avm_table_bucket* bucket_head, avm_memcell key) {
@@ -144,11 +210,16 @@ int overwrite_key(avm_table_bucket* bucket_head, avm_memcell key, avm_memcell va
 void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     assert(table); assert(key); assert(value);
 
+    avm_memcell newval;
+    memcpy(&newval, value, sizeof(avm_memcell));
+    if(newval.type == string_m)
+        newval.data.strVal = strdup(newval.data.strVal);
+
     avm_table_bucket *bucket = (avm_table_bucket *)malloc(sizeof(avm_table_bucket));
     AVM_WIPEOUT(*bucket);
 
     bucket->key   = *key;
-    bucket->value = *value;
+    bucket->value = newval;
 
     if(key->type == table_m)   {
         avm_table_inc_refcounter(key->data.tableVal);
