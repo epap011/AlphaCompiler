@@ -12,15 +12,16 @@ extern char * typeStrings[];
 
 void libfunc_strtonum(){
 
+    avm_memcell_clear(&retval);
     unsigned n = avm_totalactuals();
     if(n != 1){
         char * buffer = malloc(sizeof(char) * 128);
         sprintf(buffer, "one argument (not %d) expected in 'strtonum'!", n);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
     }
     else{
-        avm_memcell_clear(&retval);
         avm_memcell *lib_arg = avm_getactual(0);  //argument of 'libfunc' function
         
         if(lib_arg->type != string_m){
@@ -28,6 +29,7 @@ void libfunc_strtonum(){
             sprintf(buffer, "'strtonum' takes only string arguments! not" YEL" %s" RESET, typeStrings[lib_arg->type]);
             avm_error(buffer, currLine);
             free(buffer);
+            retval.type = nil_m;
         }
         
         char *endptr;

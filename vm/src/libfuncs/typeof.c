@@ -13,15 +13,16 @@ extern char * typeStrings[];
 void libfunc_typeof(void){
     
     unsigned n = avm_totalactuals();
+    avm_memcell_clear(&retval);
 
     if(n != 1){
         char * buffer = malloc(sizeof(char) * 128);
         sprintf(buffer, "one argument (not %d) expected in 'typeof'!", n);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
     }
     else{
-        avm_memcell_clear(&retval);
         retval.type = string_m;
         retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
     }

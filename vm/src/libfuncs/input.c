@@ -12,12 +12,14 @@ extern char * typeStrings[];
 
 void libfunc_input(){
 
+    avm_memcell_clear(&retval);
     unsigned n = avm_totalactuals();
     if(n > 0){
         char * buffer = malloc(sizeof(char) * 128);
         sprintf(buffer, "no arguments expected in 'input'!");
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
         return;
     }
 
@@ -27,7 +29,6 @@ void libfunc_input(){
 
    str[strcspn(str, "\n")] = '\0'; //remove newline
 
-    avm_memcell_clear(&retval);
 
     if(str[0] == '"' && str[strlen(str) -1] == '"'){  //first way of user to give a string inside quotes
         retval.type = string_m;

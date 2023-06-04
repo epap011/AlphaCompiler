@@ -12,12 +12,14 @@ extern char * typeStrings[];
 
 void libfunc_objectcopy(){
 
+    avm_memcell_clear(&retval);
     unsigned n = avm_totalactuals();
     if(n != 1){
         char * buffer = malloc(sizeof(char) * 128);
         sprintf(buffer, "one argument (not %d) expected in 'objectcopy'!", n);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
         return ;
     }
 
@@ -28,6 +30,7 @@ void libfunc_objectcopy(){
         sprintf(buffer, "'objectcopy' takes only table arguments! not" YEL" %s" RESET, typeStrings[lib_arg->type]);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
     }
     else{
         avm_table *old_table = lib_arg->data.tableVal;
@@ -64,5 +67,6 @@ void libfunc_objectcopy(){
         }
         retval.type = table_m;
         retval.data.tableVal = new_table;
+        avm_table_inc_refcounter(new_table);
     }
 }

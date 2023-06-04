@@ -12,12 +12,14 @@ extern char * typeStrings[];
 
 void libfunc_objectmemberkeys(){
 
+    avm_memcell_clear(&retval);
     unsigned n = avm_totalactuals();
     if(n != 1){
         char * buffer = malloc(sizeof(char) * 128);
         sprintf(buffer, "one argument (not %d) expected in 'objectmemberkeys'!", n);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
         return ;
     }
 
@@ -28,6 +30,7 @@ void libfunc_objectmemberkeys(){
         sprintf(buffer, "'objectmemberkeys' takes only table arguments! not" YEL" %s" RESET, typeStrings[lib_arg->type]);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
     }
     else{
 
@@ -66,7 +69,6 @@ void libfunc_objectmemberkeys(){
             }
             i++;
         }
-        avm_memcell_clear(&retval);
         retval.type = table_m;
         retval.data.tableVal = new_table;
         avm_table_inc_refcounter(new_table);    }

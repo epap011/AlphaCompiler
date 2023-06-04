@@ -12,12 +12,14 @@ extern char * typeStrings[];
 
 void libfunc_objecttotalmembers(){
 
+    avm_memcell_clear(&retval);
     unsigned n = avm_totalactuals();
     if(n != 1){
         char * buffer = malloc(sizeof(char) * 128);
         sprintf(buffer, "one argument (not %d) expected in 'objecttotalmembers'!", n);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
         return;
     }
 
@@ -28,9 +30,9 @@ void libfunc_objecttotalmembers(){
         sprintf(buffer, "'objecttotalmembers' takes only table arguments! not" YEL" %s" RESET, typeStrings[lib_arg->type]);
         avm_error(buffer, currLine);
         free(buffer);
+        retval.type = nil_m;
     }
     else{
-        avm_memcell_clear(&retval);
         retval.type = number_m;
         retval.data.numVal = lib_arg->data.tableVal->total;
     }

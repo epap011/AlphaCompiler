@@ -1,7 +1,7 @@
 #include "avm_helpers.h"
 #include "../stack/avm_stack.h"
 #include "../tables/avm_tables.h"
-#include "../executors/execute.h" 
+#include "../executors/execute.h"
 #include <math.h>
 
 extern int DEBUG;
@@ -13,7 +13,7 @@ extern char * typeStrings[];
 
 void libfunc_argument(void){
     unsigned prev_topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
-    avm_memcell_clear(&retval);
+        avm_memcell_clear(&retval);
 
     if(!prev_topsp){    
         char * buffer = malloc(sizeof(char) * 128);
@@ -30,7 +30,8 @@ void libfunc_argument(void){
             sprintf(buffer, "one argument (not %d) expected in 'argument'!", n);
             avm_error(buffer, currLine);
             free(buffer);
-            return ;
+            retval.type = nil_m;
+            return;
         }
 
         unsigned totalArgs = avm_get_envvalue(prev_topsp + AVM_NUMACTUALS_OFFSET);
@@ -40,19 +41,19 @@ void libfunc_argument(void){
             char * buffer = malloc(sizeof(char) * 128);
             sprintf(buffer, "'argument' takes only numeric arguments! not" YEL" %s" RESET, typeStrings[lib_arg->type]);
             avm_error(buffer, currLine);
+            retval.type = nil_m;
             free(buffer);
         }
         else if(lib_arg->data.numVal < 0 || lib_arg->data.numVal > totalArgs){
             char * buffer = malloc(sizeof(char) * 128);
             sprintf(buffer, "argument must be in range [0, %d]!", totalArgs);
             avm_error(buffer, currLine);
+            retval.type = nil_m;
             free(buffer);
         }
         else {
             avm_memcell tmp = stack[prev_topsp + AVM_STACKENV_SIZE + 1 + (int)lib_arg->data.numVal];
-            if(tmp.type == string_m) avm_assign(&retval, &tmp);
-            else retval.data = tmp.data;
-            retval.type = tmp.type;
+            avm_assign(&retval, &tmp);
         }
     }
 }
