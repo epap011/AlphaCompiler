@@ -210,15 +210,18 @@ int overwrite_key(avm_table_bucket* bucket_head, avm_memcell key, avm_memcell va
 void avm_table_setelem(avm_table *table, avm_memcell *key, avm_memcell *value) {
     assert(table); assert(key); assert(value);
 
-    avm_memcell newval;
+    avm_memcell newval, newkey;
     memcpy(&newval, value, sizeof(avm_memcell));
+    memcpy(&newkey, key, sizeof(avm_memcell));
     if(newval.type == string_m)
         newval.data.strVal = strdup(newval.data.strVal);
+    if(newkey.type == string_m)
+        newkey.data.strVal = strdup(newkey.data.strVal);
 
     avm_table_bucket *bucket = (avm_table_bucket *)malloc(sizeof(avm_table_bucket));
     AVM_WIPEOUT(*bucket);
 
-    bucket->key   = *key;
+    bucket->key   = newkey;
     bucket->value = newval;
 
     if(key->type == table_m)   {
