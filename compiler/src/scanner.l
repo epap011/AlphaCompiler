@@ -208,5 +208,7 @@ char * replace_escape_chars(char* str, int length){
         
         i++; j++;
     }
+    new_str[j] = '\0';
+    
     return new_str;
 }

@@ -22,6 +22,7 @@ Symbol* manage_local_id (SymbolTable* symTable, const char* id, unsigned int sco
 Symbol* manage_global_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 Symbol* manage_funcdef  (SymbolTable* symTable, char* id, unsigned int scope, unsigned int line);
 void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
+void flip_formal_offsets(void);
 void manage_lvalue_inc(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 void manage_lvalue_dec(SymbolTable* symTable, const char* id, unsigned int scope, unsigned int line);
 expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned int line);
@@ -37,7 +38,7 @@ int convert_to_bool(expr* expr);
 void manage_program        (int debug, FILE* out);
 
 stmt_t* manage_stmt_expr(int debug, FILE* out);
-stmt_t* manage_stmt_ifstmt    (int debug, FILE* out);
+stmt_t* manage_stmt_ifstmt    (int debug, FILE* out, stmt_t* ifstmt);
 stmt_t* manage_stmt_whilestmt (int debug, FILE* out);
 stmt_t* manage_stmt_forstmt   (int debug, FILE* out);
 stmt_t* manage_stmt_returnstmt(int debug, FILE* out);
@@ -95,7 +96,7 @@ expr* manage_lvalue_member      (int debug, FILE* out, expr* member);
 expr* manage_memeber_lvalue_dot_ident(int debug, FILE* out, expr* lvalue, char* name, unsigned int scope, unsigned int line, int* normalcall_skip);
 void  manage_memeber_lvalue_lbr_expr_rbr(int debug, FILE* out, expr* lvalue, expr* expr_list, expr** tableitem, unsigned int scope, unsigned int line);
 expr* manage_member_call_dot_ident      (int debug, FILE* out, expr* call,  char* id, int* normalcall_skip);
-expr* manage_member_call_lbr_expr_rbr   (int debug, FILE* out, expr* call, expr* expr1);
+void manage_member_call_lbr_expr_rbr   (int debug, FILE* out, expr* call, expr* expr1, expr** tableitem, unsigned int scope, unsigned int line);
 
 expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out, unsigned int scope, unsigned int line, expr* lvalue, expr* elist);
 expr* manage_call_lvalue_callsuffix     (int debug, FILE* out, SymbolTable* symTable, expr* lvalue, int* normalcall_skip, unsigned int scope, unsigned int line, callexpr* c_expr);
@@ -129,8 +130,8 @@ expr* manage_stmtList_stmt(int debug, FILE* out);
 expr* manage_stmtList_stmt_stmtList(int debug, FILE* out);
 expr* manage_stmtList_empty(int debug, FILE* out);
 
-expr* manage_ifstmt     (int debug, FILE* out, int ifprefix, unsigned int scope, unsigned int line);
-expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line);
+stmt_t* manage_ifstmt     (int debug, FILE* out, int ifprefix, stmt_t* stmt, unsigned int scope, unsigned int line);
+stmt_t* manage_ifstmt_else(int debug, FILE* out, int ifprefix, stmt_t* stmt1, int elseprefix, stmt_t* stmt2, unsigned int scope, unsigned int line);
 int   manage_ifprefix   (int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line);
 int   manage_elseprefix (int debug, FILE* out, unsigned int scope, unsigned int line);
 void short_circuit_emits(expr* result, unsigned int line, unsigned int scope);

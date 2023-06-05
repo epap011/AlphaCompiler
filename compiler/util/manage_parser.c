@@ -21,6 +21,9 @@ int formal_flag = 0;    //Usage: if a function is already declared (or is a buil
 extern FILE * out_file;
 int error_flag = 0;    //If we have ANY error, we dont produce quad/binary files
 
+extern unsigned formal_counter;
+extern Stack *formal_stack;
+
 char lib_functions[NUM_OF_LIB_FUNC][19] = {
     "print",
     "input",
@@ -160,8 +163,31 @@ void manage_formal_id(SymbolTable* symTable, const char* id, unsigned int scope,
     char* name     = strdup(id);
     Symbol* symbol = symbol_create(name, scope, line, FORMAL, VAR, var_s, currScopeSpace(), currScopeOffset());
     incCurrScopeOffset();
-
+    
     symbol_table_insert(symTable, symbol);
+
+    if(!formal_stack)
+        formal_stack = new_stack();
+
+    formal_counter++;
+    push(formal_stack, symbol);
+
+}
+
+void flip_formal_offsets(){
+
+    if(!formal_stack){
+        formal_stack = new_stack();
+        return;
+    }
+
+    unsigned t_formal_counter = formal_counter;
+    for(int i=0; i<formal_counter; i++){
+        Symbol* tmp_symbol = (Symbol*)pop(formal_stack);
+        tmp_symbol->offset = tmp_symbol->offset - (--t_formal_counter) +i;
+    }
+
+    formal_counter = 0;
 
 }
 
@@ -175,8 +201,8 @@ expr* manage_func_call(expr* lvalue, expr* elist, unsigned int scope, unsigned i
         temp = temp->next;
     }
     while( (temp = (expr*)pop(elist_s)) )
-        emit(param,temp,NULL,NULL,-1,line);
-    emit(call,func,NULL,NULL,-1,line);
+        emit(param,NULL,NULL,temp,-1,line);
+    emit(call,NULL,NULL,func,-1,line);
     expr* result = new_expr(var_e);
     result->sym = symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset());
     incCurrScopeOffset();
@@ -245,9 +271,9 @@ stmt_t* manage_stmt_expr(int debug, FILE* out) {
     return make_stmt();
 }
 
-stmt_t* manage_stmt_ifstmt(int debug, FILE* out) {
+stmt_t* manage_stmt_ifstmt(int debug, FILE* out, stmt_t* ifstmt) {
     if(debug) fprintf(out, MAG "Detected :" RESET"ifstmt"CYN" ->"RESET" stmt \n");
-    return make_stmt();
+    return ifstmt;
 }
 
 stmt_t* manage_stmt_whilestmt(int debug, FILE* out) {
@@ -330,7 +356,12 @@ expr* manage_arithop_emits(expr* expr1, expr* expr2, unsigned int scope, unsigne
 
         if(expr1->type == constnum_e && expr2->type == constnum_e) {
             result = new_expr(constnum_e);
-            result->numConst = expr1->numConst + expr2->numConst;
+
+            if(op == add) result->numConst = expr1->numConst + expr2->numConst;
+            else if(op == sub) result->numConst = expr1->numConst - expr2->numConst;
+            else if(op == mul) result->numConst = expr1->numConst * expr2->numConst;
+            else if(op == i_div) result->numConst = expr1->numConst / expr2->numConst;
+            else result->numConst = (int)expr1->numConst % (int)expr2->numConst;
         }
         else {
             result = new_expr(arithexpr_e);
@@ -606,7 +637,7 @@ expr* manage_term_uminus_expr(int debug, FILE* out, expr* u_expr, unsigned int s
     expr *result = new_expr(arithexpr_e);
     result->sym = symbol_table_insert(symTable, symbol_create(str_int_merge("_t",anonym_var_cnt++), scope, line, scope == 0 ? GLOBAL : _LOCAL, VAR, var_s, currScopeSpace(), currScopeOffset()));
     incCurrScopeOffset();
-    result->numConst = -(u_expr->numConst);
+    result->numConst = u_expr->numConst;
     emit(uminus, u_expr, NULL, result, -1, line);
 
     return result;
@@ -920,9 +951,14 @@ expr* manage_member_call_dot_ident(int debug, FILE* out, expr* call, char* id, i
     return e_for_name;
 }
 
-expr* manage_member_call_lbr_expr_rbr(int debug, FILE* out, expr* call, expr* expr1) {
+void manage_member_call_lbr_expr_rbr(int debug, FILE* out, expr* call, expr* expr1, expr** tableitem, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"call [ expr ]"CYN" ->"RESET" member \n");
-    return NULL;
+    
+    call = emit_if_tableitem(call,scope,line);
+    (*tableitem) = new_expr(tableitem_e);
+    (*tableitem)->sym = call->sym;
+    (*tableitem)->index = expr1;
+    
 }
 
 expr* manage_call_call_lpar_elist_rpar  (int debug, FILE* out, unsigned int scope, unsigned int line, expr* lvalue, expr* elist) {
@@ -1097,19 +1133,23 @@ expr* manage_stmtList_stmt_stmtList(int debug, FILE* out) {
     return NULL;
 }
 
-expr* manage_ifstmt(int debug, FILE* out, int ifprefix, unsigned int scope, unsigned int line) {
+stmt_t* manage_ifstmt(int debug, FILE* out, int ifprefix, stmt_t* stmt, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"IF ( expr ) stmt"CYN"-> "RESET"ifstmt  \n");
 
     patchLabel(ifprefix, nextQuadLabel());
-    return NULL;
+    return stmt;
 }
 
-expr* manage_ifstmt_else(int debug, FILE* out, int ifprefix, int elseprefix, unsigned int scope, unsigned int line) {
+stmt_t* manage_ifstmt_else(int debug, FILE* out, int ifprefix, stmt_t* stmt1, int elseprefix, stmt_t* stmt2, unsigned int scope, unsigned int line) {
     if(debug) fprintf(out, MAG "Detected :" RESET"IF ( expr ) stmt ELSE stmt"CYN"-> "RESET"ifstmt \n");
 
     patchLabel(ifprefix, elseprefix+1);
     patchLabel(elseprefix, nextQuadLabel());
-    return NULL;
+
+    stmt_t *stmt     = make_stmt();
+    stmt->break_list = merge_list(stmt1->break_list, stmt2->break_list);
+    stmt->cont_list  = merge_list(stmt1->cont_list , stmt2->cont_list);
+    return stmt;
 }
 
 int manage_ifprefix(int debug, FILE* out, expr* expr1, unsigned int scope, unsigned int line) {

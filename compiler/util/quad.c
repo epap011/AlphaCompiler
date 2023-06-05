@@ -76,6 +76,25 @@ void printQuads(){
         if(quads[i].result != NULL) {
             if(quads[i].result->sym != NULL)
                 printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->sym->name);
+            else if(quads[i].result->type == constnum_e) {
+                if(is_int(quads[i].result->numConst))
+                    printf(" RESULT: "YEL"%-15d"RESET"\t", (int) quads[i].result->numConst);
+                else
+                    printf(" RESULT: "YEL"%-15.5f"RESET"\t", quads[i].result->numConst);
+            }
+            else if(quads[i].result->type == constbool_e)
+                printf(" RESULT: "YEL"%-15s"RESET"\t", quads[i].result->boolConst ? "true" : "false");
+            else if(quads[i].result->type == conststring_e){
+                int spacing = 13 - count_str(quads[i].result->strConst);
+                printf(" RESULT: \""YEL"%s"RESET"\"", quads[i].result->strConst);
+                for(int i = 0; i < spacing; i++)
+                    printf(" ");
+                printf("\t");
+            }
+            else if(quads[i].result->type == nil_e)
+                printf(" RESULT: "YEL"nil            "RESET"\t");
+            else 
+                printf("RESULT: Something is wrong");
         }
         else
             printf(" RESULT: "RED"NULL           "RESET"\t");   

@@ -28,6 +28,9 @@
 
     Symbol* func_sym;
 
+    unsigned formal_counter;
+    Stack *formal_stack;
+
     //variable offset counters
     extern unsigned int programVarOffset;
     extern unsigned int functionLocalOffset;
@@ -119,7 +122,7 @@ program     : stmtList      {manage_program(DEBUG_PRINT, yyout);}
             ;   
 
 stmt        : expr ";"      {short_circuit_emits($1,yylineno,scope); $$ = manage_stmt_expr      (DEBUG_PRINT, yyout);}
-            | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout);}
+            | ifstmt        {$$ = manage_stmt_ifstmt    (DEBUG_PRINT, yyout, $1);}
             | whilestmt     {$$ = manage_stmt_whilestmt (DEBUG_PRINT, yyout);}
             | forstmt       {$$ = manage_stmt_forstmt   (DEBUG_PRINT, yyout);}
             | returnstmt    {$$ = manage_stmt_returnstmt(DEBUG_PRINT, yyout);}
@@ -176,7 +179,7 @@ lvalue      : IDENT                 {$$ = manage_lvalue_ident       (DEBUG_PRINT
 member      : lvalue "." IDENT      {$$ = manage_memeber_lvalue_dot_ident   (DEBUG_PRINT, yyout, $1, $3, scope, yylineno, &normcall_skip);}
             | lvalue "[" expr "]"   {     manage_memeber_lvalue_lbr_expr_rbr(DEBUG_PRINT, yyout, $1, $3, &$$, scope, yylineno);} /*dollar assignment happens in function*/
             | call "." IDENT        {$$ = manage_member_call_dot_ident      (DEBUG_PRINT, yyout, $1, $3, &normcall_skip);} 
-            | call "[" expr "]"     {     manage_member_call_lbr_expr_rbr   (DEBUG_PRINT, yyout, $1, $3);}
+            | call "[" expr "]"     {     manage_member_call_lbr_expr_rbr   (DEBUG_PRINT, yyout, $1, $3, &$$, scope, yylineno);} /*dollar assignment happens in function*/
             ;
 
 call        : call "(" elist ")"            {$$ = manage_call_call_lpar_elist_rpar(DEBUG_PRINT, yyout, scope, yylineno, $1, $3);}
@@ -267,7 +270,9 @@ funcdef         : funcprefix
                                                             enterScopeSpace(); 
                                                             resetFormalArgsOffset();
                                                         } 
-                                    idlist ")"          {decrease_scope(&scope); enterScopeSpace(); resetFunctionLocalsOffset();
+                                    idlist ")"          {
+                                                        flip_formal_offsets();
+                                                        decrease_scope(&scope); enterScopeSpace(); resetFunctionLocalsOffset();
                                                         return_flag++;
                                                         is_function_block=1;
                                                         is_function_active++;
@@ -351,8 +356,8 @@ com_id_opt      : /* empty */          {fprintf(yyout, MAG "Detected :" RESET"co
                 | "," IDENT com_id_opt {fprintf(yyout, MAG "Detected :" RESET", IDENT com_id_opt \n"); manage_formal_id(symTable, $2, scope, yylineno);}
                 ;
 
-ifstmt          : ifprefix stmt %prec LP_ELSE   {manage_ifstmt     (DEBUG_PRINT, yyout, $1, scope, yylineno);     $$ = $2;}
-                | ifprefix stmt elseprefix stmt {manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $3, scope, yylineno);}
+ifstmt          : ifprefix stmt %prec LP_ELSE   {$$ = manage_ifstmt     (DEBUG_PRINT, yyout, $1, $2, scope, yylineno);}
+                | ifprefix stmt elseprefix stmt {$$ = manage_ifstmt_else(DEBUG_PRINT, yyout, $1, $2, $3, $4, scope, yylineno);}
                 ;
 
 ifprefix        : IF "(" expr ")" {short_circuit_emits($3,yylineno,scope); $$ = manage_ifprefix(DEBUG_PRINT, yyout, $3, scope, yylineno);}

@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include "yacc_util.h"
 
+extern int error_flag;
+
 int yyerror(char* yaccProvideMessage) {
-    fprintf(stderr, "%s: at line %d, before token:%s\n",  yaccProvideMessage, yylineno, yytext);
-    fprintf(stderr , "INPUT NOT VALID\n");
+    fprintf(stderr, RED"%s:" RESET" at line " GRN "%d" RESET", before token:" YEL"%s" RESET"\n",  yaccProvideMessage, yylineno, yytext);
+    fprintf(stderr , RED"INPUT NOT VALID"RESET"\n");
+    error_flag = 1;
     return 0;
 }
 

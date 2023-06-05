@@ -7,7 +7,6 @@
 
 enum vmopcode{
     assign_vm, add_vm, sub_vm, mul_vm, div_vm, mod_vm, 
-    not_vm, 
     jmp_vm, jeq_vm, jne_vm, jle_vm, jge_vm, jlt_vm, jgt_vm, 
     call_vm, pusharg_vm, funcenter_vm, funcexit_vm, 
     newtable_vm, tablegetelem_vm, tablesetelem_vm, nop_vm
@@ -98,7 +97,5 @@ void print_libfuncs();
 void print_userfuncs();
 void generate_txt_file ();
 void generate_bin_file ();
-void parse_bin_file    ();
-char* get_string();
 
 #endif /* INSTRUCTION_H */
