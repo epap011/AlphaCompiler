@@ -42,30 +42,67 @@ void libfunc_objectmemberkeys(){
 
         int totals_found = 0, i = 0;
 
-        while(totals_found < old_table->total || i < AVM_TABLE_HASHSIZE){
+        while(totals_found < old_table->total && i < AVM_TABLE_HASHSIZE){
             if(old_table->numIndexed[i] != NULL){
-                new_key->data.numVal = totals_found++;
-                avm_table_setelem(new_table, new_key, &old_table->numIndexed[i]->key);
+                avm_table_bucket* temp = old_table->numIndexed[i];
+                while(temp != NULL){
+                    new_key->data.numVal = totals_found;
+                    avm_table_setelem(new_table, new_key, &old_table->numIndexed[i]->key);
+                    if(temp->value.type != nil_m)
+                        totals_found++;
+                    temp = temp->next;
+                }
+                
             }
             if(old_table->strIndexed[i] != NULL){
-                new_key->data.numVal = totals_found++;
-                avm_table_setelem(new_table, new_key, &old_table->strIndexed[i]->key);
+                avm_table_bucket* temp = old_table->strIndexed[i];
+                while(temp != NULL){
+                    new_key->data.numVal = totals_found;
+                    avm_table_setelem(new_table, new_key, &old_table->strIndexed[i]->key);
+                    if(temp->value.type != nil_m)
+                        totals_found++;
+                    temp = temp->next;
+                }
             }
             if(old_table->boolIndexed[i] != NULL){
-                new_key->data.numVal = totals_found++;
-                avm_table_setelem(new_table, new_key, &old_table->boolIndexed[i]->key);
+                avm_table_bucket* temp = old_table->boolIndexed[i];
+                while(temp != NULL){
+                    new_key->data.numVal = totals_found;
+                    avm_table_setelem(new_table, new_key, &old_table->boolIndexed[i]->key);
+                    if(temp->value.type != nil_m)
+                        totals_found++;
+                    temp = temp->next;
+                }
             }
             if(old_table->tableIndexed[i] != NULL){
-                new_key->data.numVal = totals_found++;
-                avm_table_setelem(new_table, new_key, &old_table->tableIndexed[i]->key);
+                avm_table_bucket* temp = old_table->tableIndexed[i];
+                while(temp != NULL){
+                    new_key->data.numVal = totals_found;
+                    avm_table_setelem(new_table, new_key, &old_table->tableIndexed[i]->key);
+                    if(temp->value.type != nil_m)
+                        totals_found++;
+                    temp = temp->next;
+                }
             }
             if(old_table->userfuncIndexed[i] != NULL){
-                new_key->data.numVal = totals_found++;
-                avm_table_setelem(new_table, new_key, &old_table->userfuncIndexed[i]->key);
+                avm_table_bucket* temp = old_table->userfuncIndexed[i];
+                while(temp != NULL){
+                    new_key->data.numVal = totals_found;
+                    avm_table_setelem(new_table, new_key, &old_table->userfuncIndexed[i]->key);
+                    if(temp->value.type != nil_m)
+                        totals_found++;
+                    temp = temp->next;
+                }
             }
             if(old_table->libfuncIndexed[i] != NULL){
-                new_key->data.numVal = totals_found++;
-                avm_table_setelem(new_table, new_key, &old_table->libfuncIndexed[i]->key);
+                avm_table_bucket* temp = old_table->libfuncIndexed[i];
+                while(temp != NULL){
+                    new_key->data.numVal = totals_found;
+                    avm_table_setelem(new_table, new_key, &old_table->libfuncIndexed[i]->key);
+                    if(temp->value.type != nil_m)
+                        totals_found++;
+                    temp = temp->next;
+                }
             }
             i++;
         }
