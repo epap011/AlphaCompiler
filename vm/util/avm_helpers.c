@@ -99,48 +99,60 @@ char* table_tostring(avm_memcell* m) {
         if(table->total_nums > 0 && table->numIndexed[i] != NULL){
             avm_table_bucket* temp = table->numIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
-                totals_found++;
+                if(temp->value.type != nil_m){
+                    key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
+                    totals_found++;
+                }
                 temp = temp->next;
             }
         }
         if(table->total_strings > 0 && table->strIndexed[i] != NULL) {
             avm_table_bucket* temp = table->strIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
-                totals_found++;
+                if(temp->value.type != nil_m){
+                    key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
+                    totals_found++;
+                }
                 temp = temp->next;
             }
         }
         if(table->total_bools > 0 && table->boolIndexed[i] != NULL) {
             avm_table_bucket* temp = table->boolIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
-                totals_found++;
+                if(temp->value.type != nil_m){
+                    key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
+                    totals_found++;
+                }
                 temp = temp->next;
             }
         }
         if(table->total_tables > 0 && table->tableIndexed[i] != NULL) {
             avm_table_bucket* temp = table->tableIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
-                totals_found++;
-                temp = temp->next;
+                if(temp->value.type != nil_m){
+                    key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
+                    totals_found++;
+                }
+                temp = temp->next;;
             }
         }
         if(table->total_userfuncs > 0 && table->userfuncIndexed[i] != NULL) {
             avm_table_bucket* temp = table->userfuncIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
-                totals_found++;
+                if(temp->value.type != nil_m){
+                    key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
+                    totals_found++;
+                }
                 temp = temp->next;
             }
         }
         if(table->total_libfuncs > 0 && table->libfuncIndexed[i] != NULL) {
             avm_table_bucket* temp = table->libfuncIndexed[i];
             while(temp != NULL){
-                key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
-                totals_found++;
+                if(temp->value.type != nil_m){
+                    key_value_pair_to_string(temp, &content, &total_chars, &initial_capacity);
+                    totals_found++;
+                }
                 temp = temp->next;
             }
         }
